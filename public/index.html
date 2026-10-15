@@ -24,9 +24,7 @@
   --c-mint:    #8ee0d0;
   --c-teal:    #5fc9b8;
   --c-yellow:  #f5d76e;
-  --c-cream:   #faf0d4;
   --c-blue:    #8bc4f0;
-  --c-sky:     #b8dcf5;
   --c-orange:  #f0a878;
 
   --danger:  #e05656;
@@ -58,11 +56,92 @@ body {
   font-weight: 500;
   letter-spacing: -0.1px;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   min-height: 100vh;
   overflow-x: hidden;
 }
 
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  transition: opacity 0.5s var(--ease), visibility 0.5s;
+}
+
+#loader.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.ld-mark {
+  width: 76px;
+  height: 76px;
+  background: var(--c-coral);
+  border: var(--bw-thick) solid var(--ink);
+  box-shadow: 6px 6px 0 var(--ink);
+  border-radius: var(--r);
+  display: grid;
+  place-items: center;
+  animation: ldFloat 1.4s ease-in-out infinite;
+}
+
+@keyframes ldFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.ld-mark svg {
+  color: var(--ink);
+}
+
+.ld-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+  text-transform: uppercase;
+}
+
+.ld-bar {
+  width: 220px;
+  height: 8px;
+  background: var(--bg-2);
+  border: var(--bw) solid var(--ink);
+  border-radius: 99px;
+  overflow: hidden;
+  box-shadow: var(--sh-sm);
+}
+
+.ld-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--c-coral);
+  transition: width 0.3s var(--ease);
+  border-radius: 99px;
+}
+
+.ld-hint {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ============================================================
+   SHELL
+   ============================================================ */
 .shell {
   max-width: 880px;
   margin: 0 auto;
@@ -153,7 +232,12 @@ body {
   letter-spacing: 1px;
   text-transform: uppercase;
   color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
+
+.live:hover { transform: translate(-2px, -2px); box-shadow: var(--sh); }
+.live:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
 
 .live .d {
   width: 8px;
@@ -162,6 +246,20 @@ body {
   border: 1.5px solid var(--ink);
   border-radius: 50%;
   flex-shrink: 0;
+}
+
+.live.degraded { background: var(--c-yellow); }
+.live.critical { background: var(--danger); color: #fff; }
+.live.critical .d { background: #fff; }
+
+.live.checking .d {
+  background: var(--c-orange);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 
 /* ============================================================
@@ -215,7 +313,7 @@ body {
 
 .tab {
   flex: 1;
-  min-width: 180px;
+  min-width: 160px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -270,20 +368,10 @@ body {
   text-transform: uppercase;
 }
 
-.tab.active {
-  background: var(--c-yellow);
-}
-.tab.active .tnum {
-  background: var(--ink);
-  color: var(--c-yellow);
-}
+.tab.active { background: var(--c-yellow); }
+.tab.active .tnum { background: var(--ink); color: var(--c-yellow); }
 .tab.active .tlabel .tsub { color: var(--ink-2); }
-
-.tab:not(.active):hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--sh);
-}
-
+.tab:not(.active):hover { transform: translate(-2px, -2px); box-shadow: var(--sh); }
 .tab:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
 
 /* ============================================================
@@ -411,7 +499,6 @@ body {
   background: var(--ok);
   border: 1.5px solid var(--ink);
   border-radius: 50%;
-  flex-shrink: 0;
 }
 
 @keyframes pillIn {
@@ -452,13 +539,8 @@ body {
   color: var(--ink);
 }
 
-.go:active:not(:disabled) {
-  transform: translate(1px, 1px);
-  box-shadow: 1px 1px 0 var(--ink);
-}
-
+.go:active:not(:disabled) { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
 .go:disabled { opacity: 0.55; cursor: wait; }
-
 .go svg { transition: transform 0.2s var(--ease); }
 .go:hover:not(:disabled) svg { transform: translateX(3px); }
 
@@ -495,10 +577,7 @@ body {
   user-select: none;
 }
 
-.chip:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 4px 4px 0 var(--ink);
-}
+.chip:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--ink); }
 
 .chip.c1 { background: var(--c-coral); }
 .chip.c2 { background: var(--c-purple); }
@@ -537,14 +616,6 @@ body {
   background: var(--c-coral);
   color: var(--ink);
   border-color: var(--ink);
-}
-
-.st.tiny {
-  font-size: 10px;
-  padding: 10px 14px;
-  letter-spacing: 0.4px;
-  color: var(--muted);
-  background: var(--bg-2);
 }
 
 .spin {
@@ -597,10 +668,6 @@ body {
   border: 2px solid var(--surface);
   border-radius: 99px;
   font-size: 10px;
-}
-
-.card-bar .tag.fallback {
-  background: var(--c-orange);
 }
 
 .card-inner { padding: 22px; }
@@ -732,11 +799,7 @@ body {
   min-width: 0;
 }
 
-.prev-audio audio {
-  width: 100%;
-  height: 42px;
-  border-radius: 0;
-}
+.prev-audio audio { width: 100%; height: 42px; border-radius: 0; }
 
 /* ============================================================
    MEDIA LIST
@@ -767,12 +830,7 @@ body {
   box-shadow: 6px 6px 0 var(--ink);
 }
 
-.row-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
+.row-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
 .rtag {
   padding: 4px 9px;
@@ -803,11 +861,7 @@ body {
   color: var(--muted);
 }
 
-.row-act {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+.row-act { display: flex; gap: 8px; flex-wrap: wrap; }
 
 .b {
   display: inline-flex;
@@ -831,11 +885,7 @@ body {
   user-select: none;
 }
 
-.b:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 5px 5px 0 var(--ink);
-}
-
+.b:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
 .b:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
 
 .b.play { background: var(--c-mint); }
@@ -870,11 +920,7 @@ body {
   flex-wrap: wrap;
 }
 
-.grid-info b {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-weight: 800;
-  font-size: 12px;
-}
+.grid-info b { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 12px; }
 
 .grid {
   display: grid;
@@ -894,10 +940,7 @@ body {
   animation: fadeIn 0.4s var(--ease) backwards;
 }
 
-.tile:hover {
-  transform: translate(-3px, -3px);
-  box-shadow: 6px 6px 0 var(--ink);
-}
+.tile:hover { transform: translate(-3px, -3px); box-shadow: 6px 6px 0 var(--ink); }
 
 .tile-thumb {
   position: relative;
@@ -948,13 +991,7 @@ body {
   color: var(--ink);
 }
 
-.tile-info {
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-}
+.tile-info { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
 
 .tile-title {
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -983,19 +1020,152 @@ body {
   text-overflow: ellipsis;
 }
 
-.tile-act {
+.tile-act { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+
+.tile-act .b { flex: 1; justify-content: center; padding: 8px 10px; font-size: 10.5px; }
+
+/* ============================================================
+   STATUS PAGE
+   ============================================================ */
+.status-grid {
   display: flex;
-  gap: 8px;
-  margin-top: auto;
-  padding-top: 4px;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.tile-act .b {
-  flex: 1;
-  justify-content: center;
-  padding: 8px 10px;
-  font-size: 10.5px;
+.svc {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  flex-wrap: wrap;
 }
+
+.svc:hover { transform: translate(-2px, -2px); box-shadow: var(--sh); }
+
+.svc-info { display: flex; align-items: center; gap: 12px; min-width: 0; }
+
+.svc-dot {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.svc-dot.online { background: var(--ok); box-shadow: 0 0 0 4px rgba(76,184,138,0.2); }
+.svc-dot.down { background: var(--danger); box-shadow: 0 0 0 4px rgba(224,86,86,0.2); }
+.svc-dot.checking { background: var(--c-orange); animation: pulse 1s infinite; }
+
+.svc-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.1px;
+  line-height: 1.15;
+  color: var(--ink);
+}
+
+.svc-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 3px;
+}
+
+.svc-right { display: flex; align-items: center; gap: 10px; }
+
+.svc-latency {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-2);
+  letter-spacing: 0.3px;
+}
+
+.svc-badge {
+  padding: 4px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+
+.svc-badge.online { background: var(--c-mint); color: var(--ink); }
+.svc-badge.down { background: var(--danger); color: #fff; border-color: var(--danger); }
+.svc-badge.checking { background: var(--c-yellow); color: var(--ink); }
+
+.summary-box {
+  padding: 18px;
+  background: var(--surface);
+  border: var(--bw-thick) solid var(--ink);
+  box-shadow: var(--sh-lg);
+  border-radius: var(--r-lg);
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.summary-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 15px;
+  letter-spacing: -0.2px;
+}
+
+.summary-text.healthy { color: var(--ok); }
+.summary-text.degraded { color: var(--c-orange); }
+.summary-text.critical { color: var(--danger); }
+
+.summary-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.4px;
+  margin-top: 4px;
+  text-transform: uppercase;
+}
+
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r-sm);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 11.5px;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s;
+}
+
+.refresh-btn:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); background: var(--c-coral); color: var(--ink); }
+.refresh-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+.refresh-btn:disabled { opacity: 0.55; cursor: wait; }
+.refresh-btn svg { transition: transform 0.5s var(--ease); }
+.refresh-btn:disabled svg { animation: sp 0.8s linear infinite; }
 
 /* ============================================================
    FLOATING PLAYER
@@ -1091,7 +1261,6 @@ body {
 
 .pbtn:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--ink); }
 .pbtn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
-
 .pbtn.primary { background: var(--c-mint); }
 .pbtn.primary:hover { background: var(--c-teal); color: var(--surface); }
 
@@ -1186,6 +1355,10 @@ body {
   .player-art { width: 38px; height: 38px; }
   .player-title { font-size: 12px; }
   .pbtn { width: 36px; height: 36px; }
+  .svc { padding: 12px 14px; }
+  .svc-name { font-size: 12px; }
+  .summary-box { padding: 14px; }
+  .summary-text { font-size: 13.5px; }
 }
 
 @media (max-width: 360px) {
@@ -1203,6 +1376,18 @@ body {
 </head>
 <body>
 
+<!-- LOADING SCREEN -->
+<div id="loader">
+  <div class="ld-mark">
+    <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+    </svg>
+  </div>
+  <div class="ld-text">Downloader AIO</div>
+  <div class="ld-bar"><div class="ld-bar-fill" id="ldFill"></div></div>
+  <div class="ld-hint" id="ldHint">MEMUAT SISTEM...</div>
+</div>
+
 <div class="shell">
 
   <header class="top">
@@ -1217,16 +1402,16 @@ body {
         <span class="brand-by">By <b>Egaa</b></span>
       </div>
     </div>
-    <div class="live">
+    <button class="live checking" id="liveBtn" type="button">
       <span class="d"></span>
-      <span>Online</span>
-    </div>
+      <span id="liveText">Cek Status</span>
+    </button>
   </header>
 
   <section class="hero">
     <h1>Tempel link, <span class="hl">kami proses.</span><br>
         <span class="hl alt">Cepat &amp; rapi.</span></h1>
-    <p>Mendukung TikTok, Instagram, YouTube, Facebook, Twitter, Pinterest, Spotify, dan platform lainnya.</p>
+    <p>Mendukung TikTok, Instagram, YouTube, Facebook, Twitter, Spotify, Reddit, dan 20+ platform lainnya.</p>
   </section>
 
   <nav class="tabs">
@@ -1234,7 +1419,7 @@ body {
       <span class="tnum">01</span>
       <span class="tlabel">
         <span class="tmain">Download</span>
-        <span class="tsub">Link</span>
+        <span class="tsub">URL</span>
       </span>
     </button>
     <button class="tab" data-tab="yt">
@@ -1242,6 +1427,13 @@ body {
       <span class="tlabel">
         <span class="tmain">YouTube Search</span>
         <span class="tsub">Find</span>
+      </span>
+    </button>
+    <button class="tab" data-tab="status">
+      <span class="tnum">03</span>
+      <span class="tlabel">
+        <span class="tmain">Status API</span>
+        <span class="tsub">Cek Status Api</span>
       </span>
     </button>
   </nav>
@@ -1253,7 +1445,7 @@ body {
       <div class="inp-card">
         <div class="inp-label">
           <span class="ldot"></span>
-          <span>Tempel link</span>
+          <span>Tempel link dari TikTok, Instagram, YouTube, Spotify, atau platform lainnya</span>
         </div>
         <div class="inp-row">
           <div class="input-wrap">
@@ -1263,7 +1455,7 @@ body {
                 <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
               </svg>
             </span>
-            <input type="text" id="dlin" placeholder="Tempel link Bro" autocomplete="off" spellcheck="false" />
+            <input type="text" id="dlin" placeholder="https://..." autocomplete="off" spellcheck="false" inputmode="url" />
             <div class="pill" id="dlpill">
               <span class="pdot"></span>
               <span id="dlpilltext">—</span>
@@ -1281,10 +1473,14 @@ body {
         <span class="chip c2">Instagram</span>
         <span class="chip c3">YouTube</span>
         <span class="chip c4">Facebook</span>
-        <span class="chip c1">Twitter</span>
+        <span class="chip c1">Twitter / X</span>
         <span class="chip c2">Spotify</span>
         <span class="chip c3">Pinterest</span>
         <span class="chip c4">SoundCloud</span>
+        <span class="chip c1">Reddit</span>
+        <span class="chip c2">Threads</span>
+        <span class="chip c3">CapCut</span>
+        <span class="chip c4">Twitch</span>
       </div>
 
       <div class="result" id="dlout"></div>
@@ -1295,7 +1491,7 @@ body {
       <div class="inp-card">
         <div class="inp-label">
           <span class="ldot"></span>
-          <span>Search video</span>
+          <span>Search video or paste YouTube URL</span>
         </div>
         <div class="inp-row">
           <div class="input-wrap">
@@ -1319,6 +1515,37 @@ body {
       </div>
 
       <div class="result" id="ytout"></div>
+    </section>
+
+    <!-- STATUS -->
+    <section class="panel" id="panel-status">
+      <div class="summary-box">
+        <div>
+          <div class="summary-text" id="statusOverall">Memeriksa...</div>
+          <div class="summary-sub" id="statusSub">Menghubungi semua server</div>
+        </div>
+        <button class="refresh-btn" id="refreshBtn">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/>
+          </svg>
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      <div class="status-grid" id="statusGrid">
+        <div class="svc">
+          <div class="svc-info">
+            <span class="svc-dot checking"></span>
+            <div>
+              <div class="svc-name">Memuat...</div>
+              <div class="svc-label">Menghubungi server</div>
+            </div>
+          </div>
+          <div class="svc-right">
+            <span class="svc-badge checking">...</span>
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>
@@ -1355,8 +1582,7 @@ body {
 
 <script>
 /* ============================================================
-   DOWNLOADER AIO v5.2 — By Egaa
-   Fallback system: API 1 (downr) <-> API 2 (getdl)
+   DOWNLOADER AIO v6 — By Egaa
    ============================================================ */
 
 const $ = (id) => document.getElementById(id);
@@ -1395,7 +1621,7 @@ const S = {
 };
 
 document.addEventListener('pointerdown', (e) => {
-  const el = e.target.closest('.go, .tab, .b, .pbtn');
+  const el = e.target.closest('.go, .tab, .b, .pbtn, .live, .refresh-btn');
   if (!el) return;
   if (el.classList.contains('tab')) S.tab();
   else S.tap();
@@ -1408,6 +1634,7 @@ tabs.forEach(t => t.addEventListener('click', () => {
   const tab = t.dataset.tab;
   tabs.forEach(x => x.classList.toggle('active', x === t));
   panels.forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`));
+  if (tab === 'status' && !statusLoaded) loadStatus();
 }));
 
 /* ---------- Utils ---------- */
@@ -1418,7 +1645,6 @@ const esc = (s) => s == null ? '' : String(s)
 const stLoad = (t = 'Memproses...') =>
   `<div class="st"><span class="spin"></span><span>${esc(t)}</span></div>`;
 const stErr = (m) => `<div class="st err">${esc(m)}</div>`;
-const stTiny = (m) => `<div class="st tiny">${esc(m)}</div>`;
 
 async function post(url, body) {
   const r = await fetch(url, {
@@ -1431,7 +1657,7 @@ async function post(url, body) {
   return data;
 }
 
-/* ---------- Platform detect ---------- */
+/* ---------- Detect platform ---------- */
 const PLATFORMS = [
   { r: /tiktok\.com|vt\.tiktok|vm\.tiktok/i, l: 'TikTok' },
   { r: /instagram\.com|instagr\.am/i,        l: 'Instagram' },
@@ -1440,7 +1666,11 @@ const PLATFORMS = [
   { r: /twitter\.com|x\.com/i,               l: 'Twitter' },
   { r: /spotify\.com|spoti\.fi/i,            l: 'Spotify' },
   { r: /pinterest\.com|pin\.it/i,            l: 'Pinterest' },
-  { r: /soundcloud\.com|snd\.sc/i,           l: 'SoundCloud' }
+  { r: /soundcloud\.com|snd\.sc/i,           l: 'SoundCloud' },
+  { r: /reddit\.com|redd\.it/i,              l: 'Reddit' },
+  { r: /threads\.net/i,                      l: 'Threads' },
+  { r: /capcut\.com/i,                       l: 'CapCut' },
+  { r: /twitch\.tv/i,                        l: 'Twitch' }
 ];
 
 function detect(url) {
@@ -1449,12 +1679,7 @@ function detect(url) {
   return { l: 'Link' };
 }
 
-function isLink(s) {
-  if (/^https?:\/\//i.test(s)) return true;
-  return /(?:tiktok|instagram|youtube|youtu\.be|facebook|fb\.watch|twitter|x\.com|spotify|pinterest|soundcloud)\.(?:com|be|space|org|net|co)/i.test(s);
-}
-
-/* ---------- Input detect pill ---------- */
+/* ---------- Input detect ---------- */
 const dlin = $('dlin');
 const dlpill = $('dlpill');
 const dlpilltext = $('dlpilltext');
@@ -1464,16 +1689,10 @@ dlin.addEventListener('input', () => {
   cancelAnimationFrame(raf1);
   raf1 = requestAnimationFrame(() => {
     const v = dlin.value.trim();
-    if (!v) {
-      dlpill.classList.remove('show');
-      return;
-    }
+    if (!v) { dlpill.classList.remove('show'); return; }
+    const p = detect(v);
     dlpill.classList.add('show');
-    if (isLink(v)) {
-      dlpilltext.textContent = detect(v).l + ' detected';
-    } else {
-      dlpilltext.textContent = 'TikTok search';
-    }
+    dlpilltext.textContent = p.l + ' detected';
   });
 });
 
@@ -1487,25 +1706,16 @@ ytin.addEventListener('input', () => {
   cancelAnimationFrame(raf2);
   raf2 = requestAnimationFrame(() => {
     const v = ytin.value.trim();
-    if (!v) {
-      ytpill.classList.remove('show');
-      ytgolabel.textContent = 'Search';
-      return;
-    }
+    if (!v) { ytpill.classList.remove('show'); ytgolabel.textContent = 'Search'; return; }
     const isUrl = /youtube\.com|youtu\.be/i.test(v);
     ytpill.classList.add('show');
-    if (isUrl) {
-      ytpilltext.textContent = 'URL detected';
-      ytgolabel.textContent = 'Download';
-    } else {
-      ytpilltext.textContent = 'Search mode';
-      ytgolabel.textContent = 'Search';
-    }
+    if (isUrl) { ytpilltext.textContent = 'URL detected'; ytgolabel.textContent = 'Download'; }
+    else { ytpilltext.textContent = 'Search mode'; ytgolabel.textContent = 'Search'; }
   });
 });
 
 /* ============================================================
-   DOWNLOAD — dengan fallback dari backend
+   DOWNLOAD
    ============================================================ */
 const dlgo = $('dlgo');
 const dlout = $('dlout');
@@ -1515,62 +1725,15 @@ dlin.addEventListener('keydown', (e) => { if (e.key === 'Enter') runDownload(); 
 
 async function runDownload() {
   const input = dlin.value.trim();
-  if (!input) { dlout.innerHTML = stErr('Tempel link'); S.err(); return; }
+  if (!input) { dlout.innerHTML = stErr('Tempel link dulu'); S.err(); return; }
 
   dlout.innerHTML = stLoad('Memproses...');
   dlgo.disabled = true;
 
   try {
     const data = await post('/api/download', { input });
-    if (!data.status) {
-      const msg = data.detail ? `${data.error} — ${data.detail}` : data.error;
-      throw new Error(msg || 'Gagal memproses');
-    }
+    if (!data.status) throw new Error(data.error || 'Gagal memproses');
 
-    /* ================= SEARCH MODE (TikTok) ================= */
-    if (data.mode === 'search') {
-      const results = data.data || [];
-      if (!results.length) throw new Error('Tidak ada video ditemukan');
-
-      const apiLabel = data.fallback ? `via ${data.api} (fallback)` : `via ${data.api}`;
-      const fallbackNote = data.fallback
-        ? stTiny(`Server utama (${data.primary_api}) tidak merespons — dialihkan ke server cadangan (${data.api}).`)
-        : '';
-
-      dlout.innerHTML = `
-        ${fallbackNote}
-        <div class="grid-info">
-          <span><b>${results.length}</b> videos found</span>
-          <span>"${esc(data.query)}" — ${esc(apiLabel)}</span>
-        </div>
-        <div class="grid">
-          ${results.map((vv, i) => `
-            <div class="tile" style="animation-delay:${i * 25}ms">
-              <div class="tile-thumb">
-                <img src="${esc(vv.cover_url)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.opacity=0">
-                <span class="tile-badge">TikTok</span>
-                ${vv.duration ? `<span class="tile-dur">${esc(vv.duration)}s</span>` : ''}
-              </div>
-              <div class="tile-info">
-                <div class="tile-title">${esc(vv.title)}</div>
-                <div class="tile-sub">${esc(vv.created_at)}</div>
-                <div class="tile-act">
-                  <a class="b ghost" href="${esc(vv.play_url)}" target="_blank" rel="noopener noreferrer">Open</a>
-                  <button class="b play" data-p="${esc(vv.play_url)}" data-pt="${esc(vv.title)}" data-pi="${esc(vv.cover_url || '')}" data-pa="0">
-                    <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                    Play
-                  </button>
-                </div>
-              </div>
-            </div>`).join('')}
-        </div>`;
-
-      bindPlay(dlout);
-      S.ok();
-      return;
-    }
-
-    /* ================= DOWNLOAD MODE ================= */
     const medias = data.medias || [];
     if (!medias.length) throw new Error('Tidak ada media tersedia');
 
@@ -1586,20 +1749,13 @@ async function runDownload() {
 
     let preview = '';
     if (prevV) {
-      preview = `
-        <div class="prev">
-          <span class="prev-tag">Preview Video</span>
-          <video controls playsinline preload="metadata" src="${esc(prevV.url)}"></video>
-        </div>`;
+      preview = `<div class="prev"><span class="prev-tag">Preview Video</span><video controls playsinline preload="metadata" src="${esc(prevV.url)}"></video></div>`;
     } else if (prevA) {
       preview = `
-        <div class="prev">
-          <span class="prev-tag">Preview Audio</span>
+        <div class="prev"><span class="prev-tag">Preview Audio</span>
           <div class="prev-audio">
             <div class="ap-head">
-              <div class="ap-icon">
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
-              </div>
+              <div class="ap-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div>
               <div class="ap-title">${esc(data.title || 'Audio')}</div>
             </div>
             <audio controls preload="metadata" src="${esc(prevA.url)}"></audio>
@@ -1620,34 +1776,22 @@ async function runDownload() {
           </div>
           <div class="row-act">
             <button class="b play" data-p="${esc(m.url)}" data-pt="${esc(data.title || 'Media')}" data-pi="${esc(data.thumbnail || '')}" data-pa="${isA ? '1' : '0'}">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              Play
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play
             </button>
             <a class="b dl" href="${esc(m.url)}" target="_blank" rel="noopener noreferrer" download>
               <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-              </svg>
-              Download
+              </svg>Download
             </a>
           </div>
         </div>`;
     }).join('');
 
-    const tagClass = data.fallback ? 'tag fallback' : 'tag';
-    const tagText = data.fallback
-      ? `${esc(det.l)} / ${esc((data.source || 'MEDIA').toUpperCase())} — via ${esc(data.api)}`
-      : `${esc(det.l)} / ${esc((data.source || 'MEDIA').toUpperCase())}`;
-
-    const fallbackNote = data.fallback
-      ? stTiny(`Server utama (${data.primary_api}) tidak merespons — dialihkan ke server cadangan (${data.api}).`)
-      : '';
-
     dlout.innerHTML = `
-      ${fallbackNote}
       <div class="card">
         <div class="card-bar">
           <span>Media Result</span>
-          <span class="${tagClass}">${tagText}</span>
+          <span class="tag">${esc(det.l)} / ${esc((data.source || 'MEDIA').toUpperCase())}</span>
         </div>
         <div class="card-inner">
           <div class="card-head">
@@ -1709,21 +1853,14 @@ async function runYouTube() {
       const isVid = !!mp4[0]?.url;
 
       const thumb = data.thumbnail
-        ? `<img class="thumb" src="${esc(data.thumbnail)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
-        : '';
+        ? `<img class="thumb" src="${esc(data.thumbnail)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : '';
 
       const preview = prevSrc ? (isVid
         ? `<div class="prev"><span class="prev-tag">Preview Video</span><video controls playsinline preload="metadata" src="${esc(prevSrc)}"></video></div>`
-        : `<div class="prev">
-             <span class="prev-tag">Preview Audio</span>
-             <div class="prev-audio">
-               <div class="ap-head">
-                 <div class="ap-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div>
-                 <div class="ap-title">${esc(data.title)}</div>
-               </div>
-               <audio controls preload="metadata" src="${esc(prevSrc)}"></audio>
-             </div>
-           </div>`) : '';
+        : `<div class="prev"><span class="prev-tag">Preview Audio</span><div class="prev-audio">
+             <div class="ap-head"><div class="ap-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div>
+             <div class="ap-title">${esc(data.title)}</div></div>
+             <audio controls preload="metadata" src="${esc(prevSrc)}"></audio></div></div>`) : '';
 
       const allRows = [
         ...mp4.map(m => ({ t: 'Video', c: 'v', q: m.quality, e: 'MP4', u: m.url, a: false })),
@@ -1739,32 +1876,24 @@ async function runYouTube() {
           </div>
           <div class="row-act">
             <button class="b play" data-p="${esc(m.u)}" data-pt="${esc(data.title)}" data-pi="${esc(data.thumbnail || '')}" data-pa="${m.a ? '1' : '0'}">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-              Play
+              <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play
             </button>
             <a class="b dl" href="${esc(m.u)}" target="_blank" rel="noopener noreferrer" download>
               <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-              </svg>
-              Download
+              </svg>Download
             </a>
           </div>
         </div>`).join('');
 
       ytout.innerHTML = `
         <div class="card">
-          <div class="card-bar">
-            <span>Video Result</span>
-            <span class="tag">YouTube</span>
-          </div>
+          <div class="card-bar"><span>Video Result</span><span class="tag">YouTube</span></div>
           <div class="card-inner">
-            <div class="card-head">
-              ${thumb}
-              <div class="head-info">
-                <div class="card-title">${esc(data.title || 'Video')}</div>
-                <div class="card-sub">${allRows.length} format available</div>
-              </div>
-            </div>
+            <div class="card-head">${thumb}<div class="head-info">
+              <div class="card-title">${esc(data.title || 'Video')}</div>
+              <div class="card-sub">${allRows.length} format available</div>
+            </div></div>
             ${preview}
             <div class="mlist">${rows}</div>
           </div>
@@ -1821,6 +1950,98 @@ async function runYouTube() {
 }
 
 /* ============================================================
+   STATUS API
+   ============================================================ */
+const statusGrid = $('statusGrid');
+const statusOverall = $('statusOverall');
+const statusSub = $('statusSub');
+const refreshBtn = $('refreshBtn');
+const liveBtn = $('liveBtn');
+const liveText = $('liveText');
+
+let statusLoaded = false;
+
+async function loadStatus(showLoader = true) {
+  if (showLoader) {
+    refreshBtn.disabled = true;
+    liveBtn.classList.add('checking');
+    liveBtn.classList.remove('degraded', 'critical');
+    liveText.textContent = 'Checking';
+  }
+
+  try {
+    const r = await fetch('/api/status', { method: 'GET' });
+    const data = await r.json();
+
+    if (!data.status) throw new Error('Gagal cek status');
+
+    statusLoaded = true;
+
+    // Overall summary
+    const overallMap = {
+      healthy: { text: 'Semua Sistem Normal', cls: 'healthy' },
+      degraded: { text: 'Beberapa Layanan Terganggu', cls: 'degraded' },
+      critical: { text: 'Semua Layanan Down', cls: 'critical' }
+    };
+    const om = overallMap[data.overall] || overallMap.degraded;
+    statusOverall.textContent = om.text;
+    statusOverall.className = 'summary-text ' + om.cls;
+    statusSub.textContent = `${data.online}/${data.total} layanan online`;
+
+    // Service list
+    statusGrid.innerHTML = data.services.map(s => `
+      <div class="svc">
+        <div class="svc-info">
+          <span class="svc-dot ${s.status}"></span>
+          <div>
+            <div class="svc-name">${esc(s.name)}</div>
+            <div class="svc-label">${esc(s.label)}</div>
+          </div>
+        </div>
+        <div class="svc-right">
+          <span class="svc-latency">${s.latency}ms</span>
+          <span class="svc-badge ${s.status}">${s.status === 'online' ? 'Online' : 'Down'}</span>
+        </div>
+      </div>`).join('');
+
+    // Update live button
+    liveBtn.classList.remove('checking', 'degraded', 'critical');
+    if (data.overall === 'healthy') {
+      liveText.textContent = 'Online';
+    } else if (data.overall === 'degraded') {
+      liveBtn.classList.add('degraded');
+      liveText.textContent = 'Degraded';
+    } else {
+      liveBtn.classList.add('critical');
+      liveText.textContent = 'Down';
+    }
+  } catch (err) {
+    statusOverall.textContent = 'Gagal Cek Status';
+    statusOverall.className = 'summary-text critical';
+    statusSub.textContent = err.message;
+    statusGrid.innerHTML = `<div class="st err">${esc(err.message)}</div>`;
+    liveBtn.classList.remove('checking', 'degraded');
+    liveBtn.classList.add('critical');
+    liveText.textContent = 'Error';
+  } finally {
+    refreshBtn.disabled = false;
+    liveBtn.classList.remove('checking');
+  }
+}
+
+refreshBtn.addEventListener('click', () => loadStatus(true));
+liveBtn.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === 'status'));
+  panels.forEach(p => p.classList.toggle('active', p.id === 'panel-status'));
+  loadStatus(true);
+});
+
+/* Auto check status saat load */
+window.addEventListener('load', () => {
+  setTimeout(() => loadStatus(false), 500);
+});
+
+/* ============================================================
    FLOATING PLAYER
    ============================================================ */
 const player = $('player');
@@ -1862,9 +2083,7 @@ function doPlay() {
     pstatus.textContent = 'Now playing';
     pplay.innerHTML = I_PAUSE;
     part.classList.add('playing');
-  }).catch(() => {
-    pstatus.textContent = 'Playback failed';
-  });
+  }).catch(() => { pstatus.textContent = 'Playback failed'; });
 }
 
 function doPause() {
@@ -1913,6 +2132,32 @@ function bindPlay(root) {
     });
   });
 }
+
+/* ============================================================
+   LOADING SCREEN
+   ============================================================ */
+(function bootLoader() {
+  const loader = $('loader');
+  const fill = $('ldFill');
+  const hint = $('ldHint');
+  const hints = ['MEMUAT SISTEM...', 'MENYIAPKAN API...', 'HAMPIR SIAP...'];
+  let pct = 0;
+  let hi = 0;
+
+  const t1 = setInterval(() => {
+    pct = Math.min(pct + 12 + Math.random() * 10, 100);
+    fill.style.width = pct + '%';
+    if (pct >= 40 && hi === 0) { hi = 1; hint.textContent = hints[1]; }
+    if (pct >= 75 && hi === 1) { hi = 2; hint.textContent = hints[2]; }
+    if (pct >= 100) {
+      clearInterval(t1);
+      setTimeout(() => {
+        loader.classList.add('hide');
+        setTimeout(() => loader.remove(), 600);
+      }, 300);
+    }
+  }, 180);
+})();
 </script>
 </body>
 </html>
