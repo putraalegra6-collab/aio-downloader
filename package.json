@@ -7,6 +7,7 @@
     "node": "24.x"
   },
   "dependencies": {
-    "axios": "^1.7.9"
+    "axios": "^1.7.9",
+    "@distube/ytdl-core": "^4.16.3"
   }
 }
