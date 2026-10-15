@@ -1,221 +1,176 @@
 /* ============================================================
    DOWNLOAD API — By Egaa
-   Primary: Omdown.site (Next.js Server Action)
+   Fokus Downr.org dengan session management yang benar
    ============================================================ */
 
 const axios = require('axios');
 
-const OMDOWN_BASE = 'https://www.omdown.site';
-const OMDOWN_ACTION = '70fe8fea45b688241b80ac22216712ce589fb80dc7';
+const DOWNR_BASE = 'https://downr.org';
+const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
-const OMDOWN_PLATFORMS = [
-  { name: 'tiktok',    pattern: /(?:tiktok\.com|vt\.tiktok\.com|vm\.tiktok\.com)/i },
-  { name: 'pinedrama', pattern: /(?:shortdrama\.tiktok\.com|pinedrama)/i },
-  { name: 'youtube',   pattern: /(?:youtube\.com|youtu\.be)/i },
-  { name: 'instagram', pattern: /(?:instagram\.com|instagr\.am)/i },
-  { name: 'x',         pattern: /(?:x\.com|twitter\.com)/i },
-  { name: 'facebook',  pattern: /(?:facebook\.com|fb\.watch|fb\.com)/i },
-  { name: 'spotify',   pattern: /(?:spotify\.com)/i },
-  { name: 'soundcloud',pattern: /(?:soundcloud\.com)/i },
-  { name: 'pinterest', pattern: /(?:pinterest\.com|pin\.it)/i },
-  { name: 'reddit',    pattern: /(?:reddit\.com|redd\.it)/i },
-  { name: 'capcut',    pattern: /(?:capcut\.com)/i },
-  { name: 'threads',   pattern: /(?:threads\.net)/i },
-  { name: 'snapchat',  pattern: /(?:snapchat\.com)/i },
-  { name: 'twitch',    pattern: /(?:twitch\.tv)/i },
-  { name: 'deviantart',pattern: /(?:deviantart\.com)/i },
-  { name: 'pixiv',     pattern: /(?:pixiv\.net)/i },
-  { name: 'mangadex',  pattern: /(?:mangadex\.org)/i }
-];
-
+/* ---------- Detect platform ---------- */
 function detectPlatform(url) {
-  if (!url || typeof url !== 'string') return 'general';
-  for (const p of OMDOWN_PLATFORMS) if (p.pattern.test(url)) return p.name;
+  if (!url) return 'general';
+  const patterns = [
+    { name: 'tiktok',    r: /tiktok\.com|vt\.tiktok|vm\.tiktok/i },
+    { name: 'youtube',   r: /youtube\.com|youtu\.be/i },
+    { name: 'instagram', r: /instagram\.com|instagr\.am/i },
+    { name: 'facebook',  r: /facebook\.com|fb\.watch|fb\.com/i },
+    { name: 'twitter',   r: /twitter\.com|x\.com/i },
+    { name: 'spotify',   r: /spotify\.com/i },
+    { name: 'soundcloud',r: /soundcloud\.com/i },
+    { name: 'pinterest', r: /pinterest\.com|pin\.it/i },
+    { name: 'reddit',    r: /reddit\.com|redd\.it/i }
+  ];
+  for (const p of patterns) if (p.r.test(url)) return p.name;
   return 'general';
 }
 
-/* Encode Next-Router-State-Tree */
-function encodeRouterState(urlPath) {
-  const tree = [
-    '',
-    {
-      children: [
-        urlPath.split('/').filter(Boolean),
-        {
-          children: ['__PAGE__', {}]
-        }
-      ]
-    },
-    null,
-    null,
-    true
-  ];
-  return encodeURIComponent(JSON.stringify(tree));
+/* ---------- Fix URL relative ---------- */
+function fixUrl(u, base) {
+  if (!u || typeof u !== 'string') return null;
+  if (u.startsWith('http')) return u;
+  if (u.startsWith('/')) return base + u;
+  return u;
 }
 
-async function omdownFetch(mediaUrl, locale, platform, urlPath) {
-  const payload = JSON.stringify([mediaUrl, platform, locale]);
+/* ---------- Parse Flight chunk (kalau response Next.js) ---------- */
+function parseFlightChunks(text, base) {
+  const map = {};
+  const rx = /([0-9a-f]+):T([0-9a-f]+),/g;
+  let m;
+  while ((m = rx.exec(text)) !== null) {
+    const id = m[1];
+    const len = parseInt(m[2], 16);
+    const start = m.index + m[0].length;
+    map['$' + id] = text.slice(start, start + len);
+  }
+  return map;
+}
 
-  const headers = {
-    'Accept': 'text/x-component',
-    'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
-    'Content-Type': 'text/plain;charset=UTF-8',
-    'Next-Action': OMDOWN_ACTION,
-    'Next-Router-State-Tree': encodeRouterState(urlPath),
-    'Origin': OMDOWN_BASE,
-    'Referer': `${OMDOWN_BASE}${urlPath}`,
-    'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36',
-    'sec-ch-ua': '"Chromium";v="133", "Not(A:Brand";v="24"',
-    'sec-ch-ua-mobile': '?1',
-    'sec-ch-ua-platform': '"Android"',
-    'Sec-Fetch-Dest': 'empty',
-    'Sec-Fetch-Mode': 'cors',
-    'Sec-Fetch-Site': 'same-origin'
-  };
+/* ---------- Downr: ambil cookie session ---------- */
+async function downrSession() {
+  try {
+    const res = await axios.get(`${DOWNR_BASE}/.netlify/functions/analytics`, {
+      timeout: 15000,
+      headers: {
+        'User-Agent': UA,
+        'Accept': '*/*',
+        'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Referer': `${DOWNR_BASE}/`,
+        'Origin': DOWNR_BASE,
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin'
+      },
+      validateStatus: () => true
+    });
 
-  const res = await axios.post(`${OMDOWN_BASE}${urlPath}`, payload, {
-    headers,
-    timeout: 55000,
-    maxContentLength: 50 * 1024 * 1024,
-    maxBodyLength: 50 * 1024 * 1024,
-    validateStatus: () => true
-  });
+    const setCookie = res.headers['set-cookie'] || [];
+    const cookies = setCookie.map(c => c.split(';')[0]).join('; ');
+    return cookies;
+  } catch (err) {
+    throw new Error(`session: ${err.message}`);
+  }
+}
 
+/* ---------- Downr: convert URL ---------- */
+async function downrConvert(url, cookie) {
+  const res = await axios.post(
+    `${DOWNR_BASE}/.netlify/functions/bbc`,
+    { url },
+    {
+      timeout: 30000,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': '*/*',
+        'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+        'Origin': DOWNR_BASE,
+        'Referer': `${DOWNR_BASE}/`,
+        'User-Agent': UA,
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-origin',
+        ...(cookie ? { 'Cookie': cookie } : {})
+      },
+      validateStatus: () => true
+    }
+  );
   return res;
 }
 
-async function omdownDownload(mediaUrl, locale = 'id') {
-  const trimmed = String(mediaUrl).trim();
-  const platform = detectPlatform(trimmed);
-  const urlPath = `/${locale}`;
+/* ---------- Downr main ---------- */
+async function downrDownload(url) {
+  const cookie = await downrSession();
+  let r = await downrConvert(url, cookie);
 
-  // Try 1: standard request
-  let res = await omdownFetch(trimmed, locale, platform, urlPath);
-
-  // Try 2: kalau 404, coba tanpa Router-State-Tree
-  if (res.status === 404) {
-    const payload = JSON.stringify([trimmed, platform, locale]);
-    res = await axios.post(`${OMDOWN_BASE}${urlPath}`, payload, {
-      headers: {
-        'Accept': 'text/x-component',
-        'Content-Type': 'text/plain;charset=UTF-8',
-        'Next-Action': OMDOWN_ACTION,
-        'Origin': OMDOWN_BASE,
-        'Referer': `${OMDOWN_BASE}${urlPath}`,
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36'
-      },
-      timeout: 55000,
-      maxContentLength: 50 * 1024 * 1024,
-      validateStatus: () => true
-    });
+  // Retry kalau butuh cookie baru
+  if (r.status === 403) {
+    const text = typeof r.data === 'string' ? r.data : JSON.stringify(r.data);
+    if (text.includes('user_retry_required')) {
+      const cookie2 = await downrSession();
+      r = await downrConvert(url, cookie2);
+    }
   }
 
-  // Try 3: kalau masih 404, coba tanpa /id (root)
-  if (res.status === 404) {
-    const payload = JSON.stringify([trimmed, platform, locale]);
-    res = await axios.post(`${OMDOWN_BASE}/`, payload, {
-      headers: {
-        'Accept': 'text/x-component',
-        'Content-Type': 'text/plain;charset=UTF-8',
-        'Next-Action': OMDOWN_ACTION,
-        'Origin': OMDOWN_BASE,
-        'Referer': `${OMDOWN_BASE}/`,
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36'
-      },
-      timeout: 55000,
-      maxContentLength: 50 * 1024 * 1024,
-      validateStatus: () => true
-    });
+  if (r.status !== 200) {
+    throw new Error(`downr HTTP ${r.status}`);
   }
 
-  if (res.status < 200 || res.status >= 300) {
-    throw new Error(`omdown HTTP ${res.status}`);
+  let json = r.data;
+  if (typeof json === 'string') {
+    // Coba parse Flight chunks dulu
+    if (json.includes(':"$') || /[0-9a-f]+:T[0-9a-f]+,/.test(json)) {
+      const chunks = parseFlightChunks(json, DOWNR_BASE);
+      const idx = json.indexOf('{"success":');
+      if (idx >= 0) {
+        let depth = 0, end = -1;
+        for (let i = idx; i < json.length; i++) {
+          if (json[i] === '{') depth++;
+          else if (json[i] === '}') { depth--; if (depth === 0) { end = i + 1; break; } }
+        }
+        if (end > 0) json = JSON.parse(json.slice(idx, end));
+      }
+    } else {
+      json = JSON.parse(json);
+    }
   }
 
-  const rawText = res.data;
-  if (!rawText || typeof rawText !== 'string') {
-    throw new Error('omdown: no response data');
+  if (json.error) {
+    throw new Error(typeof json.error === 'string' ? json.error : 'invalid url');
   }
 
-  const chunkMap = {};
-  const chunkRegex = /([0-9a-f]+):T([0-9a-f]+),/g;
-  let cm;
-  while ((cm = chunkRegex.exec(rawText)) !== null) {
-    const id = cm[1];
-    const len = parseInt(cm[2], 16);
-    const start = cm.index + cm[0].length;
-    chunkMap['$' + id] = rawText.slice(start, start + len);
-  }
-
-  const idx = rawText.indexOf('{"success":');
-  if (idx === -1) throw new Error('omdown: konten tidak ditemukan / platform belum didukung');
-
-  let depth = 0, endIdx = -1;
-  const jsonStr = rawText.slice(idx);
-  for (let i = 0; i < jsonStr.length; i++) {
-    if (jsonStr[i] === '{') depth++;
-    else if (jsonStr[i] === '}') { depth--; if (depth === 0) { endIdx = i + 1; break; } }
-  }
-  if (endIdx === -1) throw new Error('omdown: gagal parse JSON');
-
-  const parsed = JSON.parse(jsonStr.slice(0, endIdx));
-  if (!parsed.success || !parsed.data) {
-    throw new Error(parsed.error || 'omdown: gagal ekstrak media');
-  }
-
-  const data = parsed.data;
-
-  const fixUrl = (u) => {
-    if (!u || typeof u !== 'string') return null;
-    let target = u;
-    if (chunkMap[target]) target = chunkMap[target];
-    if (target.startsWith('/')) return `${OMDOWN_BASE}${target}`;
-    return target;
-  };
-
-  const formats = (data.formats || []).map(f => {
-    let dlUrl = f.downloadUrl;
-    if (dlUrl && chunkMap[dlUrl]) dlUrl = chunkMap[dlUrl];
-    return {
-      id: f.id,
-      label: f.label,
-      description: f.description,
-      kind: f.kind,
-      quality: f.quality || f.label || 'Default',
-      ext: f.ext || 'mp4',
-      is_audio: f.kind === 'audio',
-      downloadUrl: fixUrl(dlUrl)
-    };
-  }).filter(f => f.downloadUrl);
-
-  if (!formats.length) throw new Error('omdown: no downloadable format');
+  const medias = (json.medias || []).filter(m => m && m.url);
+  if (!medias.length) throw new Error('no media found');
 
   return {
     ok: true,
     mode: 'download',
-    api: 'omdown',
-    source: (data.platform || platform).toLowerCase(),
-    title: data.title || 'Untitled',
-    author: data.author || null,
-    duration: data.durationLabel || null,
-    thumbnail: fixUrl(data.thumbnailUrl),
-    url: trimmed,
-    medias: formats.map(f => ({
-      type: f.kind || 'video',
-      quality: f.quality,
-      extension: f.ext,
-      is_audio: f.is_audio,
-      url: f.downloadUrl
+    api: 'downr',
+    source: json.source || detectPlatform(url),
+    title: json.title || null,
+    thumbnail: fixUrl(json.thumbnail, DOWNR_BASE),
+    url: json.url || url,
+    medias: medias.map(m => ({
+      type: m.type || (m.is_audio ? 'audio' : 'video'),
+      quality: m.quality || 'Default',
+      extension: m.extension || (m.is_audio ? 'mp3' : 'mp4'),
+      is_audio: m.is_audio ?? false,
+      url: fixUrl(m.url, DOWNR_BASE)
     }))
   };
 }
 
+/* ---------- isUrl ---------- */
 function isUrl(input) {
   const s = String(input).trim();
   if (/^https?:\/\//i.test(s)) return true;
   return /(?:tiktok|instagram|youtube|youtu\.be|facebook|fb\.watch|twitter|x\.com|spotify|pinterest|soundcloud|reddit|threads|twitch|capcut)\.(?:com|be|space|org|net|co|tv)/i.test(s);
 }
 
+/* ============================================================
+   HANDLER
+   ============================================================ */
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -237,7 +192,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const result = await omdownDownload(value);
+    const result = await downrDownload(value);
     return res.status(200).json({ status: true, ...result });
   } catch (err) {
     return res.status(500).json({
