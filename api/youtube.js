@@ -1,25 +1,15 @@
 /* ============================================================
-   YOUTUBE API — By Egaa v2
+   YOUTUBE API — By Egaa v3
    Search: Innertube (youtubei)
-   Download: Invidious instances (multi-fallback)
+   Download: ytdl-core (native, no external API)
    ============================================================ */
 
 const axios = require('axios');
+const ytdl = require('@distube/ytdl-core');
 
 const YT = "https://www.youtube.com";
 const UA = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36";
 const FALLBACK_CFG = { key: "AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8", version: "2.20261002.10.00" };
-
-/* Invidious instances — dicoba berurutan sampai works */
-const INVIDIOUS = [
-  'https://inv.nadeko.net',
-  'https://invidious.nerdvpn.de',
-  'https://yewtu.be',
-  'https://invidious.f5.si',
-  'https://iv.melmac.space',
-  'https://invidious.privacyredirect.com',
-  'https://vid.puffyan.us'
-];
 
 const yt = axios.create({
   timeout: 25000,
@@ -69,7 +59,7 @@ function mapVideo(v) {
 }
 
 /* ============================================================
-   SEARCH — Innertube
+   SEARCH
    ============================================================ */
 async function search(query) {
   const cfg = await getConfig();
@@ -102,121 +92,112 @@ function extractVideoId(input) {
 }
 
 /* ============================================================
-   GET TITLE via oEmbed
-   ============================================================ */
-async function getTitle(videoId) {
-  try {
-    const res = await axios.get(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`, { timeout: 8000 });
-    return res.data.title;
-  } catch { return "Video"; }
-}
-
-/* ============================================================
-   DOWNLOAD — Invidious multi-instance
+   DOWNLOAD — ytdl-core
    ============================================================ */
 async function download(input) {
   const videoId = extractVideoId(input);
   if (!videoId) throw new Error("Video ID tidak valid");
 
-  const errors = [];
-  let data = null;
-  let usedInstance = null;
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
-  // Coba setiap instance Invidious sampai salah satu works
-  for (const inst of INVIDIOUS) {
-    try {
-      const res = await axios.get(`${inst}/api/v1/videos/${videoId}`, {
-        timeout: 20000,
-        headers: { 'User-Agent': UA, 'Accept': 'application/json' },
-        validateStatus: () => true
-      });
-
-      if (res.status !== 200) {
-        errors.push(`${inst.replace('https://','')}: HTTP ${res.status}`);
-        continue;
+  // Ambil info video
+  let info;
+  try {
+    info = await ytdl.getInfo(videoUrl, {
+      requestOptions: {
+        headers: {
+          'User-Agent': UA,
+          'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7'
+        }
       }
-
-      if (!res.data || !res.data.title) {
-        errors.push(`${inst.replace('https://','')}: invalid data`);
-        continue;
-      }
-
-      data = res.data;
-      usedInstance = inst;
-      break;
-    } catch (err) {
-      errors.push(`${inst.replace('https://','')}: ${err.message}`);
-    }
+    });
+  } catch (err) {
+    throw new Error(`Gagal mengambil info: ${err.message}`);
   }
 
-  if (!data) {
-    throw new Error('YouTube download failed: ' + errors.join(' | '));
-  }
+  if (!info || !info.formats) throw new Error('Info video tidak tersedia');
 
-  const title = data.title || await getTitle(videoId);
-  const thumbnail = data.videoThumbnails?.[0]?.url || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+  const title = info.videoDetails?.title || 'Video';
+  const author = info.videoDetails?.author || null;
+  const durationSec = info.videoDetails?.lengthSeconds;
+  const thumbnail = info.videoDetails?.thumbnails?.slice(-1)[0]?.url
+    || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-  // Kumpulkan format
+  /* Kumpulkan format MP4 (progressive: video+audio) */
   const mp4 = [];
   const mp3 = [];
 
-  const fmtStreams = data.formatStreams || [];
-  const adaptive = data.adaptiveFormats || [];
-
-  // Format video+audio combined
-  fmtStreams.forEach(f => {
+  // Filter yang ada video + audio (progressive)
+  info.formats.forEach(f => {
     if (!f.url) return;
-    const quality = f.qualityLabel || f.resolution || 'Video';
-    // Extract resolution height
-    const hMatch = quality.match(/(\d+)p/);
-    const height = hMatch ? parseInt(hMatch[1]) : 0;
-    // Skip kalau terlalu kecil
-    if (height && height < 144) return;
-    mp4.push({
-      quality: quality,
-      format: 'mp4',
-      url: f.url,
-      height: height,
-      size: f.size ? `${(f.size / 1024 / 1024).toFixed(1)}MB` : null
-    });
+
+    const hasVideo = f.hasVideo;
+    const hasAudio = f.hasAudio;
+    const quality = f.qualityLabel || f.quality || '';
+
+    // Progressive (video + audio)
+    if (hasVideo && hasAudio) {
+      const hMatch = quality.match(/(\d+)p/);
+      const height = hMatch ? parseInt(hMatch[1]) : 0;
+      mp4.push({
+        quality: quality || 'Video',
+        format: 'mp4',
+        url: f.url,
+        height,
+        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null,
+        type: 'progressive',
+        itag: f.itag
+      });
+    }
   });
 
-  // Format video-only (adaptive)
-  adaptive.filter(f => f.type && f.type.startsWith('video')).forEach(f => {
-    if (!f.url) return;
-    const quality = f.qualityLabel || f.resolution || 'Video';
-    const hMatch = quality.match(/(\d+)p/);
-    const height = hMatch ? parseInt(hMatch[1]) : 0;
-    // Skip kalau duplikat dari fmtStreams
-    if (mp4.find(m => m.height === height && m.height > 0)) return;
-    mp4.push({
-      quality: quality + ' (video only)',
-      format: 'mp4',
-      url: f.url,
-      height: height,
-      size: f.clen ? `${(f.clen / 1024 / 1024).toFixed(1)}MB` : null
+  // Kalau gak ada progressive, ambil video-only sebagai fallback
+  if (!mp4.length) {
+    info.formats.forEach(f => {
+      if (!f.url || !f.hasVideo) return;
+      const quality = f.qualityLabel || 'Video';
+      const hMatch = quality.match(/(\d+)p/);
+      const height = hMatch ? parseInt(hMatch[1]) : 0;
+      if (height < 144) return;
+      mp4.push({
+        quality: quality + ' (video only)',
+        format: 'mp4',
+        url: f.url,
+        height,
+        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null,
+        type: 'adaptive',
+        itag: f.itag
+      });
     });
-  });
+  }
 
-  // Format audio
-  adaptive.filter(f => f.type && f.type.startsWith('audio')).forEach(f => {
-    if (!f.url) return;
-    // Ambil hanya bitrate tertinggi per encoding
-    let bitrate = f.bitrate ? Math.round(f.bitrate / 1000) : 128;
+  // Audio
+  info.formats.forEach(f => {
+    if (!f.url || !f.hasAudio || f.hasVideo) return;
+    const bitrate = f.audioBitrate || 128;
     mp3.push({
       quality: `${bitrate}kbps`,
       format: 'mp3',
       url: f.url,
-      bitrate: bitrate,
-      size: f.clen ? `${(f.clen / 1024 / 1024).toFixed(1)}MB` : null
+      bitrate,
+      size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null,
+      itag: f.itag
     });
   });
 
-  // Sort by quality (descending)
+  // Sort
   mp4.sort((a, b) => (b.height || 0) - (a.height || 0));
   mp3.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
 
-  // Dedupe mp3 by bitrate
+  // Dedupe
+  const seenMp4 = new Set();
+  const mp4Unique = mp4.filter(m => {
+    const k = `${m.height}-${m.type}`;
+    if (seenMp4.has(k)) return false;
+    seenMp4.add(k);
+    return true;
+  });
+
   const seenMp3 = new Set();
   const mp3Unique = mp3.filter(m => {
     if (seenMp3.has(m.bitrate)) return false;
@@ -224,19 +205,19 @@ async function download(input) {
     return true;
   });
 
-  if (!mp4.length && !mp3Unique.length) {
-    throw new Error('Tidak ada format unduhan tersedia');
+  if (!mp4Unique.length && !mp3Unique.length) {
+    throw new Error('Tidak ada format tersedia (mungkin video age-restricted)');
   }
 
   return {
     videoId,
     title,
-    url: `https://www.youtube.com/watch?v=${videoId}`,
+    author,
+    duration: durationSec ? `${durationSec}s` : null,
+    url: videoUrl,
     thumbnail,
-    author: data.author || null,
-    duration: data.lengthSeconds ? `${data.lengthSeconds}s` : null,
-    source: `invidious (${usedInstance.replace('https://','')})`,
-    mp4: mp4.slice(0, 8),
+    source: 'ytdl-core',
+    mp4: mp4Unique.slice(0, 8),
     mp3: mp3Unique.slice(0, 4)
   };
 }
