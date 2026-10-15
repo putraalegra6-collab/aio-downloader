@@ -1,6 +1,6 @@
 /* ============================================================
    DOWNLOAD API — By Egaa
-   Primary: Omdown.site (26+ platforms)
+   Primary: Omdown.site (Next.js Server Action)
    ============================================================ */
 
 const axios = require('axios');
@@ -34,25 +34,99 @@ function detectPlatform(url) {
   return 'general';
 }
 
-async function omdownDownload(mediaUrl, locale = 'id') {
-  const trimmed = String(mediaUrl).trim();
-  const platform = detectPlatform(trimmed);
-  const payload = JSON.stringify([trimmed, platform, locale]);
-
-  const res = await axios.post(`${OMDOWN_BASE}/${locale}`, payload, {
-    headers: {
-      'Next-Action': OMDOWN_ACTION,
-      'Content-Type': 'text/plain;charset=UTF-8',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-      'Referer': `${OMDOWN_BASE}/${locale}`,
-      'Origin': OMDOWN_BASE,
-      'Accept': 'text/x-component'
+/* Encode Next-Router-State-Tree */
+function encodeRouterState(urlPath) {
+  const tree = [
+    '',
+    {
+      children: [
+        urlPath.split('/').filter(Boolean),
+        {
+          children: ['__PAGE__', {}]
+        }
+      ]
     },
+    null,
+    null,
+    true
+  ];
+  return encodeURIComponent(JSON.stringify(tree));
+}
+
+async function omdownFetch(mediaUrl, locale, platform, urlPath) {
+  const payload = JSON.stringify([mediaUrl, platform, locale]);
+
+  const headers = {
+    'Accept': 'text/x-component',
+    'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Content-Type': 'text/plain;charset=UTF-8',
+    'Next-Action': OMDOWN_ACTION,
+    'Next-Router-State-Tree': encodeRouterState(urlPath),
+    'Origin': OMDOWN_BASE,
+    'Referer': `${OMDOWN_BASE}${urlPath}`,
+    'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36',
+    'sec-ch-ua': '"Chromium";v="133", "Not(A:Brand";v="24"',
+    'sec-ch-ua-mobile': '?1',
+    'sec-ch-ua-platform': '"Android"',
+    'Sec-Fetch-Dest': 'empty',
+    'Sec-Fetch-Mode': 'cors',
+    'Sec-Fetch-Site': 'same-origin'
+  };
+
+  const res = await axios.post(`${OMDOWN_BASE}${urlPath}`, payload, {
+    headers,
     timeout: 55000,
     maxContentLength: 50 * 1024 * 1024,
     maxBodyLength: 50 * 1024 * 1024,
     validateStatus: () => true
   });
+
+  return res;
+}
+
+async function omdownDownload(mediaUrl, locale = 'id') {
+  const trimmed = String(mediaUrl).trim();
+  const platform = detectPlatform(trimmed);
+  const urlPath = `/${locale}`;
+
+  // Try 1: standard request
+  let res = await omdownFetch(trimmed, locale, platform, urlPath);
+
+  // Try 2: kalau 404, coba tanpa Router-State-Tree
+  if (res.status === 404) {
+    const payload = JSON.stringify([trimmed, platform, locale]);
+    res = await axios.post(`${OMDOWN_BASE}${urlPath}`, payload, {
+      headers: {
+        'Accept': 'text/x-component',
+        'Content-Type': 'text/plain;charset=UTF-8',
+        'Next-Action': OMDOWN_ACTION,
+        'Origin': OMDOWN_BASE,
+        'Referer': `${OMDOWN_BASE}${urlPath}`,
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36'
+      },
+      timeout: 55000,
+      maxContentLength: 50 * 1024 * 1024,
+      validateStatus: () => true
+    });
+  }
+
+  // Try 3: kalau masih 404, coba tanpa /id (root)
+  if (res.status === 404) {
+    const payload = JSON.stringify([trimmed, platform, locale]);
+    res = await axios.post(`${OMDOWN_BASE}/`, payload, {
+      headers: {
+        'Accept': 'text/x-component',
+        'Content-Type': 'text/plain;charset=UTF-8',
+        'Next-Action': OMDOWN_ACTION,
+        'Origin': OMDOWN_BASE,
+        'Referer': `${OMDOWN_BASE}/`,
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36'
+      },
+      timeout: 55000,
+      maxContentLength: 50 * 1024 * 1024,
+      validateStatus: () => true
+    });
+  }
 
   if (res.status < 200 || res.status >= 300) {
     throw new Error(`omdown HTTP ${res.status}`);
@@ -159,10 +233,7 @@ module.exports = async (req, res) => {
 
   const value = String(input).trim();
   if (!isUrl(value)) {
-    return res.status(400).json({
-      status: false,
-      error: 'Masukkan link media yang valid (TikTok, Instagram, YouTube, dll)'
-    });
+    return res.status(400).json({ status: false, error: 'Masukkan link media yang valid' });
   }
 
   try {
