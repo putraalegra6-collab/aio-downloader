@@ -1,11 +1,18 @@
 /* ============================================================
    DOWNLOAD API — API 1 (downr.org) + API 2 (getdl.space)
-   Fallback otomatis. Compatible Node 18+.
+   Fallback otomatis. Proxy bypass Cloudflare.
    ============================================================ */
 
 const axios = require('axios');
 const { wrapper } = require('axios-cookiejar-support');
 const { CookieJar } = require('tough-cookie');
+
+/* ============================================================
+   PROXY HELPER — bypass Cloudflare blok Vercel
+   ============================================================ */
+function proxyUrl(target) {
+  return `https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`;
+}
 
 /* ============================================================
    API 1 — downr.org (universal downloader)
@@ -14,7 +21,7 @@ const DOWNR_BASE = 'https://downr.org';
 const DOWNR_UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
 const downrClient = axios.create({
-  timeout: 25000,
+  timeout: 30000,
   headers: {
     'User-Agent': DOWNR_UA,
     'Accept': 'application/json, text/plain, */*',
@@ -25,7 +32,8 @@ const downrClient = axios.create({
 });
 
 async function downrSession() {
-  const res = await downrClient.get(`${DOWNR_BASE}/.netlify/functions/analytics`);
+  const target = `${DOWNR_BASE}/.netlify/functions/analytics`;
+  const res = await downrClient.get(proxyUrl(target));
   const raw = res.headers['set-cookie'] || [];
   return raw.map(c => c.split(';')[0]).join('; ');
 }
@@ -39,8 +47,9 @@ async function downrConvert(url, cookie) {
   };
   if (cookie) headers['Cookie'] = cookie;
 
+  const target = `${DOWNR_BASE}/.netlify/functions/bbc`;
   const res = await downrClient.post(
-    `${DOWNR_BASE}/.netlify/functions/bbc`,
+    proxyUrl(target),
     { url },
     { headers, validateStatus: () => true }
   );
@@ -51,7 +60,6 @@ async function downrDownload(url) {
   let cookie = await downrSession();
   let r = await downrConvert(url, cookie);
 
-  // Retry kalau butuh session baru
   if (r.status === 403) {
     const txt = typeof r.data === 'string' ? r.data : JSON.stringify(r.data);
     if (!txt.includes('user_retry_required')) throw new Error('access forbidden');
@@ -108,17 +116,19 @@ async function getdlSearch(query, count = 12, region = 'ID') {
   const client = wrapper(axios.create({
     jar,
     withCredentials: true,
-    timeout: 20000,
+    timeout: 25000,
     headers: GETDL_HEADERS
   }));
 
-  const sess = await client.get(`${GETDL_BASE}/api/session`);
+  const sessTarget = `${GETDL_BASE}/api/session`;
+  const sess = await client.get(proxyUrl(sessTarget));
   if (!sess.data?.success || !sess.data.sessionId) {
     throw new Error('session init failed');
   }
 
+  const searchTarget = `${GETDL_BASE}/api/search/tiktok`;
   const res = await client.post(
-    `${GETDL_BASE}/api/search/tiktok`,
+    proxyUrl(searchTarget),
     { query, count, cursor: 0, region, sessionId: sess.data.sessionId, sortType: 0 },
     { headers: { ...GETDL_HEADERS, 'Content-Type': 'application/json' } }
   );
