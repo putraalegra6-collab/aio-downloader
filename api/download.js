@@ -1,6 +1,6 @@
 /* ============================================================
    DOWNLOAD API — API 1 (downr.org) + API 2 (getdl.space)
-   Sistem fallback otomatis: kalau API 1 gagal → API 2 dipakai.
+   Fallback otomatis. Compatible Node 18+.
    ============================================================ */
 
 const axios = require('axios');
@@ -13,52 +13,66 @@ const { CookieJar } = require('tough-cookie');
 const DOWNR_BASE = 'https://downr.org';
 const DOWNR_UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
+const downrClient = axios.create({
+  timeout: 25000,
+  headers: {
+    'User-Agent': DOWNR_UA,
+    'Accept': 'application/json, text/plain, */*',
+    'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Origin': DOWNR_BASE,
+    'Referer': DOWNR_BASE + '/'
+  }
+});
+
 async function downrSession() {
-  const res = await fetch(`${DOWNR_BASE}/.netlify/functions/analytics`, {
-    headers: { 'User-Agent': DOWNR_UA, 'Referer': `${DOWNR_BASE}/` },
-    signal: AbortSignal.timeout(10000)
-  });
-  if (!res.ok) throw new Error(`session init gagal (${res.status})`);
-  const raw = typeof res.headers.getSetCookie === 'function'
-    ? res.headers.getSetCookie()
-    : [res.headers.get('set-cookie')].filter(Boolean);
+  const res = await downrClient.get(`${DOWNR_BASE}/.netlify/functions/analytics`);
+  const raw = res.headers['set-cookie'] || [];
   return raw.map(c => c.split(';')[0]).join('; ');
 }
 
-function downrConvert(url, cookie) {
-  return fetch(`${DOWNR_BASE}/.netlify/functions/bbc`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Origin': DOWNR_BASE,
-      'Referer': `${DOWNR_BASE}/`,
-      'User-Agent': DOWNR_UA,
-      ...(cookie ? { 'Cookie': cookie } : {})
-    },
-    body: JSON.stringify({ url }),
-    signal: AbortSignal.timeout(20000)
-  });
+async function downrConvert(url, cookie) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Origin': DOWNR_BASE,
+    'Referer': DOWNR_BASE + '/',
+    'User-Agent': DOWNR_UA
+  };
+  if (cookie) headers['Cookie'] = cookie;
+
+  const res = await downrClient.post(
+    `${DOWNR_BASE}/.netlify/functions/bbc`,
+    { url },
+    { headers, validateStatus: () => true }
+  );
+  return res;
 }
 
 async function downrDownload(url) {
   let cookie = await downrSession();
   let r = await downrConvert(url, cookie);
 
+  // Retry kalau butuh session baru
   if (r.status === 403) {
-    const text = await r.text();
-    if (text.trim() !== 'user_retry_required') throw new Error('access forbidden');
+    const txt = typeof r.data === 'string' ? r.data : JSON.stringify(r.data);
+    if (!txt.includes('user_retry_required')) throw new Error('access forbidden');
     cookie = await downrSession();
     r = await downrConvert(url, cookie);
     if (r.status === 403) throw new Error('access forbidden');
   }
   if (r.status === 429) throw new Error('rate limited');
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  if (r.status < 200 || r.status >= 300) throw new Error(`HTTP ${r.status}`);
 
-  const json = await r.json();
-  if (json.error) throw new Error(typeof json.error === 'string' && json.error.trim() ? json.error : 'invalid url');
+  const json = typeof r.data === 'object' ? r.data : JSON.parse(r.data);
+
+  if (json.error) {
+    const msg = typeof json.error === 'string' && json.error.trim()
+      ? json.error
+      : 'invalid url';
+    throw new Error(msg);
+  }
 
   const medias = (json.medias || []).filter(m => m && m.url);
-  if (!medias.length) throw new Error('no media');
+  if (!medias.length) throw new Error('no media found');
 
   return {
     ok: true,
@@ -91,11 +105,16 @@ const GETDL_HEADERS = {
 
 async function getdlSearch(query, count = 12, region = 'ID') {
   const jar = new CookieJar();
-  const client = wrapper(axios.create({ jar, withCredentials: true, timeout: 15000 }));
+  const client = wrapper(axios.create({
+    jar,
+    withCredentials: true,
+    timeout: 20000,
+    headers: GETDL_HEADERS
+  }));
 
-  const sess = await client.get(`${GETDL_BASE}/api/session`, { headers: GETDL_HEADERS });
+  const sess = await client.get(`${GETDL_BASE}/api/session`);
   if (!sess.data?.success || !sess.data.sessionId) {
-    throw new Error('session init gagal');
+    throw new Error('session init failed');
   }
 
   const res = await client.post(
@@ -130,7 +149,7 @@ async function getdlSearch(query, count = 12, region = 'ID') {
 }
 
 /* ============================================================
-   AUTO-DETECT: URL vs keyword
+   AUTO-DETECT URL vs keyword
    ============================================================ */
 function isUrl(input) {
   const s = String(input).trim();
@@ -139,9 +158,7 @@ function isUrl(input) {
 }
 
 /* ============================================================
-   HANDLER dengan FALLBACK otomatis
-   - URL     → API 1 (downr) utama | API 2 (getdl) fallback
-   - Keyword → API 2 (getdl) utama  | API 1 (downr) fallback
+   HANDLER dengan fallback otomatis
    ============================================================ */
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -163,7 +180,6 @@ module.exports = async (req, res) => {
 
   const errors = [];
 
-  /* --- Tentukan urutan API berdasarkan input --- */
   const apiChain = urlMode
     ? [
         { name: 'downr', fn: () => downrDownload(value) },
@@ -174,13 +190,11 @@ module.exports = async (req, res) => {
         { name: 'downr', fn: () => downrDownload(value) }
       ];
 
-  /* --- Coba API satu per satu sampai ada yang berhasil --- */
   for (let i = 0; i < apiChain.length; i++) {
     const api = apiChain[i];
     try {
       const result = await api.fn();
       if (result && result.ok) {
-        // Tandai kalau ini hasil fallback (bukan API utama)
         if (i > 0) {
           result.fallback = true;
           result.primary_api = apiChain[0].name;
@@ -194,7 +208,6 @@ module.exports = async (req, res) => {
     }
   }
 
-  /* --- Semua API gagal --- */
   return res.status(500).json({
     status: false,
     error: 'Semua server tidak merespons',
