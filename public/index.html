@@ -56,7 +56,6 @@ body {
   position: relative;
 }
 
-/* Background pattern halus biar gak sunyi */
 body::before {
   content: '';
   position: fixed;
@@ -152,7 +151,7 @@ body::before {
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
 /* HERO */
-.hero { margin-bottom: 26px; position: relative; }
+.hero { margin-bottom: 26px; }
 .hero h1 {
   font-weight: 800;
   font-size: clamp(26px, 4.2vw, 38px);
@@ -169,8 +168,6 @@ body::before {
 }
 .hero h1 .hl.alt { background: var(--c-purple); }
 .hero p { font-size: 14px; font-weight: 500; color: var(--ink-2); max-width: 560px; line-height: 1.65; }
-
-/* Platform mini badges (info kecil, bukan chips) */
 .platform-mini {
   display: flex;
   align-items: center;
@@ -311,7 +308,7 @@ body::before {
 }
 .input-wrap input::placeholder { color: var(--muted); }
 
-/* Detect Badge — bigger & prominent */
+/* Detect Badge */
 .detect {
   display: none;
   align-items: center; gap: 8px;
@@ -336,7 +333,6 @@ body::before {
 @keyframes pillIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
 @keyframes pdPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
 
-/* Platform colors */
 .detect[data-platform="tiktok"] { background: #000; color: #fff; border-color: #000; box-shadow: 2px 2px 0 #25F4EE; }
 .detect[data-platform="tiktok"] .pdot { background: #25F4EE; border-color: #fff; }
 .detect[data-platform="instagram"] { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: #fff; border-color: #dc2743; box-shadow: 2px 2px 0 #dc2743; }
@@ -366,7 +362,6 @@ body::before {
 .detect[data-platform="link"] { background: var(--c-mint); color: var(--ink); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
 .detect[data-platform="link"] .pdot { background: var(--ok); border-color: var(--ink); }
 
-/* Hint di bawah input */
 .inp-hint {
   display: flex;
   align-items: center;
@@ -392,7 +387,6 @@ body::before {
 }
 .inp-hint.hide { opacity: 0; height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
 
-/* Go button */
 .go {
   display: inline-flex; align-items: center; justify-content: center; gap: 10px;
   padding: 16px 24px;
@@ -424,7 +418,6 @@ body::before {
   .detect .pdot { width: 7px; height: 7px; }
 }
 
-/* Result */
 .result { display: flex; flex-direction: column; gap: 16px; }
 .st {
   display: flex; align-items: center; justify-content: center; gap: 14px;
@@ -449,7 +442,6 @@ body::before {
 }
 @keyframes sp { to { transform: rotate(360deg); } }
 
-/* MEDIA CARD */
 .card {
   background: var(--surface);
   border: var(--bw-thick) solid var(--ink);
@@ -476,7 +468,6 @@ body::before {
 }
 .card-inner { padding: 22px; }
 
-/* AUTHOR HEADER */
 .author-head {
   display: flex; align-items: center; gap: 12px;
   padding: 12px 14px;
@@ -524,7 +515,6 @@ body::before {
   border-radius: 99px;
 }
 
-/* Media header */
 .card-head { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; flex-wrap: wrap; }
 .thumb {
   width: 150px; height: 150px;
@@ -553,7 +543,6 @@ body::before {
   border-radius: 99px;
 }
 
-/* Artist card (Spotify) */
 .artist-card {
   display: flex; gap: 16px;
   padding: 18px;
@@ -595,7 +584,6 @@ body::before {
   color: var(--ink-2);
 }
 
-/* Preview */
 .prev {
   margin-bottom: 20px;
   border: var(--bw) solid var(--ink);
@@ -638,7 +626,6 @@ body::before {
 }
 .prev-audio audio { width: 100%; height: 42px; }
 
-/* Media list */
 .mlist { display: flex; flex-direction: column; gap: 10px; }
 .row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -683,6 +670,7 @@ body::before {
 }
 .b:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
 .b:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+.b:disabled { opacity: 0.7; cursor: wait; }
 .b.play { background: var(--c-mint); }
 .b.play:hover { background: var(--c-teal); color: var(--surface); }
 .b.dl { background: var(--ink); color: var(--surface); }
@@ -690,7 +678,6 @@ body::before {
 .b.ghost { background: var(--surface); }
 .b.ghost:hover { background: var(--c-yellow); }
 
-/* GRID */
 .grid-info {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 12px 18px;
@@ -762,7 +749,6 @@ body::before {
 .tile-act { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
 .tile-act .b { flex: 1; justify-content: center; padding: 8px 10px; font-size: 10.5px; }
 
-/* STATUS PAGE */
 .status-summary {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   padding: 22px;
@@ -891,7 +877,6 @@ body::before {
 .svc-badge.down { background: var(--danger); color: #fff; border-color: var(--danger); }
 .svc-badge.checking { background: var(--c-yellow); }
 
-/* FLOATING PLAYER */
 .player {
   position: fixed;
   left: 20px; right: 20px; bottom: 20px;
@@ -956,7 +941,6 @@ body::before {
 }
 .pbar-fill { height: 100%; width: 0%; background: var(--c-coral); border-radius: 99px; }
 
-/* FOOTER */
 .foot {
   display: flex; align-items: center; justify-content: space-between; gap: 14px;
   padding: 18px 22px;
@@ -993,7 +977,6 @@ body::before {
   letter-spacing: 1px;
 }
 
-/* RESPONSIVE */
 @media (max-width: 640px) {
   .shell { padding: 20px 16px 60px; }
   .top { margin-bottom: 20px; }
@@ -1103,7 +1086,7 @@ body::before {
       </span>
       <span class="tlabel">
         <span class="tmain">Download</span>
-        <span class="tsub">Url</span>
+        <span class="tsub">Universal</span>
       </span>
     </button>
     <button class="tab" data-tab="yt">
@@ -1112,7 +1095,7 @@ body::before {
       </span>
       <span class="tlabel">
         <span class="tmain">YouTube</span>
-        <span class="tsub">Search</span>
+        <span class="tsub">Search &amp; Save</span>
       </span>
     </button>
     <button class="tab" data-tab="status">
@@ -1121,7 +1104,7 @@ body::before {
       </span>
       <span class="tlabel">
         <span class="tmain">Status</span>
-        <span class="tsub">Api</span>
+        <span class="tsub">System Health</span>
       </span>
     </button>
   </nav>
@@ -1132,7 +1115,7 @@ body::before {
       <div class="inp-card">
         <div class="inp-label">
           <span class="ldot"></span>
-          <span>Tempel link</span>
+          <span>Tempel link dari platform apapun</span>
         </div>
         <div class="inp-row">
           <div class="input-wrap">
@@ -1157,10 +1140,9 @@ body::before {
           <span class="ih-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
           </span>
-          <span>Tempel link</span>
+          <span>Tempel link dari aplikasi manapun — sistem akan mendeteksi platformnya otomatis</span>
         </div>
       </div>
-
       <div class="result" id="dlout"></div>
     </section>
 
@@ -1190,7 +1172,7 @@ body::before {
           <span class="ih-icon">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
           </span>
-          <span>Search</span>
+          <span>Ketik kata kunci untuk mencari — atau tempel URL YouTube untuk mengunduh langsung</span>
         </div>
       </div>
       <div class="result" id="ytout"></div>
@@ -1217,7 +1199,6 @@ body::before {
           </button>
         </div>
       </div>
-
       <div class="status-list" id="statusGrid">
         <div class="svc">
           <div class="svc-left">
@@ -1239,7 +1220,7 @@ body::before {
   <footer class="foot">
     <div class="foot-left">
       <span>Downloader AIO</span>
-      <span class="foot-version">Ega</span>
+      <span class="foot-version">V11</span>
     </div>
     <span class="foot-by">Created by Egaa</span>
   </footer>
@@ -1266,7 +1247,6 @@ body::before {
 
 <script>
 const $ = (id) => document.getElementById(id);
-$('yr') && ($('yr').textContent = new Date().getFullYear());
 
 let actx = null;
 function initAudio() {
@@ -1403,7 +1383,7 @@ ytin.addEventListener('input', () => {
   });
 });
 
-/* DOWNLOAD */
+/* ============ DOWNLOAD ============ */
 const dlgo = $('dlgo');
 const dlout = $('dlout');
 
@@ -1505,6 +1485,7 @@ async function runDownload() {
       const tagText = isA ? 'Audio' : (isI ? 'Image' : 'Video');
       const q = m.quality || 'Default';
       const ext = (m.extension || '').toUpperCase();
+      const fn = ((data.title || 'media').replace(/[^a-z0-9]+/gi, '_').slice(0, 60)) + '.' + (m.extension || 'mp4').toLowerCase();
       return `
         <div class="row" style="animation-delay:${i * 25}ms">
           <div class="row-info">
@@ -1516,9 +1497,9 @@ async function runDownload() {
             ${!isI ? `<button class="b play" data-p="${esc(m.url)}" data-pt="${esc(data.title || 'Media')}" data-pi="${esc(data.thumbnail || data.author_avatar || '')}" data-pa="${isA ? '1' : '0'}">
               <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play
             </button>` : ''}
-            <a class="b dl" href="${esc(m.url)}" target="_blank" rel="noopener noreferrer" download>
+            <button class="b dl" data-dl="${esc(m.url)}" data-fn="${esc(fn)}">
               <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download
-            </a>
+            </button>
           </div>
         </div>`;
     }).join('');
@@ -1545,6 +1526,7 @@ async function runDownload() {
       </div>`;
 
     bindPlay(dlout);
+    bindDownload(dlout);
     S.ok();
 
     if (!prevV && prevA) {
@@ -1561,7 +1543,7 @@ async function runDownload() {
   }
 }
 
-/* YOUTUBE */
+/* ============ YOUTUBE ============ */
 const ytgo = $('ytgo');
 const ytout = $('ytout');
 
@@ -1581,42 +1563,49 @@ async function runYouTube() {
       const data = await post('/api/youtube', { action: 'download', url: v });
       if (data.error) throw new Error(data.error);
 
-      const mp4 = (data.mp4 || []).filter(m => m.url);
+      const mp4Progressive = (data.mp4 || []).filter(m => m.url);
+      const mp4VideoOnly = (data.mp4video_only || []).filter(m => m.url);
       const mp3 = (data.mp3 || []).filter(m => m.url);
-      if (!mp4.length && !mp3.length) throw new Error('Link unduhan tidak tersedia');
 
-      const prevSrc = mp4[0]?.url || mp3[0]?.url;
-      const isVid = !!mp4[0]?.url;
-      const thumb = data.thumbnail ? `<img class="thumb" src="${esc(data.thumbnail)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">` : '';
+      if (!mp4Progressive.length && !mp4VideoOnly.length && !mp3.length) {
+        throw new Error('Link unduhan tidak tersedia');
+      }
 
-      const preview = prevSrc ? (isVid
-        ? `<div class="prev"><span class="prev-tag">Preview Video</span><video controls playsinline preload="metadata" src="${esc(prevSrc)}"></video></div>`
-        : `<div class="prev"><span class="prev-tag">Preview Audio</span><div class="prev-audio">
-             <div class="ap-head"><div class="ap-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div>
-             <div class="ap-title">${esc(data.title)}</div></div>
-             <audio controls preload="metadata" src="${esc(prevSrc)}"></audio></div></div>`) : '';
+      const thumb = data.thumbnail
+        ? `<img class="thumb" src="${esc(data.thumbnail)}" alt="" referrerpolicy="no-referrer" onerror="this.style.display='none'">`
+        : '';
+
+      const previewSrc = mp4Progressive[0]?.url || null;
+      const preview = previewSrc
+        ? `<div class="prev"><span class="prev-tag">Preview Video</span><video controls playsinline preload="metadata" src="${esc(previewSrc)}"></video></div>`
+        : `<div class="st" style="margin-bottom:16px">Preview tidak tersedia — pakai download langsung.</div>`;
 
       const allRows = [
-        ...mp4.map(m => ({ t: 'Video', c: 'v', q: m.quality, e: 'MP4', u: m.url, a: false })),
-        ...mp3.map(m => ({ t: 'Audio', c: 'a', q: m.quality, e: 'MP3', u: m.url, a: true }))
+        ...mp4Progressive.map(m => ({ t: 'Video', c: 'v', q: m.quality, e: 'MP4', u: m.url, a: false, note: null, playable: true })),
+        ...mp4VideoOnly.map(m => ({ t: 'Video', c: 'v', q: m.quality, e: 'MP4', u: m.url, a: false, note: 'Tanpa audio (video only)', playable: false })),
+        ...mp3.map(m => ({ t: 'Audio', c: 'a', q: m.quality, e: 'MP3', u: m.url, a: true, note: null, playable: true }))
       ];
 
-      const rows = allRows.map((m, i) => `
-        <div class="row" style="animation-delay:${i * 25}ms">
-          <div class="row-info">
-            <span class="rtag ${m.c}">${m.t}</span>
-            <span class="rq">${esc(m.q)}</span>
-            <span class="re">.${m.e}</span>
-          </div>
-          <div class="row-act">
-            <button class="b play" data-p="${esc(m.u)}" data-pt="${esc(data.title)}" data-pi="${esc(data.thumbnail || '')}" data-pa="${m.a ? '1' : '0'}">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play
-            </button>
-            <a class="b dl" href="${esc(m.u)}" target="_blank" rel="noopener noreferrer" download>
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download
-            </a>
-          </div>
-        </div>`).join('');
+      const rows = allRows.map((m, i) => {
+        const fn = ((data.title || 'video').replace(/[^a-z0-9]+/gi, '_').slice(0, 60)) + '.' + m.e.toLowerCase();
+        return `
+          <div class="row" style="animation-delay:${i * 25}ms">
+            <div class="row-info">
+              <span class="rtag ${m.c}">${m.t}</span>
+              <span class="rq">${esc(m.q)}</span>
+              <span class="re">.${m.e}</span>
+              ${m.note ? `<span class="re" style="color:var(--danger)">• ${m.note}</span>` : ''}
+            </div>
+            <div class="row-act">
+              ${m.playable ? `<button class="b play" data-p="${esc(m.u)}" data-pt="${esc(data.title)}" data-pi="${esc(data.thumbnail || '')}" data-pa="${m.a ? '1' : '0'}">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play
+              </button>` : ''}
+              <button class="b dl" data-dl="${esc(m.u)}" data-fn="${esc(fn)}">
+                <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Download
+              </button>
+            </div>
+          </div>`;
+      }).join('');
 
       ytout.innerHTML = `
         <div class="card">
@@ -1632,6 +1621,7 @@ async function runYouTube() {
         </div>`;
 
       bindPlay(ytout);
+      bindDownload(ytout);
       S.ok();
     } else {
       const data = await post('/api/youtube', { action: 'search', query: v });
@@ -1681,7 +1671,7 @@ async function runYouTube() {
   }
 }
 
-/* STATUS */
+/* ============ STATUS ============ */
 const statusGrid = $('statusGrid');
 const statusOverall = $('statusOverall');
 const statusSub = $('statusSub');
@@ -1775,7 +1765,7 @@ window.addEventListener('load', () => {
   setTimeout(() => loadStatus(false), 800);
 });
 
-/* PLAYER */
+/* ============ PLAYER ============ */
 const player = $('player');
 const paudio = $('paudio');
 const ptitle = $('ptitle');
@@ -1859,7 +1849,46 @@ function bindPlay(root) {
   });
 }
 
-/* LOADER */
+function bindDownload(root) {
+  root.querySelectorAll('[data-dl]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (btn.disabled) return;
+      const url = btn.dataset.dl;
+      const filename = btn.dataset.fn || 'media.mp4';
+      const original = btn.innerHTML;
+
+      btn.innerHTML = '<span class="spin" style="width:12px;height:12px;border-width:2px;border-top-color:transparent"></span> Loading';
+      btn.disabled = true;
+
+      try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 8000);
+
+        btn.innerHTML = '✓ Downloaded';
+        setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 1800);
+      } catch (err) {
+        window.open(url, '_blank');
+        btn.innerHTML = original;
+        btn.disabled = false;
+      }
+    });
+  });
+}
+
+/* ============ LOADER ============ */
 (function bootLoader() {
   const loader = $('loader');
   const fill = $('ldFill');
