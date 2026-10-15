@@ -1,7 +1,7 @@
 /* ============================================================
-   YOUTUBE API — By Egaa v3
-   Search: Innertube (youtubei)
-   Download: ytdl-core (native, no external API)
+   YOUTUBE API — By Egaa v4
+   Search: Innertube
+   Download: ytdl-core (progressive prioritized)
    ============================================================ */
 
 const axios = require('axios');
@@ -16,9 +16,6 @@ const yt = axios.create({
   headers: { "User-Agent": UA, "Content-Type": "application/json", Origin: YT, Referer: YT + "/" }
 });
 
-/* ============================================================
-   CONFIG
-   ============================================================ */
 async function getConfig() {
   try {
     const res = await axios.get(YT + "/?hl=en", {
@@ -44,7 +41,6 @@ function collect(node, out) {
 function mapVideo(v) {
   const owner = v.ownerText?.runs?.[0];
   const path = owner?.navigationEndpoint?.browseEndpoint?.canonicalBaseUrl;
-  const snippet = v.detailedMetadataSnippets?.[0] ? text(v.detailedMetadataSnippets[0].snippetText) : null;
   return {
     videoId: v.videoId,
     title: text(v.title),
@@ -52,15 +48,11 @@ function mapVideo(v) {
     duration: text(v.lengthText),
     views: text(v.viewCountText),
     published: text(v.publishedTimeText),
-    description: snippet || text(v.descriptionSnippet),
     channel: { name: text(v.ownerText), url: path ? YT + path : null },
     thumbnail: `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`
   };
 }
 
-/* ============================================================
-   SEARCH
-   ============================================================ */
 async function search(query) {
   const cfg = await getConfig();
   const res = await yt.post(`${YT}/youtubei/v1/search?key=${cfg.key}&prettyPrint=false`, {
@@ -81,9 +73,6 @@ async function search(query) {
   return { query, total: results.length, results };
 }
 
-/* ============================================================
-   EXTRACT VIDEO ID
-   ============================================================ */
 function extractVideoId(input) {
   const s = String(input).trim();
   if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
@@ -91,16 +80,12 @@ function extractVideoId(input) {
   return m ? m[1] : null;
 }
 
-/* ============================================================
-   DOWNLOAD — ytdl-core
-   ============================================================ */
 async function download(input) {
   const videoId = extractVideoId(input);
   if (!videoId) throw new Error("Video ID tidak valid");
 
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
-  // Ambil info video
   let info;
   try {
     info = await ytdl.getInfo(videoUrl, {
@@ -123,89 +108,63 @@ async function download(input) {
   const thumbnail = info.videoDetails?.thumbnails?.slice(-1)[0]?.url
     || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-  /* Kumpulkan format MP4 (progressive: video+audio) */
-  const mp4 = [];
+  const mp4 = [];   // progressive (video + audio)
+  const mp4v = [];  // video only
   const mp3 = [];
 
-  // Filter yang ada video + audio (progressive)
   info.formats.forEach(f => {
     if (!f.url) return;
 
     const hasVideo = f.hasVideo;
     const hasAudio = f.hasAudio;
     const quality = f.qualityLabel || f.quality || '';
+    const hMatch = quality.match(/(\d+)p/);
+    const height = hMatch ? parseInt(hMatch[1]) : 0;
 
-    // Progressive (video + audio)
     if (hasVideo && hasAudio) {
-      const hMatch = quality.match(/(\d+)p/);
-      const height = hMatch ? parseInt(hMatch[1]) : 0;
       mp4.push({
         quality: quality || 'Video',
         format: 'mp4',
         url: f.url,
         height,
-        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null,
-        type: 'progressive',
-        itag: f.itag
+        has_audio: true,
+        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null
+      });
+    } else if (hasVideo && !hasAudio) {
+      if (height < 144) return;
+      mp4v.push({
+        quality: quality + ' (tanpa audio)',
+        format: 'mp4',
+        url: f.url,
+        height,
+        has_audio: false,
+        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null
+      });
+    } else if (hasAudio && !hasVideo) {
+      const bitrate = f.audioBitrate || 128;
+      mp3.push({
+        quality: `${bitrate}kbps`,
+        format: 'mp3',
+        url: f.url,
+        bitrate,
+        has_audio: true,
+        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null
       });
     }
   });
 
-  // Kalau gak ada progressive, ambil video-only sebagai fallback
-  if (!mp4.length) {
-    info.formats.forEach(f => {
-      if (!f.url || !f.hasVideo) return;
-      const quality = f.qualityLabel || 'Video';
-      const hMatch = quality.match(/(\d+)p/);
-      const height = hMatch ? parseInt(hMatch[1]) : 0;
-      if (height < 144) return;
-      mp4.push({
-        quality: quality + ' (video only)',
-        format: 'mp4',
-        url: f.url,
-        height,
-        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null,
-        type: 'adaptive',
-        itag: f.itag
-      });
-    });
-  }
-
-  // Audio
-  info.formats.forEach(f => {
-    if (!f.url || !f.hasAudio || f.hasVideo) return;
-    const bitrate = f.audioBitrate || 128;
-    mp3.push({
-      quality: `${bitrate}kbps`,
-      format: 'mp3',
-      url: f.url,
-      bitrate,
-      size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null,
-      itag: f.itag
-    });
-  });
-
-  // Sort
   mp4.sort((a, b) => (b.height || 0) - (a.height || 0));
+  mp4v.sort((a, b) => (b.height || 0) - (a.height || 0));
   mp3.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
 
-  // Dedupe
-  const seenMp4 = new Set();
-  const mp4Unique = mp4.filter(m => {
-    const k = `${m.height}-${m.type}`;
-    if (seenMp4.has(k)) return false;
-    seenMp4.add(k);
-    return true;
-  });
+  const seenH = new Set();
+  const mp4u = mp4.filter(m => { if (seenH.has(m.height)) return false; seenH.add(m.height); return true; });
+  const seenV = new Set();
+  const mp4vu = mp4v.filter(m => { if (seenV.has(m.height)) return false; seenV.add(m.height); return true; });
+  const seenA = new Set();
+  const mp3u = mp3.filter(m => { if (seenA.has(m.bitrate)) return false; seenA.add(m.bitrate); return true; });
 
-  const seenMp3 = new Set();
-  const mp3Unique = mp3.filter(m => {
-    if (seenMp3.has(m.bitrate)) return false;
-    seenMp3.add(m.bitrate);
-    return true;
-  });
-
-  if (!mp4Unique.length && !mp3Unique.length) {
+  if (!mp4u.length && !mp4vu.length && !mp3u.length) {
     throw new Error('Tidak ada format tersedia (mungkin video age-restricted)');
   }
 
@@ -217,14 +176,12 @@ async function download(input) {
     url: videoUrl,
     thumbnail,
     source: 'ytdl-core',
-    mp4: mp4Unique.slice(0, 8),
-    mp3: mp3Unique.slice(0, 4)
+    mp4: mp4u.slice(0, 6),
+    mp4video_only: mp4vu.slice(0, 4),
+    mp3: mp3u.slice(0, 4)
   };
 }
 
-/* ============================================================
-   HANDLER
-   ============================================================ */
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
