@@ -1,11 +1,11 @@
 /* ============================================================
-   YOUTUBE API — By Egaa v4
+   YOUTUBE API — By Egaa v5
    Search: Innertube
-   Download: ytdl-core (progressive prioritized)
+   Download: youtubei.js (no filesystem writes)
    ============================================================ */
 
 const axios = require('axios');
-const ytdl = require('@distube/ytdl-core');
+const { Innertube } = require('youtubei.js');
 
 const YT = "https://www.youtube.com";
 const UA = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36";
@@ -80,77 +80,105 @@ function extractVideoId(input) {
   return m ? m[1] : null;
 }
 
+/* ============================================================
+   DOWNLOAD — youtubei.js (no filesystem writes)
+   ============================================================ */
 async function download(input) {
   const videoId = extractVideoId(input);
   if (!videoId) throw new Error("Video ID tidak valid");
 
   const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
+  let ytClient;
   let info;
   try {
-    info = await ytdl.getInfo(videoUrl, {
-      requestOptions: {
-        headers: {
-          'User-Agent': UA,
-          'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7'
-        }
-      }
+    ytClient = await Innertube.create({
+      lang: 'id',
+      location: 'ID',
+      retrieve_player: true,
+      generate_session_locally: true
     });
+    info = await ytClient.getInfo(videoId);
   } catch (err) {
-    throw new Error(`Gagal mengambil info: ${err.message}`);
+    throw new Error(`Gagal akses YouTube: ${err.message}`);
   }
 
-  if (!info || !info.formats) throw new Error('Info video tidak tersedia');
+  if (!info) throw new Error('Info video tidak tersedia');
 
-  const title = info.videoDetails?.title || 'Video';
-  const author = info.videoDetails?.author || null;
-  const durationSec = info.videoDetails?.lengthSeconds;
-  const thumbnail = info.videoDetails?.thumbnails?.slice(-1)[0]?.url
+  const title = info.basic_info?.title || 'Video';
+  const author = info.basic_info?.author || null;
+  const duration = info.basic_info?.duration;
+  const thumbnail = info.basic_info?.thumbnail?.[0]?.url
     || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 
-  const mp4 = [];   // progressive (video + audio)
+  // Kumpulkan streaming data
+  let streaming = null;
+  try {
+    streaming = info.streaming_data;
+    if (!streaming) {
+      streaming = await info.getStreamingData();
+    }
+  } catch (err) {
+    // Coba langsung via getStreamingData
+  }
+
+  if (!streaming) throw new Error('Streaming data tidak tersedia');
+
+  const mp4 = [];   // progressive (video+audio)
   const mp4v = [];  // video only
   const mp3 = [];
 
-  info.formats.forEach(f => {
-    if (!f.url) return;
+  const formats = streaming.formats || [];
+  const adaptive = streaming.adaptive_formats || [];
 
-    const hasVideo = f.hasVideo;
-    const hasAudio = f.hasAudio;
-    const quality = f.qualityLabel || f.quality || '';
+  // Progressive formats
+  formats.forEach(f => {
+    const url = f.decipher(ytClient.session.player);
+    if (!url) return;
+    const quality = f.quality_label || f.quality || 'Video';
     const hMatch = quality.match(/(\d+)p/);
     const height = hMatch ? parseInt(hMatch[1]) : 0;
+    mp4.push({
+      quality: quality,
+      format: 'mp4',
+      url,
+      height,
+      has_audio: true,
+      size: f.content_length ? `${(parseInt(f.content_length) / 1024 / 1024).toFixed(1)}MB` : null
+    });
+  });
 
-    if (hasVideo && hasAudio) {
-      mp4.push({
-        quality: quality || 'Video',
-        format: 'mp4',
-        url: f.url,
-        height,
-        has_audio: true,
-        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null
-      });
-    } else if (hasVideo && !hasAudio) {
-      if (height < 144) return;
-      mp4v.push({
-        quality: quality + ' (tanpa audio)',
-        format: 'mp4',
-        url: f.url,
-        height,
-        has_audio: false,
-        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null
-      });
-    } else if (hasAudio && !hasVideo) {
-      const bitrate = f.audioBitrate || 128;
-      mp3.push({
-        quality: `${bitrate}kbps`,
-        format: 'mp3',
-        url: f.url,
-        bitrate,
-        has_audio: true,
-        size: f.contentLength ? `${(f.contentLength / 1024 / 1024).toFixed(1)}MB` : null
-      });
-    }
+  // Adaptive video only
+  adaptive.filter(f => f.has_video && !f.has_audio).forEach(f => {
+    const url = f.decipher(ytClient.session.player);
+    if (!url) return;
+    const quality = f.quality_label || 'Video';
+    const hMatch = quality.match(/(\d+)p/);
+    const height = hMatch ? parseInt(hMatch[1]) : 0;
+    if (height < 144) return;
+    mp4v.push({
+      quality: quality + ' (tanpa audio)',
+      format: 'mp4',
+      url,
+      height,
+      has_audio: false,
+      size: f.content_length ? `${(parseInt(f.content_length) / 1024 / 1024).toFixed(1)}MB` : null
+    });
+  });
+
+  // Adaptive audio
+  adaptive.filter(f => f.has_audio && !f.has_video).forEach(f => {
+    const url = f.decipher(ytClient.session.player);
+    if (!url) return;
+    const bitrate = Math.round((f.bitrate || 128000) / 1000);
+    mp3.push({
+      quality: `${bitrate}kbps`,
+      format: 'mp3',
+      url,
+      bitrate,
+      has_audio: true,
+      size: f.content_length ? `${(parseInt(f.content_length) / 1024 / 1024).toFixed(1)}MB` : null
+    });
   });
 
   mp4.sort((a, b) => (b.height || 0) - (a.height || 0));
@@ -172,10 +200,10 @@ async function download(input) {
     videoId,
     title,
     author,
-    duration: durationSec ? `${durationSec}s` : null,
+    duration: duration ? `${duration}s` : null,
     url: videoUrl,
     thumbnail,
-    source: 'ytdl-core',
+    source: 'youtubei.js',
     mp4: mp4u.slice(0, 6),
     mp4video_only: mp4vu.slice(0, 4),
     mp3: mp3u.slice(0, 4)
