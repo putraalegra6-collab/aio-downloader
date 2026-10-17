@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#f0e9dc" />
-<title>Downloader AIO & PlayMusic — By Egaa</title>
+<title>Downloader AIO — By Egaa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
@@ -17,10 +17,15 @@
   --ink-2: #4a4a4a;
   --muted: #8a857a;
   --c-coral: #f4a8a8;
+  --c-pink: #f5c9d6;
   --c-purple: #b8a9e8;
+  --c-lav: #d4c8f0;
   --c-mint: #8ee0d0;
+  --c-teal: #5fc9b8;
   --c-yellow: #f5d76e;
   --c-blue: #8bc4f0;
+  --c-orange: #f0a878;
+  --c-green: #4cb88a;
   --danger: #e05656;
   --ok: #4cb88a;
   --bw: 2.5px;
@@ -40,10 +45,11 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   font-size: 14.5px;
   line-height: 1.55;
   font-weight: 500;
+  letter-spacing: -0.1px;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   overflow-x: hidden;
@@ -51,241 +57,1141 @@ body {
 }
 
 body::before {
-  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background-image: radial-gradient(circle at 1.5px 1.5px, rgba(26,26,26,0.045) 1.5px, transparent 2px);
-  background-size: 32px 32px;
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle at 1.5px 1.5px, rgba(26,26,26,0.045) 1.5px, transparent 2px),
+    linear-gradient(135deg, transparent 48%, rgba(26,26,26,0.025) 49%, rgba(26,26,26,0.025) 51%, transparent 52%);
+  background-size: 32px 32px, 48px 48px;
+  background-position: 0 0, 12px 12px;
 }
 
 .shell { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; position: relative; z-index: 1; }
 
-/* HEADER & HERO (SAMA KAYAK SEBELUMNYA) */
-.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: 12px; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r); padding: 10px 16px 10px 10px; }
-.mark { width: 42px; height: 42px; background: var(--c-coral); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); display: grid; place-items: center; }
-.brand-info { display: flex; flex-direction: column; line-height: 1.1; }
-.brand-name { font-weight: 800; font-size: 14px; }
-.brand-by { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.8px; margin-top: 3px; }
-.brand-by b { color: var(--ink); background: var(--c-yellow); border: 1.5px solid var(--ink); border-radius: 4px; padding: 1px 6px; }
-.live { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--c-mint); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; cursor: pointer; }
-.live .d { width: 8px; height: 8px; background: var(--ok); border: 1.5px solid var(--ink); border-radius: 50%; }
-.hero { margin-bottom: 26px; }
-.hero h1 { font-weight: 800; font-size: clamp(26px, 4.2vw, 38px); line-height: 1.12; letter-spacing: -1px; margin-bottom: 12px; }
-.hero h1 .hl { background: var(--c-yellow); border: var(--bw) solid var(--ink); border-radius: 6px; padding: 1px 10px; display: inline-block; box-shadow: var(--sh-sm); }
-.hero h1 .hl.alt { background: var(--c-purple); }
-.hero p { font-size: 14px; color: var(--ink-2); max-width: 560px; line-height: 1.65; }
+/* LOADER */
+#loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--bg);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 26px;
+  transition: opacity 0.5s var(--ease), visibility 0.5s;
+}
+#loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.ld-mark {
+  width: 76px; height: 76px;
+  background: var(--c-coral);
+  border: var(--bw-thick) solid var(--ink);
+  box-shadow: 6px 6px 0 var(--ink);
+  border-radius: var(--r);
+  display: grid; place-items: center;
+  animation: ldFloat 1.4s ease-in-out infinite;
+}
+@keyframes ldFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+.ld-text { font-weight: 800; font-size: 15px; letter-spacing: 0.5px; text-transform: uppercase; }
+.ld-bar { width: 220px; height: 8px; background: var(--bg-2); border: var(--bw) solid var(--ink); border-radius: 99px; overflow: hidden; box-shadow: var(--sh-sm); }
+.ld-bar-fill { height: 100%; width: 0%; background: var(--c-coral); transition: width 0.3s var(--ease); }
+.ld-hint { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
 
-/* TABS & PANELS */
+/* HEADER */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.brand {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--surface);
+  border: var(--bw-thick) solid var(--ink);
+  box-shadow: var(--sh);
+  border-radius: var(--r);
+  padding: 10px 16px 10px 10px;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.brand:hover { transform: translate(-2px, -2px); box-shadow: var(--sh-lg); }
+.mark {
+  width: 42px; height: 42px;
+  background: var(--c-coral);
+  border: var(--bw) solid var(--ink);
+  border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  flex-shrink: 0;
+}
+.brand-info { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-weight: 800; font-size: 14px; letter-spacing: -0.2px; }
+.brand-by {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  color: var(--ink-2); letter-spacing: 0.8px;
+  text-transform: uppercase; margin-top: 3px;
+}
+.brand-by b {
+  color: var(--ink); background: var(--c-yellow);
+  border: 1.5px solid var(--ink); border-radius: 4px;
+  padding: 1px 6px; font-weight: 700;
+}
+.live {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 14px;
+  background: var(--c-mint);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+}
+.live:hover { transform: translate(-2px,-2px); box-shadow: var(--sh); }
+.live:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+.live .d { width: 8px; height: 8px; background: var(--ok); border: 1.5px solid var(--ink); border-radius: 50%; flex-shrink: 0; }
+.live.degraded { background: var(--c-yellow); }
+.live.critical { background: var(--danger); color: #fff; }
+.live.critical .d { background: #fff; }
+.live.checking .d { background: var(--c-orange); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* HERO */
+.hero { margin-bottom: 26px; }
+.hero h1 {
+  font-weight: 800;
+  font-size: clamp(26px, 4.2vw, 38px);
+  line-height: 1.12; letter-spacing: -1px;
+  margin-bottom: 12px;
+}
+.hero h1 .hl {
+  background: var(--c-yellow);
+  border: var(--bw) solid var(--ink);
+  border-radius: 6px;
+  padding: 1px 10px;
+  display: inline-block;
+  box-shadow: var(--sh-sm);
+}
+.hero h1 .hl.alt { background: var(--c-purple); }
+.hero p { font-size: 14px; font-weight: 500; color: var(--ink-2); max-width: 560px; line-height: 1.65; }
+.platform-mini {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 18px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.6px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+.platform-mini .pm-label {
+  padding: 4px 8px;
+  background: var(--ink);
+  color: var(--surface);
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-size: 9px;
+}
+.platform-mini .pm-sep {
+  width: 4px; height: 4px;
+  background: var(--muted);
+  border-radius: 50%;
+  opacity: 0.5;
+}
+.platform-mini .pm-item {
+  color: var(--ink-2);
+  font-weight: 600;
+  transition: color 0.15s var(--ease);
+}
+.platform-mini .pm-item:hover { color: var(--ink); }
+
+/* TABS */
 .tabs { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
-.tab { flex: 1; min-width: 140px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-weight: 700; font-size: 13.5px; cursor: pointer; transition: 0.15s; text-align: left; }
-.tab .ticon { width: 34px; height: 34px; display: grid; place-items: center; background: var(--bg-2); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); transition: 0.15s; }
-.tab .tlabel { display: flex; flex-direction: column; gap: 2px; }
-.tab .tlabel .tmain { font-weight: 800; font-size: 13.5px; }
-.tab .tlabel .tsub { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; color: var(--muted); text-transform: uppercase; }
+.tab {
+  flex: 1; min-width: 160px;
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 13.5px;
+  letter-spacing: -0.1px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s;
+  text-align: left;
+}
+.tab .ticon {
+  width: 34px; height: 34px;
+  flex-shrink: 0;
+  display: grid; place-items: center;
+  background: var(--bg-2);
+  border: var(--bw) solid var(--ink);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  transition: background 0.15s, color 0.15s;
+}
+.tab .tlabel { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.tab .tlabel .tmain { font-weight: 800; font-size: 13.5px; line-height: 1.1; }
+.tab .tlabel .tsub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 600;
+  color: var(--muted); letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
 .tab.active { background: var(--c-yellow); }
 .tab.active .ticon { background: var(--ink); color: var(--c-yellow); }
 .tab.active .tlabel .tsub { color: var(--ink-2); }
+.tab:not(.active):hover { transform: translate(-2px,-2px); box-shadow: var(--sh); }
+.tab:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
 
+/* PANEL */
 .panel { display: none; }
 .panel.active { display: block; animation: fadeIn 0.35s var(--ease); }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
 /* INPUT CARD */
-.inp-card { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 22px; margin-bottom: 18px; position: relative; overflow: hidden; }
-.inp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--c-coral) 0%, var(--c-coral) 25%, var(--c-mint) 25%, var(--c-mint) 50%, var(--c-purple) 50%, var(--c-purple) 75%, var(--c-blue) 75%, var(--c-blue) 100%); }
-.inp-label { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--ink-2); margin-bottom: 12px; text-transform: uppercase; }
-.inp-label .ldot { width: 8px; height: 8px; background: var(--c-coral); border: 1.5px solid var(--ink); border-radius: 50%; }
+.inp-card {
+  background: var(--surface);
+  border: var(--bw-thick) solid var(--ink);
+  box-shadow: var(--sh-lg);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  margin-bottom: 18px;
+  position: relative;
+  overflow: hidden;
+}
+.inp-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--c-coral) 0%, var(--c-coral) 20%, var(--c-yellow) 20%, var(--c-yellow) 40%, var(--c-mint) 40%, var(--c-mint) 60%, var(--c-purple) 60%, var(--c-purple) 80%, var(--c-blue) 80%, var(--c-blue) 100%);
+}
+.inp-label {
+  display: flex; align-items: center; gap: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: var(--ink-2); margin-bottom: 12px;
+}
+.inp-label .ldot {
+  width: 8px; height: 8px;
+  background: var(--c-coral);
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+}
 .inp-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.input-wrap { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 12px; background: var(--bg); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); padding: 0 14px; transition: 0.15s; }
-.input-wrap:focus-within { background: var(--surface); transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--c-blue); }
-.input-wrap input { flex: 1; min-width: 0; padding: 16px 0; background: transparent; border: none; outline: none; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; }
-.go { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 24px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-weight: 800; font-size: 13px; text-transform: uppercase; cursor: pointer; transition: 0.15s; }
-.go:hover:not(:disabled) { transform: translate(-3px,-3px); box-shadow: 6px 6px 0 var(--ink); background: var(--c-coral); color: var(--ink); }
+.input-wrap {
+  flex: 1; min-width: 200px;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--bg);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  padding: 0 14px;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s;
+}
+.input-wrap:focus-within {
+  background: var(--surface);
+  transform: translate(-2px,-2px);
+  box-shadow: 4px 4px 0 var(--c-blue);
+}
+.input-wrap .ic { display: flex; flex-shrink: 0; color: var(--ink-2); }
+.input-wrap input {
+  flex: 1; min-width: 0;
+  padding: 16px 0;
+  background: transparent; border: none; outline: none;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 500;
+  color: var(--ink);
+}
+.input-wrap input::placeholder { color: var(--muted); }
 
-/* RESULT */
-.st { padding: 32px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; text-transform: uppercase; }
-.st.err { background: var(--c-coral); }
-.spin { display: inline-block; width: 16px; height: 16px; border: 2.5px solid var(--ink); border-top-color: transparent; border-radius: 50%; animation: sp 0.7s linear infinite; }
+.detect {
+  display: none;
+  align-items: center; gap: 8px;
+  padding: 8px 14px 8px 12px;
+  border: 2.5px solid var(--ink);
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  flex-shrink: 0; white-space: nowrap;
+  animation: pillIn 0.35s var(--ease);
+  box-shadow: 2px 2px 0 var(--ink);
+}
+.detect.show { display: inline-flex; }
+.detect .pdot {
+  width: 8px; height: 8px;
+  background: var(--ink);
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+  animation: pdPulse 1.5s ease-in-out infinite;
+}
+@keyframes pillIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
+@keyframes pdPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
+
+.detect[data-platform="tiktok"] { background: #000; color: #fff; border-color: #000; box-shadow: 2px 2px 0 #25F4EE; }
+.detect[data-platform="tiktok"] .pdot { background: #25F4EE; border-color: #fff; }
+.detect[data-platform="instagram"] { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: #fff; border-color: #dc2743; box-shadow: 2px 2px 0 #dc2743; }
+.detect[data-platform="instagram"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="youtube"] { background: #FF0000; color: #fff; border-color: #FF0000; box-shadow: 2px 2px 0 #FF0000; }
+.detect[data-platform="youtube"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="facebook"] { background: #1877F2; color: #fff; border-color: #1877F2; box-shadow: 2px 2px 0 #1877F2; }
+.detect[data-platform="facebook"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="twitter"] { background: #000; color: #fff; border-color: #000; box-shadow: 2px 2px 0 #1DA1F2; }
+.detect[data-platform="twitter"] .pdot { background: #1DA1F2; border-color: #1DA1F2; }
+.detect[data-platform="spotify"] { background: #1DB954; color: #fff; border-color: #1DB954; box-shadow: 2px 2px 0 #1DB954; }
+.detect[data-platform="spotify"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="soundcloud"] { background: #FF5500; color: #fff; border-color: #FF5500; box-shadow: 2px 2px 0 #FF5500; }
+.detect[data-platform="soundcloud"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="reddit"] { background: #FF4500; color: #fff; border-color: #FF4500; box-shadow: 2px 2px 0 #FF4500; }
+.detect[data-platform="reddit"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="pinterest"] { background: #E60023; color: #fff; border-color: #E60023; box-shadow: 2px 2px 0 #E60023; }
+.detect[data-platform="pinterest"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="threads"] { background: #000; color: #fff; border-color: #000; box-shadow: 2px 2px 0 #fff; }
+.detect[data-platform="threads"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="twitch"] { background: #9146FF; color: #fff; border-color: #9146FF; box-shadow: 2px 2px 0 #9146FF; }
+.detect[data-platform="twitch"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="capcut"] { background: #000; color: #fff; border-color: #000; box-shadow: 2px 2px 0 #fff; }
+.detect[data-platform="capcut"] .pdot { background: #fff; border-color: #fff; }
+.detect[data-platform="snapchat"] { background: #FFFC00; color: #000; border-color: #000; box-shadow: 2px 2px 0 #000; }
+.detect[data-platform="snapchat"] .pdot { background: #000; border-color: #000; }
+.detect[data-platform="link"] { background: var(--c-mint); color: var(--ink); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
+.detect[data-platform="link"] .pdot { background: var(--ok); border-color: var(--ink); }
+
+.inp-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: var(--bg);
+  border: 2px dashed var(--ink);
+  border-radius: var(--r-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  transition: opacity 0.3s var(--ease);
+}
+.inp-hint .ih-icon {
+  width: 14px; height: 14px;
+  flex-shrink: 0;
+  display: grid; place-items: center;
+  color: var(--ink-2);
+}
+.inp-hint.hide { opacity: 0; height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
+
+.go {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 16px 24px;
+  background: var(--ink); color: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 13px;
+  letter-spacing: 0.2px; text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s, color 0.15s;
+  white-space: nowrap; flex-shrink: 0;
+}
+.go:hover:not(:disabled) { transform: translate(-3px,-3px); box-shadow: 6px 6px 0 var(--ink); background: var(--c-coral); color: var(--ink); }
+.go:active:not(:disabled) { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+.go:disabled { opacity: 0.55; cursor: wait; }
+.go svg { transition: transform 0.2s var(--ease); }
+.go:hover:not(:disabled) svg { transform: translateX(3px); }
+
+@media (max-width: 640px) {
+  .inp-row { flex-direction: column; }
+  .go { width: 100%; }
+  .detect {
+    padding: 7px 12px 7px 10px;
+    font-size: 10.5px;
+    gap: 7px;
+  }
+  .detect .pdot { width: 7px; height: 7px; }
+}
+
+.result { display: flex; flex-direction: column; gap: 16px; }
+.st {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  padding: 32px 20px;
+  background: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh);
+  border-radius: var(--r-lg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.6px; text-transform: uppercase;
+  color: var(--ink-2);
+  animation: fadeIn 0.3s var(--ease);
+}
+.st.err { background: var(--c-coral); color: var(--ink); }
+.spin {
+  width: 16px; height: 16px;
+  border: 2.5px solid var(--ink);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: sp 0.7s linear infinite;
+}
 @keyframes sp { to { transform: rotate(360deg); } }
 
-.card { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 16px; }
-.card-bar { padding: 12px 18px; background: var(--ink); color: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; display: flex; justify-content: space-between; }
+.card {
+  background: var(--surface);
+  border: var(--bw-thick) solid var(--ink);
+  box-shadow: var(--sh-lg);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  animation: fadeIn 0.4s var(--ease) backwards;
+}
+.card-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 18px;
+  background: var(--ink); color: var(--surface);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  flex-wrap: wrap;
+}
+.card-bar .tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px;
+  background: var(--c-yellow); color: var(--ink);
+  border: 2px solid var(--surface);
+  border-radius: 99px; font-size: 10px;
+}
 .card-inner { padding: 22px; }
+
+.author-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg-2);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.author-avatar {
+  width: 48px; height: 48px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: grid; place-items: center;
+  color: var(--muted);
+}
+.author-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.author-info { flex: 1; min-width: 0; }
+.author-name {
+  font-weight: 800; font-size: 14px;
+  letter-spacing: -0.2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.author-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  color: var(--muted); letter-spacing: 0.4px;
+  text-transform: uppercase; margin-top: 2px;
+}
+.author-stats {
+  display: flex; gap: 12px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 600;
+  color: var(--ink-2);
+  flex-wrap: wrap;
+}
+.author-stats .stt {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--ink);
+  border-radius: 99px;
+}
+
 .card-head { display: flex; gap: 16px; margin-bottom: 20px; align-items: flex-start; flex-wrap: wrap; }
-.thumb { width: 120px; height: 120px; object-fit: cover; border: var(--bw) solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); }
-.card-title { font-weight: 800; font-size: 18px; line-height: 1.3; }
-.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--bg); border: var(--bw) solid var(--ink); border-radius: var(--r); margin-bottom: 10px; }
-.b { display: inline-flex; align-items: center; gap: 6px; padding: 9px 13px; border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r-sm); background: var(--surface); font-weight: 700; font-size: 11.5px; cursor: pointer; }
+.thumb {
+  width: 150px; height: 150px;
+  object-fit: cover;
+  border: var(--bw) solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: var(--sh-sm);
+  background: var(--bg-2);
+  flex-shrink: 0; display: block;
+}
+.head-info { flex: 1; min-width: 180px; }
+.card-title {
+  font-weight: 800; font-size: 18px;
+  line-height: 1.3; letter-spacing: -0.4px;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+.card-sub {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.5px; text-transform: uppercase;
+  padding: 4px 10px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--ink);
+  border-radius: 99px;
+}
+
+.artist-card {
+  display: flex; gap: 16px;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--c-mint), var(--c-teal));
+  border: var(--bw) solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: var(--sh-sm);
+  margin-bottom: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.artist-avatar {
+  width: 90px; height: 90px;
+  border: var(--bw) solid var(--ink);
+  border-radius: 50%;
+  background: var(--surface);
+  overflow: hidden;
+  flex-shrink: 0;
+  display: grid; place-items: center;
+  color: var(--muted);
+  box-shadow: var(--sh-sm);
+}
+.artist-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.artist-meta { flex: 1; min-width: 160px; }
+.artist-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.4px; text-transform: uppercase;
+  color: var(--ink-2); margin-bottom: 4px;
+}
+.artist-name {
+  font-weight: 800; font-size: 18px;
+  letter-spacing: -0.4px; line-height: 1.15;
+  margin-bottom: 4px;
+}
+.artist-track {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; font-weight: 600;
+  color: var(--ink-2);
+}
+
+.prev {
+  margin-bottom: 20px;
+  border: var(--bw) solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: var(--sh-sm);
+  overflow: hidden;
+  background: var(--ink);
+  position: relative;
+}
+.prev video { display: block; width: 100%; max-height: 420px; background: #000; }
+.prev-tag {
+  position: absolute; top: 12px; left: 12px; z-index: 2;
+  padding: 5px 11px;
+  background: var(--c-yellow);
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.prev-audio {
+  background: var(--c-mint);
+  padding: 18px;
+  display: flex; flex-direction: column; gap: 12px;
+}
+.ap-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.ap-icon {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  background: var(--surface);
+  border: var(--bw) solid var(--ink);
+  border-radius: var(--r-sm);
+  flex-shrink: 0;
+}
+.ap-title {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px; font-weight: 600;
+  word-break: break-all; line-height: 1.4;
+  min-width: 0;
+}
+.prev-audio audio { width: 100%; height: 42px; }
+
+.mlist { display: flex; flex-direction: column; gap: 10px; }
+.row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: var(--bw) solid var(--ink);
+  border-radius: var(--r);
+  box-shadow: var(--sh-sm);
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s;
+  flex-wrap: wrap;
+}
+.row:hover { background: var(--surface); transform: translate(-3px,-3px); box-shadow: 6px 6px 0 var(--ink); }
+.row-info { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rtag {
+  padding: 4px 9px;
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+}
+.rtag.v { background: var(--c-yellow); }
+.rtag.a { background: var(--c-mint); }
+.rtag.i { background: var(--c-purple); }
+.rq { font-weight: 800; font-size: 13.5px; letter-spacing: -0.2px; }
+.re { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; color: var(--muted); }
+.row-act { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.b {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 9px 13px;
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r-sm);
+  background: var(--surface); color: var(--ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 700; font-size: 11.5px;
+  letter-spacing: -0.1px; text-transform: uppercase;
+  cursor: pointer; text-decoration: none;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s;
+  white-space: nowrap; user-select: none;
+}
+.b:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); }
+.b:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+.b:disabled { opacity: 0.7; cursor: wait; }
 .b.dl { background: var(--ink); color: var(--surface); }
+.b.dl:hover { background: var(--c-coral); color: var(--ink); }
+.b.ghost { background: var(--surface); }
+.b.ghost:hover { background: var(--c-yellow); }
+
+.grid-info {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 18px;
+  background: var(--c-yellow);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  margin-bottom: 16px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.6px; text-transform: uppercase;
+  flex-wrap: wrap;
+}
+.grid-info b { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+.tile {
+  background: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+  animation: fadeIn 0.4s var(--ease) backwards;
+}
+.tile:hover { transform: translate(-3px,-3px); box-shadow: 6px 6px 0 var(--ink); }
+.tile-thumb {
+  position: relative; width: 100%;
+  aspect-ratio: 16/10;
+  background: var(--bg-2);
+  border-bottom: var(--bw) solid var(--ink);
+  overflow: hidden;
+}
+.tile-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.4s var(--ease); }
+.tile:hover .tile-thumb img { transform: scale(1.04); }
+.tile-dur {
+  position: absolute; bottom: 8px; right: 8px;
+  padding: 3px 8px;
+  background: var(--ink); color: var(--surface);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 700;
+}
+.tile-badge {
+  position: absolute; top: 8px; left: 8px;
+  padding: 4px 9px;
+  background: var(--c-coral);
+  border: 2px solid var(--ink);
+  border-radius: 6px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+}
+.tile-info { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.tile-title {
+  font-weight: 600; font-size: 12.5px;
+  line-height: 1.35; letter-spacing: -0.1px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden; min-height: 34px;
+  word-break: break-word;
+}
+.tile-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  color: var(--muted); letter-spacing: 0.2px;
+  text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tile-act { display: flex; gap: 8px; margin-top: auto; padding-top: 4px; }
+.tile-act .b { flex: 1; justify-content: center; padding: 8px 10px; font-size: 10.5px; }
 
 /* STATUS PAGE */
-.status-summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 22px; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); margin-bottom: 18px; flex-wrap: wrap; }
+.status-summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 22px;
+  background: var(--surface);
+  border: var(--bw-thick) solid var(--ink);
+  box-shadow: var(--sh-lg);
+  border-radius: var(--r-lg);
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
 .status-main { flex: 1; min-width: 220px; }
-.status-text { font-weight: 800; font-size: 20px; line-height: 1.1; margin-bottom: 6px; }
+.status-text {
+  font-weight: 800; font-size: 20px;
+  letter-spacing: -0.4px; line-height: 1.1;
+  margin-bottom: 6px;
+}
 .status-text.healthy { color: var(--ok); }
 .status-text.degraded { color: #c78f2c; }
 .status-text.critical { color: var(--danger); }
-.status-sub { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; }
+.status-text.checking { color: var(--muted); }
+.status-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 600;
+  color: var(--muted); letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
 .status-metrics { display: flex; gap: 10px; flex-wrap: wrap; }
-.metric { padding: 10px 14px; background: var(--bg); border: 2px solid var(--ink); border-radius: var(--r); text-align: center; min-width: 76px; }
-.metric-value { font-weight: 800; font-size: 18px; line-height: 1.1; }
+.metric {
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 2px solid var(--ink);
+  border-radius: var(--r);
+  text-align: center;
+  min-width: 76px;
+}
+.metric-value {
+  font-weight: 800; font-size: 18px;
+  letter-spacing: -0.5px; line-height: 1.1;
+}
 .metric-value.online { color: var(--ok); }
-.metric-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; color: var(--muted); text-transform: uppercase; margin-top: 2px; }
-.refresh-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-weight: 800; font-size: 12px; cursor: pointer; }
-.status-list { display: flex; flex-direction: column; gap: 10px; }
-.svc { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; background: var(--surface); border: var(--bw) solid var(--ink); border-radius: var(--r); }
-.svc-left { display: flex; align-items: center; gap: 12px; flex: 1; }
-.svc-dot { width: 12px; height: 12px; border: 2px solid var(--ink); border-radius: 50%; }
-.svc-dot.online { background: var(--ok); }
-.svc-dot.down { background: var(--danger); }
-.svc-name { font-weight: 700; font-size: 13px; }
-.svc-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; }
-.svc-badge { padding: 4px 10px; border: 2px solid var(--ink); border-radius: 99px; font-size: 9.5px; font-weight: 700; text-transform: uppercase; }
-.svc-badge.online { background: var(--c-mint); }
-.svc-badge.down { background: var(--danger); color: #fff; }
+.metric-value.latency { color: var(--ink); }
+.metric-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; font-weight: 600;
+  color: var(--muted); letter-spacing: 0.8px;
+  text-transform: uppercase; margin-top: 2px;
+}
+.refresh-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 18px;
+  background: var(--ink); color: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 12px;
+  letter-spacing: 0.2px; text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s;
+}
+.refresh-btn:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); background: var(--c-coral); color: var(--ink); }
+.refresh-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+.refresh-btn:disabled { opacity: 0.55; cursor: wait; }
+.refresh-btn:disabled svg { animation: sp 0.8s linear infinite; }
 
-/* FLOATING MUSIC BUTTON */
+.status-list { display: flex; flex-direction: column; gap: 10px; }
+.svc {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh-sm);
+  border-radius: var(--r);
+  transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease);
+  flex-wrap: wrap;
+}
+.svc:hover { transform: translate(-2px,-2px); box-shadow: var(--sh); }
+.svc-left { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1; }
+.svc-dot {
+  width: 12px; height: 12px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.svc-dot.online { background: var(--ok); box-shadow: 0 0 0 4px rgba(76,184,138,0.2); }
+.svc-dot.down { background: var(--danger); box-shadow: 0 0 0 4px rgba(224,86,86,0.2); }
+.svc-dot.checking { background: var(--c-orange); animation: pulse 1s infinite; }
+.svc-info { min-width: 0; flex: 1; }
+.svc-name { font-weight: 700; font-size: 13px; letter-spacing: -0.1px; line-height: 1.15; }
+.svc-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; font-weight: 600;
+  color: var(--muted); letter-spacing: 0.4px;
+  text-transform: uppercase; margin-top: 3px;
+}
+.svc-right { display: flex; align-items: center; gap: 12px; }
+.latency-wrap { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+.latency-bar {
+  flex: 1; height: 6px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--ink);
+  border-radius: 99px;
+  overflow: hidden;
+  min-width: 60px;
+}
+.latency-fill { height: 100%; border-radius: 99px; transition: width 0.5s var(--ease); }
+.latency-fill.good { background: var(--ok); }
+.latency-fill.mid { background: var(--c-yellow); }
+.latency-fill.slow { background: var(--c-orange); }
+.latency-fill.down { background: var(--danger); }
+.latency-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 700;
+  color: var(--ink-2);
+  min-width: 42px; text-align: right;
+}
+.svc-badge {
+  padding: 4px 10px;
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9.5px; font-weight: 700;
+  letter-spacing: 0.8px; text-transform: uppercase;
+}
+.svc-badge.online { background: var(--c-mint); }
+.svc-badge.down { background: var(--danger); color: #fff; border-color: var(--danger); }
+.svc-badge.checking { background: var(--c-yellow); }
+
+/* FOOTER */
+.foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  padding: 18px 22px;
+  margin-top: 48px;
+  background: var(--surface);
+  border: var(--bw) solid var(--ink);
+  box-shadow: var(--sh);
+  border-radius: var(--r-lg);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.8px; text-transform: uppercase;
+  color: var(--ink-2);
+  flex-wrap: wrap;
+}
+.foot-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.foot-by {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
+  background: var(--c-coral);
+  border: 2px solid var(--ink);
+  border-radius: 99px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: 11px;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+.foot-version {
+  padding: 4px 8px;
+  background: var(--c-yellow);
+  border: 1.5px solid var(--ink);
+  border-radius: 6px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* =======================================================
+   FLOATING MUSIC BUTTON (UI BARU)
+   ======================================================= */
 .music-fab {
-  position: fixed; bottom: 24px; right: 24px; z-index: 990;
-  width: 64px; height: 64px;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 999;
+  width: 60px;
+  height: 60px;
   background: var(--c-coral);
   border: var(--bw-thick) solid var(--ink);
   box-shadow: 6px 6px 0 var(--ink);
   border-radius: 50%;
-  display: grid; place-items: center;
-  cursor: pointer; transition: 0.3s var(--ease);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  animation: fabBounce 3s ease-in-out infinite;
 }
-.music-fab:hover { transform: translateY(-4px) scale(1.05); }
-.music-fab:active { transform: translateY(0) scale(0.95); box-shadow: 2px 2px 0 var(--ink); }
-.music-fab.playing { animation: fabPulse 2s infinite; }
-@keyframes fabPulse { 0%,100%{box-shadow: 6px 6px 0 var(--ink);} 50%{box-shadow: 6px 6px 0 var(--c-yellow);} }
-.music-fab .mini-cover { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: none; }
+@keyframes fabBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.music-fab:hover { transform: scale(1.08) translateY(-4px); }
+.music-fab:active { transform: scale(0.95) translateY(0); box-shadow: 2px 2px 0 var(--ink); }
+.music-fab svg { transition: transform 0.3s var(--ease); }
+.music-fab.playing svg { animation: sp 4s linear infinite; }
 
-/* PANEL MUSIC SEARCH */
-.music-search-panel {
-  position: fixed; bottom: 100px; right: 24px; z-index: 991;
-  width: 340px; max-width: calc(100vw - 48px);
+/* PANEL MUSIC (Mekar dari FAB) */
+.music-panel {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  width: 340px;
+  max-width: calc(100vw - 48px);
   background: var(--surface);
   border: var(--bw-thick) solid var(--ink);
   box-shadow: 8px 8px 0 var(--ink);
   border-radius: var(--r-lg);
-  display: none; flex-direction: column; overflow: hidden;
-  animation: popIn 0.3s var(--ease);
+  z-index: 998;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  transform-origin: bottom right;
+  animation: panelIn 0.3s var(--ease);
 }
-@keyframes popIn { from { opacity: 0; transform: scale(0.9) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-.music-search-panel.show { display: flex; }
-.msp-header { padding: 12px 16px; background: var(--ink); color: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-.msp-close { background: none; border: none; color: var(--surface); font-size: 16px; cursor: pointer; }
-.msp-search { padding: 12px; background: var(--bg); border-bottom: var(--bw) solid var(--ink); display: flex; gap: 8px; }
-.msp-input { flex: 1; padding: 10px; border: var(--bw) solid var(--ink); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; }
-.msp-btn { background: var(--ink); color: #fff; border: none; border-radius: var(--r-sm); padding: 0 14px; font-weight: 700; cursor: pointer; }
-.msp-results { max-height: 250px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-.msp-item { display: flex; align-items: center; gap: 10px; padding: 8px; border: 2px solid transparent; border-radius: var(--r-sm); cursor: pointer; }
-.msp-item:hover { background: var(--bg-2); border-color: var(--ink); }
-.msp-item img { width: 40px; height: 40px; border-radius: 4px; border: 1px solid var(--ink); object-fit: cover; }
-.msp-item-info { flex: 1; min-width: 0; }
-.msp-item-title { font-weight: 800; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.msp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+@keyframes panelIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+.music-panel.show { display: flex; }
 
-/* FLOATING PLAYER BAR (MUNCUL SAAT LAGU DIPUTER) */
-.floating-player {
-  position: fixed; bottom: 24px; left: 20px; right: 100px; z-index: 995;
-  max-width: 500px;
-  background: var(--surface);
-  border: var(--bw-thick) solid var(--ink);
-  box-shadow: 6px 6px 0 var(--ink);
-  border-radius: var(--r-lg);
-  padding: 10px 14px;
-  display: none; align-items: center; gap: 12px;
-  animation: slideUp 0.4s var(--ease);
+.mp-header {
+  padding: 14px;
+  background: var(--ink);
+  color: var(--surface);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
 }
-@keyframes slideUp { from { transform: translateY(150%); } to { transform: translateY(0); } }
-.floating-player.show { display: flex; }
-.fp-cover { width: 44px; height: 44px; border: var(--bw) solid var(--ink); border-radius: 50%; object-fit: cover; animation: sp 8s linear infinite; animation-play-state: paused; }
-.floating-player.playing .fp-cover { animation-play-state: running; }
-.fp-info { flex: 1; min-width: 0; }
-.fp-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fp-artist { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.fp-controls { display: flex; gap: 6px; }
-.fp-btn { width: 36px; height: 36px; display: grid; place-items: center; border: 2px solid var(--ink); border-radius: 50%; background: var(--bg); cursor: pointer; }
-.fp-btn.play { background: var(--c-mint); width: 42px; height: 42px; }
-.fp-btn.lyric { background: var(--c-purple); }
+.mp-close { cursor: pointer; background: none; border: none; color: var(--surface); font-weight: bold; font-size: 16px; }
 
-/* LYRICS MODAL */
-.lyrics-modal { position: fixed; inset: 0; z-index: 2000; background: rgba(26,26,26,0.85); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
+.mp-search-wrap { padding: 14px; border-bottom: var(--bw) solid var(--ink); background: var(--bg); display: flex; gap: 8px; }
+.mp-search {
+  flex: 1; padding: 10px; border: var(--bw) solid var(--ink);
+  border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; outline: none; background: var(--surface);
+}
+.mp-search:focus { box-shadow: 2px 2px 0 var(--c-blue); }
+.mp-search-btn {
+  padding: 0 14px; background: var(--ink); color: var(--surface);
+  border: var(--bw) solid var(--ink); border-radius: var(--r-sm);
+  font-weight: 800; cursor: pointer;
+}
+
+/* LIST LAGU */
+.mp-results { max-height: 260px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
+.mp-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px; border: 2px solid transparent;
+  border-radius: var(--r-sm); cursor: pointer; transition: 0.15s;
+}
+.mp-item:hover { background: var(--bg-2); border-color: var(--ink); }
+.mp-item img { width: 40px; height: 40px; border-radius: 6px; border: 1px solid var(--ink); object-fit: cover; }
+.mp-item-info { flex: 1; min-width: 0; }
+.mp-item-title { font-weight: 800; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
+
+/* PLAYER CONTROL DI PANEL */
+.mp-player { padding: 14px; background: var(--c-mint); border-top: var(--bw) solid var(--ink); display: none; }
+.mp-player.show { display: block; }
+.mp-now { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.mp-now img { width: 44px; height: 44px; border-radius: 6px; border: var(--bw) solid var(--ink); animation: sp 8s linear infinite; animation-play-state: paused; }
+.music-panel.playing .mp-now img { animation-play-state: running; }
+.mp-now-info { flex: 1; min-width: 0; }
+.mp-now-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-now-artist { font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+.mp-controls { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
+.mp-btn-circle {
+  width: 44px; height: 44px; border-radius: 50%; border: var(--bw) solid var(--ink);
+  background: var(--surface); display: grid; place-items: center; cursor: pointer;
+  box-shadow: 2px 2px 0 var(--ink); transition: 0.15s;
+}
+.mp-btn-circle:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); }
+.mp-btn-circle.play { background: var(--c-yellow); width: 54px; height: 54px; }
+.mp-btn-circle.lyric { background: var(--c-purple); }
+
+/* MODAL LIRIK */
+.lyrics-modal { position: fixed; inset: 0; z-index: 1000; background: rgba(26,26,26,0.85); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; padding: 20px; }
 .lyrics-modal.show { display: flex; }
 .lyrics-box { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); width: 100%; max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
 .lyrics-head { padding: 16px 20px; border-bottom: var(--bw) solid var(--ink); display: flex; justify-content: space-between; align-items: center; background: var(--c-yellow); }
-.lyrics-title { font-weight: 800; font-size: 16px; }
-.lyrics-close { background: var(--danger); color: #fff; border: 2px solid var(--ink); border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; }
+.lyrics-title { font-weight: 800; font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+.lyrics-close { background: var(--danger); color: #fff; border: 2px solid var(--ink); border-radius: 50%; width: 30px; height: 30px; font-weight: bold; cursor: pointer; display: grid; place-items: center; }
 .lyrics-content { padding: 30px 20px; overflow-y: auto; font-size: 15px; line-height: 1.8; font-weight: 600; color: var(--ink-2); text-align: center; scroll-behavior: smooth; }
 .lyric-line { margin-bottom: 16px; transition: all 0.3s; opacity: 0.5; transform: scale(0.95); }
-.lyric-line.active { color: var(--ink); opacity: 1; transform: scale(1.05); font-weight: 800; font-size: 17px; }
-.lyric-trans { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.lyric-line.active { color: var(--ink); opacity: 1; transform: scale(1.05); font-weight: 800; font-size: 17px; text-shadow: 0 0 10px rgba(0,0,0,0.1); }
+.lyric-trans { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 500; }
+.lyric-line.active .lyric-trans { color: var(--ink-2); }
 
 @media (max-width: 640px) {
-  .shell { padding: 20px 16px 100px; }
-  .inp-row { flex-direction: column; }
-  .go { width: 100%; }
-  .tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; }
-  .tab { flex: none; min-width: 140px; }
-  .music-fab { bottom: 20px; right: 20px; width: 56px; height: 56px; }
-  .floating-player { left: 16px; right: 86px; bottom: 20px; padding: 8px 10px; }
-  .fp-cover { width: 36px; height: 36px; }
-  .fp-title { font-size: 12px; }
-  .fp-btn { width: 32px; height: 32px; }
-  .fp-btn.play { width: 38px; height: 38px; }
-  .music-search-panel { bottom: 88px; right: 16px; width: calc(100vw - 32px); }
+  .shell { padding: 20px 16px 60px; }
+  .top { margin-bottom: 20px; }
+  .brand { padding: 8px 12px 8px 8px; }
+  .mark { width: 38px; height: 38px; }
+  .brand-name { font-size: 13px; }
+  .live { padding: 7px 11px; font-size: 9.5px; }
+  .hero h1 { font-size: 24px; letter-spacing: -0.6px; }
+  .hero p { font-size: 13.5px; }
+  .hero h1 .hl { padding: 1px 8px; }
+  .platform-mini { font-size: 9.5px; gap: 6px; }
+  .platform-mini .pm-label { font-size: 8.5px; padding: 3px 6px; }
+  .tab { min-width: 100%; padding: 12px 14px; }
+  .tab .tlabel .tmain { font-size: 12.5px; }
+  .inp-card { padding: 16px; }
+  .inp-label { font-size: 9.5px; }
+  .inp-hint { font-size: 9.5px; padding: 8px 10px; }
+  .card-inner { padding: 16px; }
+  .thumb { width: 100%; height: 180px; }
+  .card-title { font-size: 15.5px; }
+  .row { flex-direction: column; align-items: stretch; gap: 10px; }
+  .row-act { width: 100%; }
+  .row-act .b { flex: 1; justify-content: center; }
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .tile-info { padding: 10px; }
+  .tile-title { font-size: 11.5px; min-height: 32px; }
+  .tile-act { flex-direction: column; gap: 6px; }
+  .grid-info { font-size: 10.5px; padding: 10px 14px; }
+  .foot { padding: 14px 16px; font-size: 10px; }
+  .svc { padding: 12px 14px; }
+  .svc-name { font-size: 12px; }
+  .status-summary { padding: 16px; }
+  .status-text { font-size: 17px; }
+  .metric { padding: 8px 10px; min-width: 64px; }
+  .metric-value { font-size: 15px; }
+  .latency-wrap { min-width: 80px; }
+  .artist-card { padding: 14px; }
+  .artist-avatar { width: 70px; height: 70px; }
+  .artist-name { font-size: 16px; }
+  
+  .music-fab { bottom: 16px; right: 16px; width: 56px; height: 56px; }
+  .music-panel { bottom: 84px; right: 16px; width: calc(100vw - 32px); }
 }
+
+@media (max-width: 360px) { .grid { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; } }
 </style>
 </head>
 <body>
 
+<div id="loader">
+  <div class="ld-mark">
+    <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+  </div>
+  <div class="ld-text">Downloader AIO</div>
+  <div class="ld-bar"><div class="ld-bar-fill" id="ldFill"></div></div>
+  <div class="ld-hint" id="ldHint">MEMUAT SISTEM...</div>
+</div>
+
 <div class="shell">
+
   <header class="top">
     <div class="brand">
       <div class="mark">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
       </div>
       <div class="brand-info">
         <span class="brand-name">Downloader AIO</span>
         <span class="brand-by">By <b>Egaa</b></span>
       </div>
     </div>
-    <button class="live" id="liveBtn" type="button">
+    <button class="live checking" id="liveBtn" type="button">
       <span class="d"></span>
-      <span>Online</span>
+      <span id="liveText">Cek Status</span>
     </button>
   </header>
 
   <section class="hero">
     <h1>Tempel link, <span class="hl">kami proses.</span><br>
         <span class="hl alt">Cepat &amp; rapi.</span></h1>
-    <p>Platform terdeteksi otomatis. Ambil video, audio, atau gambar dengan kualitas terbaik. Plus, dengerin lagu favoritmu langsung di sini.</p>
+    <p>Platform terdeteksi otomatis begitu kamu tempel link. Ambil video, audio, atau gambar dengan kualitas terbaik — tanpa watermark, tanpa ribet.</p>
+    <div class="platform-mini">
+      <span class="pm-label">Supported</span>
+      <span class="pm-item">TikTok</span>
+      <span class="pm-sep"></span>
+      <span class="pm-item">Instagram</span>
+      <span class="pm-sep"></span>
+      <span class="pm-item">YouTube</span>
+      <span class="pm-sep"></span>
+      <span class="pm-item">Facebook</span>
+      <span class="pm-sep"></span>
+      <span class="pm-item">Twitter / X</span>
+      <span class="pm-sep"></span>
+      <span class="pm-item">Spotify</span>
+      <span class="pm-sep"></span>
+      <span class="pm-item">Reddit</span>
+      <span class="pm-sep"></span>
+      <span class="pm-item">+ 15 lainnya</span>
+    </div>
   </section>
 
   <nav class="tabs">
     <button class="tab active" data-tab="dl">
-      <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></span>
-      <span class="tlabel"><span class="tmain">Download</span><span class="tsub">Universal</span></span>
+      <span class="ticon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+      </span>
+      <span class="tlabel">
+        <span class="tmain">Download</span>
+        <span class="tsub">Url</span>
+      </span>
     </button>
     <button class="tab" data-tab="status">
-      <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12h4l2-8 4 16 2-8h4"/></svg></span>
-      <span class="tlabel"><span class="tmain">Status</span><span class="tsub">System Health</span></span>
+      <span class="ticon">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l2-8 4 16 2-8h4"/></svg>
+      </span>
+      <span class="tlabel">
+        <span class="tmain">Status</span>
+        <span class="tsub">Api Status</span>
+      </span>
     </button>
   </nav>
 
   <main>
+
     <section class="panel active" id="panel-dl">
       <div class="inp-card">
-        <div class="inp-label"><span class="ldot"></span> Tempel link dari platform apapun</div>
+        <div class="inp-label">
+          <span class="ldot"></span>
+          <span>Tempel link dari platform</span>
+        </div>
         <div class="inp-row">
           <div class="input-wrap">
-            <input type="text" id="dlin" placeholder="https://..." />
+            <span class="ic">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+              </svg>
+            </span>
+            <input type="text" id="dlin" placeholder="https://..." autocomplete="off" spellcheck="false" inputmode="url" />
+            <div class="detect" id="dlpill">
+              <span class="pdot"></span>
+              <span id="dlpilltext">—</span>
+            </div>
           </div>
-          <button class="go" id="dlgo">Proses</button>
+          <button class="go" id="dlgo">
+            <span>Proses</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+        </div>
+        <div class="inp-hint" id="dlHint">
+          <span class="ih-icon">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+          </span>
+          <span>Tempel link Coy</span>
         </div>
       </div>
-      <div id="dlout"></div>
+      <div class="result" id="dlout"></div>
     </section>
 
     <section class="panel" id="panel-status">
@@ -295,51 +1201,87 @@ body::before {
           <div class="status-sub" id="statusSub">Menghubungi semua server</div>
         </div>
         <div class="status-metrics">
-          <div class="metric"><div class="metric-value online" id="metricOnline">—</div><div class="metric-label">Online</div></div>
-          <div class="metric"><div class="metric-value latency" id="metricLatency">—</div><div class="metric-label">Avg ms</div></div>
-          <button class="refresh-btn" id="refreshBtn">Refresh</button>
+          <div class="metric">
+            <div class="metric-value online" id="metricOnline">—</div>
+            <div class="metric-label">Online</div>
+          </div>
+          <div class="metric">
+            <div class="metric-value latency" id="metricLatency">—</div>
+            <div class="metric-label">Avg ms</div>
+          </div>
+          <button class="refresh-btn" id="refreshBtn">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
+            <span>Refresh</span>
+          </button>
         </div>
       </div>
-      <div class="status-list" id="statusGrid"></div>
+      <div class="status-list" id="statusGrid">
+        <div class="svc">
+          <div class="svc-left">
+            <span class="svc-dot checking"></span>
+            <div class="svc-info">
+              <div class="svc-name">Memuat...</div>
+              <div class="svc-label">Menghubungi server</div>
+            </div>
+          </div>
+          <div class="svc-right">
+            <span class="svc-badge checking">...</span>
+          </div>
+        </div>
+      </div>
     </section>
+
   </main>
+
+  <footer class="foot">
+    <div class="foot-left">
+      <span>Downloader AIO</span>
+      <span class="foot-version">Ega</span>
+    </div>
+    <span class="foot-by">Created by Egaa</span>
+  </footer>
+
 </div>
 
 <!-- FLOATING BUTTON MUSIC -->
 <div class="music-fab" id="musicFab" onclick="toggleMusicPanel()">
-  <img src="" class="mini-cover" id="fabCover">
-  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" id="fabIcon">
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5">
     <path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
   </svg>
 </div>
 
-<!-- PANEL SEARCH MUSIC -->
-<div class="music-search-panel" id="musicSearchPanel">
-  <div class="msp-header">
-    <span>PlayMusic Search</span>
-    <button class="msp-close" onclick="toggleMusicPanel()">✕</button>
+<!-- MUSIC PANEL (Melayang) -->
+<div class="music-panel" id="musicPanel">
+  <div class="mp-header">
+    <span>PlayMusic</span>
+    <button class="mp-close" onclick="toggleMusicPanel()">✕</button>
   </div>
-  <div class="msp-search">
-    <input type="text" class="msp-input" id="musicSearchInput" placeholder="Cari lagu..." onkeydown="if(event.key==='Enter') searchMusic()">
-    <button class="msp-btn" onclick="searchMusic()">Cari</button>
+  
+  <div class="mp-search-wrap">
+    <input type="text" class="mp-search" id="musicSearch" placeholder="Cari lagu atau artis..." onkeydown="if(event.key==='Enter') searchMusic()">
+    <button class="mp-search-btn" onclick="searchMusic()">Cari</button>
   </div>
-  <div class="msp-results" id="musicResults"></div>
-</div>
 
-<!-- FLOATING PLAYER BAR -->
-<div class="floating-player" id="floatingPlayer">
-  <img src="" class="fp-cover" id="fpCover">
-  <div class="fp-info">
-    <div class="fp-title" id="fpTitle">—</div>
-    <div class="fp-artist" id="fpArtist">—</div>
+  <div class="mp-results" id="musicResults">
+    <!-- Hasil search di sini -->
   </div>
-  <div class="fp-controls">
-    <button class="fp-btn lyric" onclick="openLyrics()" title="Lirik">
-      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-    </button>
-    <button class="fp-btn play" id="fpPlayBtn" onclick="togglePlay()">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" id="fpPlayIcon"><path d="M8 5v14l11-7z"/></svg>
-    </button>
+
+  <div class="mp-player" id="musicPlayerControl">
+    <div class="mp-now">
+      <img src="" id="mpNowCover">
+      <div class="mp-now-info">
+        <div class="mp-now-title" id="mpNowTitle">—</div>
+        <div class="mp-now-artist" id="mpNowArtist">—</div>
+      </div>
+    </div>
+    <div class="mp-controls">
+      <button class="mp-btn-circle lyric" onclick="openLyrics()" title="Lirik">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      </button>
+      <button class="mp-btn-circle play" id="mpPlayBtn" onclick="togglePlay()">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" id="mpPlayIcon"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -359,103 +1301,256 @@ body::before {
 <script>
 const $ = (id) => document.getElementById(id);
 
-document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-  t.classList.add('active');
-  $('panel-' + t.dataset.tab).classList.add('active');
+let actx = null;
+function initAudio() {
+  if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} }
+  if (actx && actx.state === 'suspended') actx.resume();
+}
+function blip(freq, dur = 0.05, gain = 0.028, delay = 0) {
+  if (!actx) return;
+  const t = actx.currentTime + delay;
+  const o = actx.createOscillator();
+  const g = actx.createGain();
+  o.type = 'sine';
+  o.frequency.setValueAtTime(freq, t);
+  g.gain.setValueAtTime(0, t);
+  g.gain.linearRampToValueAtTime(gain, t + 0.008);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g).connect(actx.destination);
+  o.start(t); o.stop(t + dur + 0.02);
+}
+const S = {
+  tap: () => { initAudio(); blip(680); },
+  tab: () => { initAudio(); blip(560); blip(840, 0.045, 0.024, 0.03); },
+  ok: () => { initAudio(); blip(620, 0.05, 0.03); blip(880, 0.06, 0.026, 0.05); },
+  err: () => { initAudio(); blip(240, 0.11, 0.03); }
+};
+document.addEventListener('pointerdown', (e) => {
+  const el = e.target.closest('.go, .tab, .b, .live, .refresh-btn, .music-fab, .mp-item, .mp-btn-circle');
+  if (!el) return;
+  if (el.classList.contains('tab')) S.tab(); else S.tap();
+}, { passive: true });
+
+const tabs = document.querySelectorAll('.tab');
+const panels = document.querySelectorAll('.panel');
+tabs.forEach(t => t.addEventListener('click', () => {
+  const tab = t.dataset.tab;
+  tabs.forEach(x => x.classList.toggle('active', x === t));
+  panels.forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`));
+  if (tab === 'status' && !statusLoaded) loadStatus();
 }));
 
-const stLoad = () => `<div class="st"><span class="spin"></span> Memproses...</div>`;
-const stErr = (m) => `<div class="st err">${m}</div>`;
+const esc = (s) => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const stLoad = (t = 'Memproses...') => `<div class="st"><span class="spin"></span><span>${esc(t)}</span></div>`;
+const stErr = (m) => `<div class="st err">${esc(m)}</div>`;
+async function post(url, body) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+  return data;
+}
 
 /* =========================================
-   LOGIKA DOWNLOAD (TETAP SAMA)
+   MENU DOWNLOAD
 ========================================= */
-$('dlgo').addEventListener('click', async () => {
-  const url = $('dlin').value.trim();
-  if(!url) return;
-  $('dlout').innerHTML = stLoad(); $('dlgo').disabled = true;
-  try {
-    const r = await fetch('/api/download', {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ input: url })
-    });
-    const d = await r.json();
-    if(!d.status) throw new Error(d.error);
-    
-    let rows = d.medias.map(m => `
-      <div class="row">
-        <div style="font-weight:700">${m.quality} ${m.extension}</div>
-        <a class="b dl" href="/api/proxy?url=${encodeURIComponent(m.url)}&fn=video.${m.extension}" download>Download</a>
-      </div>
-    `).join('');
+const PLATFORMS = [
+  { key: 'tiktok',    r: /tiktok\.com|vt\.tiktok|vm\.tiktok/i,    l: 'TikTok Detected' },
+  { key: 'instagram', r: /instagram\.com|instagr\.am/i,           l: 'Instagram Detected' },
+  { key: 'youtube',   r: /youtube\.com|youtu\.be/i,               l: 'YouTube Detected' },
+  { key: 'facebook',  r: /facebook\.com|fb\.watch|fb\.com/i,      l: 'Facebook Detected' },
+  { key: 'twitter',   r: /twitter\.com|x\.com/i,                  l: 'Twitter / X Detected' },
+  { key: 'spotify',   r: /spotify\.com|spoti\.fi/i,               l: 'Spotify Detected' },
+  { key: 'pinterest', r: /pinterest\.com|pin\.it/i,               l: 'Pinterest Detected' },
+  { key: 'soundcloud',r: /soundcloud\.com|snd\.sc/i,              l: 'SoundCloud Detected' }
+];
+function detect(url) {
+  if (!url) return null;
+  for (const p of PLATFORMS) if (p.r.test(url)) return p;
+  return { key: 'link', l: 'Link Detected' };
+}
+const dlin = $('dlin');
+const dlpill = $('dlpill');
+const dlpilltext = $('dlpilltext');
+const dlHint = $('dlHint');
 
-    $('dlout').innerHTML = `
-      <div class="card">
-        <div class="card-bar"><span>Result</span><span>${d.source}</span></div>
-        <div class="card-inner">
-          <div class="card-head">
-            ${d.thumbnail ? `<img src="${d.thumbnail}" class="thumb">` : ''}
-            <div><div class="card-title">${d.title}</div></div>
-          </div>
-          ${rows}
-        </div>
-      </div>`;
-  } catch(e) {
-    $('dlout').innerHTML = stErr(e.message);
-  } finally { $('dlgo').disabled = false; }
+let raf1 = 0;
+dlin.addEventListener('input', () => {
+  cancelAnimationFrame(raf1);
+  raf1 = requestAnimationFrame(() => {
+    const v = dlin.value.trim();
+    if (!v) { dlpill.classList.remove('show'); dlHint.classList.remove('hide'); return; }
+    const p = detect(v);
+    dlpill.setAttribute('data-platform', p.key);
+    dlpill.classList.add('show');
+    dlpilltext.textContent = p.l;
+    dlHint.classList.add('hide');
+  });
 });
 
-/* =========================================
-   LOGIKA STATUS (TETAP SAMA)
-========================================= */
-async function loadStatus() {
-  try {
-    const r = await fetch('/api/status');
-    const d = await r.json();
-    if(!d.status) throw new Error("Gagal");
-    
-    $('statusOverall').textContent = d.overall === 'healthy' ? 'Sistem Normal' : 'Ada Gangguan';
-    $('statusOverall').className = 'status-text ' + d.overall;
-    $('statusSub').textContent = `${d.online}/${d.total} layanan online`;
-    $('metricOnline').textContent = `${d.online}/${d.total}`;
-    $('metricLatency').textContent = `${d.avg_latency}ms`;
+const dlgo = $('dlgo');
+const dlout = $('dlout');
+dlgo.addEventListener('click', runDownload);
+dlin.addEventListener('keydown', (e) => { if (e.key === 'Enter') runDownload(); });
 
-    $('statusGrid').innerHTML = d.services.map(s => `
-      <div class="svc">
-        <div class="svc-left">
-          <span class="svc-dot ${s.status}"></span>
-          <div>
-            <div class="svc-name">${s.name}</div>
-            <div class="svc-label">${s.label}</div>
+async function runDownload() {
+  const input = dlin.value.trim();
+  if (!input) { dlout.innerHTML = stErr('Tempel link dulu'); S.err(); return; }
+  dlout.innerHTML = stLoad('Memproses...');
+  dlgo.disabled = true;
+  try {
+    const data = await post('/api/download', { input });
+    if (!data.status) throw new Error(data.error || 'Gagal memproses');
+    const medias = data.medias || [];
+    if (!medias.length) throw new Error('Tidak ada media tersedia');
+    const det = detect(input);
+    const thumb = data.thumbnail ? `<img class="thumb" src="${esc(data.thumbnail)}" alt="" referrerpolicy="no-referrer">` : '';
+    const rows = medias.map((m, i) => {
+      const isA = m.is_audio;
+      const isI = m.type === 'image';
+      const tagClass = isA ? 'a' : (isI ? 'i' : 'v');
+      const tagText = isA ? 'Audio' : (isI ? 'Image' : 'Video');
+      const q = m.quality || 'Default';
+      const ext = (m.extension || '').toUpperCase();
+      const fn = ((data.title || 'media').replace(/[^a-z0-9]+/gi, '_').slice(0, 60)) + '.' + (m.extension || 'mp4').toLowerCase();
+      return `
+        <div class="row" style="animation-delay:${i * 25}ms">
+          <div class="row-info">
+            <span class="rtag ${tagClass}">${tagText}</span>
+            <span class="rq">${esc(q)}</span>
+            ${ext ? `<span class="re">.${esc(ext)}</span>` : ''}
           </div>
+          <div class="row-act">
+            <button class="b dl" data-dl="${esc(m.url)}" data-fn="${esc(fn)}">Download</button>
+          </div>
+        </div>`;
+    }).join('');
+    dlout.innerHTML = `
+      <div class="card">
+        <div class="card-bar">
+          <span>Media Result</span>
+          <span class="tag">${esc(det.l.replace(' Detected', ''))} / ${esc((data.source || 'MEDIA').toUpperCase())}</span>
         </div>
-        <span class="svc-badge ${s.status}">${s.status}</span>
-      </div>
-    `).join('');
-  } catch(e) {
-    $('statusOverall').textContent = 'Gagal Cek Status';
-    $('statusOverall').className = 'status-text critical';
+        <div class="card-inner">
+          <div class="card-head">
+            ${thumb}
+            <div class="head-info">
+              <div class="card-title">${esc(data.title || 'Tanpa Judul')}</div>
+              <div class="card-sub">${medias.length} media available</div>
+            </div>
+          </div>
+          <div class="mlist">${rows}</div>
+        </div>
+      </div>`;
+    bindDownload(dlout);
+    S.ok();
+  } catch (err) {
+    dlout.innerHTML = stErr(err.message);
+    S.err();
+  } finally {
+    dlgo.disabled = false;
   }
 }
-$('refreshBtn').addEventListener('click', loadStatus);
-loadStatus(); // Panggil saat load
 
 /* =========================================
-   LOGIKA MUSIC & FLOATING PLAYER
+   MENU STATUS
+========================================= */
+let statusLoaded = false;
+const statusGrid = $('statusGrid');
+const statusOverall = $('statusOverall');
+const statusSub = $('statusSub');
+const metricOnline = $('metricOnline');
+const metricLatency = $('metricLatency');
+const refreshBtn = $('refreshBtn');
+const liveBtn = $('liveBtn');
+const liveText = $('liveText');
+
+async function loadStatus(showLoader = true) {
+  if (showLoader) {
+    refreshBtn.disabled = true;
+    liveBtn.classList.add('checking');
+    liveBtn.classList.remove('degraded', 'critical');
+    liveText.textContent = 'Checking';
+  }
+  try {
+    const r = await fetch('/api/status', { method: 'GET' });
+    const data = await r.json();
+    if (!data.status) throw new Error('Gagal cek status');
+    statusLoaded = true;
+    const overallMap = {
+      healthy: { text: 'Semua Sistem Normal', cls: 'healthy' },
+      degraded: { text: 'Beberapa Layanan Terganggu', cls: 'degraded' },
+      critical: { text: 'Semua Layanan Down', cls: 'critical' }
+    };
+    const om = overallMap[data.overall] || overallMap.degraded;
+    statusOverall.textContent = om.text;
+    statusOverall.className = 'status-text ' + om.cls;
+    statusSub.textContent = `${data.online}/${data.total} layanan online`;
+    metricOnline.textContent = `${data.online}/${data.total}`;
+    metricLatency.textContent = `${data.avg_latency}ms`;
+    statusGrid.innerHTML = data.services.map(s => {
+      let barClass = 'good';
+      if (s.status === 'down') barClass = 'down';
+      else if (s.latency > 3000) barClass = 'slow';
+      else if (s.latency > 1000) barClass = 'mid';
+      const barPct = s.status === 'down' ? 100 : Math.min(100, (s.latency / 3000) * 100);
+      return `
+        <div class="svc">
+          <div class="svc-left">
+            <span class="svc-dot ${s.status}"></span>
+            <div class="svc-info">
+              <div class="svc-name">${esc(s.name)}</div>
+              <div class="svc-label">${esc(s.label)}</div>
+            </div>
+          </div>
+          <div class="svc-right">
+            <div class="latency-wrap">
+              <div class="latency-bar"><div class="latency-fill ${barClass}" style="width:${barPct}%"></div></div>
+              <span class="latency-text">${s.latency}ms</span>
+            </div>
+            <span class="svc-badge ${s.status}">${s.status === 'online' ? 'Online' : 'Down'}</span>
+          </div>
+        </div>`;
+    }).join('');
+    liveBtn.classList.remove('checking', 'degraded', 'critical');
+    if (data.overall === 'healthy') liveText.textContent = 'Online';
+    else if (data.overall === 'degraded') { liveBtn.classList.add('degraded'); liveText.textContent = 'Degraded'; }
+    else { liveBtn.classList.add('critical'); liveText.textContent = 'Down'; }
+  } catch (err) {
+    statusOverall.textContent = 'Gagal Cek Status';
+    statusOverall.className = 'status-text critical';
+    statusSub.textContent = err.message;
+    statusGrid.innerHTML = `<div class="st err">${esc(err.message)}</div>`;
+    liveBtn.classList.remove('checking', 'degraded');
+    liveBtn.classList.add('critical');
+    liveText.textContent = 'Error';
+  } finally {
+    refreshBtn.disabled = false;
+    liveBtn.classList.remove('checking');
+  }
+}
+refreshBtn.addEventListener('click', () => loadStatus(true));
+liveBtn.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === 'status'));
+  panels.forEach(p => p.classList.toggle('active', p.id === 'panel-status'));
+  loadStatus(true);
+});
+window.addEventListener('load', () => { setTimeout(() => loadStatus(false), 800); });
+
+/* =========================================
+   LOGIKA MUSIC (FLOATING BUTTON)
 ========================================= */
 let currentSong = null;
 let lyricsData = null;
 const audio = $('audioPlayer');
+const musicPanel = $('musicPanel');
+const musicFab = $('musicFab');
 
 function toggleMusicPanel() {
-  const panel = $('musicSearchPanel');
-  panel.classList.toggle('show');
+  musicPanel.classList.toggle('show');
 }
 
 async function searchMusic() {
-  const q = $('musicSearchInput').value.trim();
+  const q = $('musicSearch').value.trim();
   if(!q) return;
   const resDiv = $('musicResults');
   resDiv.innerHTML = `<div style="text-align:center;padding:10px"><span class="spin" style="width:14px;height:14px"></span></div>`;
@@ -464,14 +1559,15 @@ async function searchMusic() {
     const r = await fetch(`/api/ytmusic?action=search&query=${encodeURIComponent(q)}`);
     const d = await r.json();
     if(!d.status) throw new Error(d.message || "Gagal mencari");
+
     if(!d.result.songs || d.result.songs.length === 0) throw new Error("Lagu tidak ditemukan");
 
     resDiv.innerHTML = d.result.songs.map((song) => `
-      <div class="msp-item" onclick='playMusicSong(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
+      <div class="mp-item" onclick='playMusicSong(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
         <img src="${song.thumbnail}" loading="lazy">
-        <div class="msp-item-info">
-          <div class="msp-item-title">${song.title}</div>
-          <div class="msp-item-artist">${song.artist}</div>
+        <div class="mp-item-info">
+          <div class="mp-item-title">${esc(song.title)}</div>
+          <div class="mp-item-artist">${esc(song.artist)}</div>
         </div>
       </div>
     `).join('');
@@ -482,22 +1578,19 @@ async function searchMusic() {
 
 async function playMusicSong(song) {
   if(!song) return;
-  
-  // Tutup panel search, munculin floating player
-  $('musicSearchPanel').classList.remove('show');
-  $('floatingPlayer').classList.add('show');
-  
   currentSong = song;
-  $('fpTitle').textContent = song.title;
-  $('fpArtist').textContent = song.artist;
-  $('fpCover').src = song.thumbnail;
-  $('fabCover').src = song.thumbnail;
   
-  // UI Loading
-  $('floatingPlayer').classList.remove('playing');
-  $('musicFab').classList.remove('playing');
-  $('fpPlayIcon').innerHTML = `<span class="spin" style="width:14px;height:14px;border-width:2px;border-top-color:transparent"></span>`;
+  // UI Update
+  $('mpNowTitle').textContent = song.title;
+  $('mpNowArtist').textContent = song.artist;
+  $('mpNowCover').src = song.thumbnail;
+  $('musicPlayerControl').classList.add('show');
+  musicFab.classList.add('playing'); // Animasi muter di FAB
   
+  // Reset UI player
+  musicFab.classList.remove('playing'); // Stop muter dulu
+  $('mpPlayIcon').innerHTML = `<span class="spin" style="width:14px;height:14px;border-width:2px;border-top-color:transparent"></span>`;
+
   try {
     const r = await fetch('/api/ytmusic', {
       method: 'POST', headers: {'Content-Type':'application/json'},
@@ -512,22 +1605,18 @@ async function playMusicSong(song) {
       audio.load();
       
       audio.oncanplay = () => {
-        // PENTING: Play() harus dipanggil setelah user interaction (klik)
-        audio.play().then(() => {
-          $('floatingPlayer').classList.add('playing');
-          $('musicFab').classList.add('playing');
-          $('fpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
-        }).catch(err => {
-          alert("Klik sekali lagi di tombol Play untuk mulai memutar.");
-        });
+        audio.play();
+        musicFab.classList.add('playing'); // Mulai muter
+        $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
       };
     } else {
       throw new Error("Link audio tidak ditemukan");
     }
   } catch(e) {
     console.error(e);
-    alert("Gagal: " + e.message);
-    $('fpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    alert("Gagal memutar lagu: " + e.message);
+    musicFab.classList.remove('playing');
+    $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
   }
 }
 
@@ -535,14 +1624,12 @@ function togglePlay() {
   if(!audio.src) return;
   if(audio.paused) {
     audio.play();
-    $('floatingPlayer').classList.add('playing');
-    $('musicFab').classList.add('playing');
-    $('fpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+    musicFab.classList.add('playing');
+    $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
   } else {
     audio.pause();
-    $('floatingPlayer').classList.remove('playing');
-    $('musicFab').classList.remove('playing');
-    $('fpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+    musicFab.classList.remove('playing');
+    $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
   }
 }
 
@@ -598,6 +1685,65 @@ function syncLyrics() {
     }
   }
 }
+
+/* DOWNLOAD HANDLER */
+function bindDownload(root) {
+  root.querySelectorAll('[data-dl]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (btn.disabled) return;
+      const url = btn.dataset.dl;
+      const filename = btn.dataset.fn || 'media.mp4';
+      const original = btn.innerHTML;
+
+      btn.innerHTML = '<span class="spin" style="width:12px;height:12px;border-width:2px;border-top-color:transparent"></span>';
+      btn.disabled = true;
+      try {
+        const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}&fn=${encodeURIComponent(filename)}`;
+        const check = await fetch(proxyUrl, { method: 'HEAD' }).catch(() => null);
+        if (check && check.ok) {
+          const a = document.createElement('a');
+          a.href = proxyUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          btn.innerHTML = '✓';
+        } else {
+          throw new Error("Proxy timeout");
+        }
+      } catch (err) {
+        window.open(url, '_blank');
+        btn.innerHTML = '✓';
+      } finally {
+        setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2200);
+      }
+    });
+  });
+}
+
+/* LOADER */
+(function bootLoader() {
+  const loader = $('loader');
+  const fill = $('ldFill');
+  const hint = $('ldHint');
+  const hints = ['MEMUAT SISTEM...', 'MENYIAPKAN API...', 'HAMPIR SIAP...'];
+  let pct = 0;
+  let hi = 0;
+  const t1 = setInterval(() => {
+    pct = Math.min(pct + 12 + Math.random() * 10, 100);
+    fill.style.width = pct + '%';
+    if (pct >= 40 && hi === 0) { hi = 1; hint.textContent = hints[1]; }
+    if (pct >= 75 && hi === 1) { hi = 2; hint.textContent = hints[2]; }
+    if (pct >= 100) {
+      clearInterval(t1);
+      setTimeout(() => {
+        loader.classList.add('hide');
+        setTimeout(() => loader.remove(), 600);
+      }, 300);
+    }
+  }, 180);
+})();
 </script>
 </body>
 </html>
