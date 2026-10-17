@@ -296,13 +296,13 @@ body::before {
 #tab-search .mp-search-btn:hover { background: var(--c-coral); color: var(--ink); }
 
 .mp-results { max-height: 280px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-.mp-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 2px solid transparent; border-radius: var(--r); cursor: pointer; transition: 0.2s var(--ease); background: var(--surface); }
+.mp-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 2px solid transparent; border-radius: var(--r); cursor: pointer; transition: 0.2s var(--ease); background: var(--surface); position: relative; z-index: 10;}
 .mp-item:hover { background: var(--bg-2); border-color: var(--ink); transform: translateX(2px); }
 .mp-item img { width: 46px; height: 46px; border-radius: 8px; border: 2px solid var(--ink); object-fit: cover; box-shadow: 2px 2px 0 var(--ink); }
 .mp-item-info { flex: 1; min-width: 0; }
 .mp-item-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
 .mp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--muted); }
-.mp-item .action-btn { background: transparent; border: none; cursor: pointer; padding: 6px; color: var(--muted); transition: 0.2s; display: grid; place-items: center; border-radius: 50%; }
+.mp-item .action-btn { background: transparent; border: none; cursor: pointer; padding: 6px; color: var(--muted); transition: 0.2s; display: grid; place-items: center; border-radius: 50%; position: relative; z-index: 20; }
 .mp-item .action-btn:hover { color: var(--ink); background: var(--bg-2); }
 .mp-item .action-btn.active { color: var(--c-coral); }
 
@@ -317,8 +317,8 @@ body::before {
 .share-btn:hover { background: var(--c-mint); transform: translate(-2px,-2px); box-shadow: var(--sh); }
 .share-btn svg { width: 16px; height: 16px; }
 
-/* PLAYER CONTROL (SIMPLE & WORK) */
-.mp-player { padding: 16px 20px; background: var(--c-mint); border-top: var(--bw-thick) solid var(--ink); display: none; }
+/* PLAYER CONTROL (FIXED Z-INDEX) */
+.mp-player { padding: 16px 20px; background: var(--c-mint); border-top: var(--bw-thick) solid var(--ink); display: none; position: relative; z-index: 50;}
 .mp-player.show { display: block; }
 .mp-now { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
 .mp-now img { width: 52px; height: 52px; border-radius: 8px; border: var(--bw-thick) solid var(--ink); box-shadow: 2px 2px 0 var(--ink); animation: sp 8s linear infinite; animation-play-state: paused; }
@@ -327,8 +327,8 @@ body::before {
 .mp-now-title { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
 .mp-now-artist { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); }
 
-.mp-controls { display: flex; justify-content: center; align-items: center; gap: 24px; }
-.mp-btn-circle { width: 48px; height: 48px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-sm); transition: 0.15s var(--ease); }
+.mp-controls { display: flex; justify-content: center; align-items: center; gap: 24px; position: relative; z-index: 99;}
+.mp-btn-circle { width: 48px; height: 48px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-sm); transition: 0.15s var(--ease); position: relative; z-index: 100;}
 .mp-btn-circle:hover { transform: translate(-2px,-2px); box-shadow: var(--sh); background: var(--c-yellow); }
 .mp-btn-circle:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
 .mp-btn-circle.play { background: var(--ink); color: var(--surface); width: 64px; height: 64px; box-shadow: var(--sh); }
@@ -489,7 +489,7 @@ body::before {
     </div>
   </div>
 
-  <!-- PLAYER CONTROL (SIMPLE & WORK) -->
+  <!-- PLAYER CONTROL (FIXED Z-INDEX) -->
   <div class="mp-player" id="musicPlayerControl">
     <div class="mp-now">
       <img src="" id="mpNowCover">
@@ -499,7 +499,6 @@ body::before {
       </div>
     </div>
     
-    <!-- CONTROLS (PREV, PLAY, NEXT) -->
     <div class="mp-controls">
       <button class="mp-btn-circle" onclick="playPrev()" title="Previous">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
@@ -607,7 +606,7 @@ refreshBtn.addEventListener('click', () => loadStatus(true)); liveBtn.addEventLi
 
 
 /* =========================================
-   LOGIKA MUSIC & PLAYER (STRIPPED DOWN FOR 100% WORK)
+   LOGIKA MUSIC & PLAYER (FIXED Z-INDEX & SIMPLE)
    ========================================= */
 let currentSong = null;
 let currentPlaylist = []; 
@@ -784,7 +783,7 @@ function playMusicByIndex(index) {
   playMusicSong(currentPlaylist[index]);
 }
 
-// FUNGSI UTAMA: MAIN MUSIK
+// FUNGSI UTAMA: MAIN MUSIK (SIMPLE, NO PROMISE CHAIN)
 async function playMusicSong(song) {
   if(!song) return;
   currentSong = song;
@@ -794,10 +793,6 @@ async function playMusicSong(song) {
   $('mpNowCover').src = song.thumbnail;
   $('musicPlayerControl').classList.add('show');
   
-  const isFav = getStore('fav_music').some(s => s.videoId === song.videoId);
-  if(isFav) document.getElementById('mpFavBtn').classList.add('active');
-  else document.getElementById('mpFavBtn').classList.remove('active');
-
   musicFab.classList.remove('playing');
   $('mpPlayIcon').innerHTML = `<span class="spin" style="width:14px;height:14px;border-width:2px;border-top-color:transparent"></span>`;
   
@@ -814,23 +809,21 @@ async function playMusicSong(song) {
       audio.src = proxiedAudio;
       audio.load();
       
-      audio.play().then(() => {
-        musicFab.classList.add('playing');
-        musicPanel.classList.add('playing');
-        $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
-        
-        if ('mediaSession' in navigator) {
-          navigator.mediaSession.metadata = new MediaMetadata({
-            title: song.title, artist: song.artist, album: 'PlayMusic IZZ',
-            artwork: [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
-          });
-          navigator.mediaSession.setActionHandler('play', () => audio.play());
-          navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-        }
-      }).catch(err => {
-        $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-        alert("Klik tombol play sekali lagi untuk memulai.");
-      });
+      // LANGSUNG PLAY TANPA PROMISE (Biar gak kena blokir)
+      audio.play();
+      
+      musicFab.classList.add('playing');
+      musicPanel.classList.add('playing');
+      $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+      
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({
+          title: song.title, artist: song.artist, album: 'PlayMusic IZZ',
+          artwork: [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
+        });
+        navigator.mediaSession.setActionHandler('play', () => audio.play());
+        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+      }
       
     } else {
       throw new Error("Link audio tidak ditemukan");
