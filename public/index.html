@@ -9,9 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* =========================================
-   CSS DARI LU (UTUH 100%)
-   ========================================= */
+/* (CSS DARI LU UTUH 100%) */
 :root {
   --bg: #f0e9dc; --bg-2: #e8dfce; --surface: #fdfaf3; --ink: #1a1a1a; --ink-2: #4a4a4a; --muted: #8a857a;
   --c-coral: #f4a8a8; --c-purple: #b8a9e8; --c-mint: #8ee0d0; --c-yellow: #f5d76e; --c-blue: #8bc4f0;
@@ -280,14 +278,12 @@ body::before {
 .mp-header { padding: 14px; background: var(--ink); color: var(--surface); display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .mp-close { cursor: pointer; background: none; border: none; color: var(--surface); font-weight: bold; font-size: 16px; }
 
-/* TABS MUSIC (Search, Lirik, Favorit, Playlist) */
 .mp-tabs { display: flex; border-bottom: var(--bw) solid var(--ink); background: var(--bg-2); }
 .mp-tab { flex: 1; text-align: center; padding: 10px 0; font-size: 11px; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; transition: 0.2s; }
 .mp-tab.active { color: var(--ink); border-bottom-color: var(--c-coral); background: var(--surface); }
 .mp-tab-content { display: none; flex-direction: column; }
 .mp-tab-content.active { display: flex; }
 
-/* Tab Search */
 #tab-search .mp-search-wrap { padding: 14px; border-bottom: var(--bw) solid var(--ink); background: var(--bg); display: flex; gap: 8px; }
 #tab-search .mp-search { flex: 1; padding: 10px; border: var(--bw) solid var(--ink); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; background: var(--surface); }
 #tab-search .mp-search-btn { padding: 0 14px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); font-weight: 800; cursor: pointer; }
@@ -301,15 +297,11 @@ body::before {
 .mp-item .fav-btn { background: none; border: none; cursor: pointer; padding: 5px; color: var(--muted); transition: 0.2s; }
 .mp-item .fav-btn.active { color: var(--danger); }
 
-/* Tab Lirik Preview */
 .lyrics-preview { padding: 20px; text-align: center; font-size: 14px; font-weight: 600; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; }
 .lyrics-preview button { margin-top: 16px; padding: 10px 16px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: 99px; font-weight: bold; cursor: pointer; }
-
-/* Tab Favorit / Playlist */
 #tab-favorit .mp-results, #tab-playlist .mp-results { max-height: 300px; }
 .tab-empty { padding: 30px 20px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 10px; }
 
-/* PLAYER CONTROL */
 .mp-player { padding: 14px; background: var(--c-mint); border-top: var(--bw) solid var(--ink); display: none; }
 .mp-player.show { display: block; }
 .mp-now { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
@@ -326,7 +318,6 @@ body::before {
 .mp-btn-circle.fav { background: var(--bg-2); }
 .mp-btn-circle.fav.active { background: var(--c-coral); }
 
-/* LIRIK FULLSCREEN */
 .lyrics-modal { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: none; flex-direction: column; padding: 20px; }
 .lyrics-modal.show { display: flex; }
 .lyrics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: var(--bw) solid var(--ink); }
@@ -456,9 +447,6 @@ body::before {
   <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
 </div>
 
-<!-- WADAH IFRAME YOUTUBE (WAJIB ADA DI LAYAR BIAR BACKGROUND PLAY JALAN) -->
-<div id="ytPlayerContainer" style="position:fixed; width:1px; height:1px; bottom:-10px; left:-10px; opacity:0; pointer-events:none; z-index:-1;"></div>
-
 <!-- MUSIC PANEL -->
 <div class="music-panel" id="musicPanel">
   <div class="mp-header">
@@ -529,6 +517,8 @@ body::before {
   <div class="lyrics-content" id="lyricsContent">Memuat lirik...</div>
 </div>
 
+<audio id="audioPlayer" crossorigin="anonymous"></audio>
+
 <script>
 const $ = (id) => document.getElementById(id);
 let actx = null;
@@ -537,7 +527,6 @@ function blip(freq, dur = 0.05, gain = 0.028, delay = 0) { if (!actx) return; co
 const S = { tap: () => { initAudio(); blip(680); }, tab: () => { initAudio(); blip(560); blip(840, 0.045, 0.024, 0.03); }, ok: () => { initAudio(); blip(620, 0.05, 0.03); blip(880, 0.06, 0.026, 0.05); }, err: () => { initAudio(); blip(240, 0.11, 0.03); } };
 document.addEventListener('pointerdown', (e) => { const el = e.target.closest('.go, .tab, .b, .live, .refresh-btn, .music-fab, .mp-item, .mp-btn-circle, .mp-tab'); if (!el) return; if (el.classList.contains('tab') || el.classList.contains('mp-tab')) S.tab(); else S.tap(); }, { passive: true });
 
-/* TABS UTAMA & DOWNLOAD (SAMA) */
 const tabs = document.querySelectorAll('.tab'); const panels = document.querySelectorAll('.panel');
 tabs.forEach(t => t.addEventListener('click', () => { const tab = t.dataset.tab; tabs.forEach(x => x.classList.toggle('active', x === t)); panels.forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`)); if (tab === 'status' && !statusLoaded) loadStatus(); }));
 const esc = (s) => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -555,43 +544,13 @@ refreshBtn.addEventListener('click', () => loadStatus(true)); liveBtn.addEventLi
 
 
 /* =========================================
-   LOGIKA MUSIC & PLAYER (BACKGROUND PLAY + FAVORIT/PLAYLIST WORK)
+   LOGIKA MUSIC & PLAYER (BACKGROUND PLAY)
    ========================================= */
 let currentSong = null;
-let ytPlayer = null;
-let isPlaying = false;
+let lyricsData = null;
+const audio = $('audioPlayer');
 const musicPanel = $('musicPanel');
 const musicFab = $('musicFab');
-
-// Load API YouTube IFrame
-const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api"; const firstScriptTag = document.getElementsByTagName('script')[0]; firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-window.onYouTubeIframeAPIReady = function() { console.log("YT API Ready"); };
-
-// Inisialisasi awal IFrame Player (Kosong dulu)
-function initYTPlayer(videoId) {
-  if(!ytPlayer) {
-    ytPlayer = new YT.Player('ytPlayerContainer', {
-      height: '1', width: '1', videoId: videoId,
-      playerVars: { 'autoplay': 1, 'controls': 0, 'playsinline': 1, 'origin': window.location.origin },
-      events: {
-        'onReady': (e) => { e.target.playVideo(); },
-        'onStateChange': (e) => {
-          if(e.data === YT.PlayerState.PLAYING) {
-            isPlaying = true;
-            musicFab.classList.add('playing');
-            $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
-          } else if(e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
-            isPlaying = false;
-            musicFab.classList.remove('playing');
-            $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-          }
-        }
-      }
-    });
-  } else {
-    ytPlayer.loadVideoById(videoId);
-  }
-}
 
 function toggleMusicPanel() { musicPanel.classList.toggle('show'); }
 
@@ -615,7 +574,6 @@ function switchTab(tabName) {
   if(tabName === 'playlist') renderList('playlist');
 }
 
-// FITUR FAVORIT & PLAYLIST (LOCALSTORAGE)
 function getStore(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } }
 function setStore(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
 
@@ -624,7 +582,7 @@ function toggleFavoriteCurrent() {
   let favs = getStore('fav_music');
   const idx = favs.findIndex(s => s.videoId === currentSong.videoId);
   if(idx > -1) {
-    favs.splice(idx, 1); // Hapus
+    favs.splice(idx, 1);
     document.getElementById('mpFavBtn').classList.remove('active');
   } else {
     favs.push(currentSong);
@@ -678,7 +636,6 @@ async function searchMusic() {
     if(!d.status) throw new Error(d.message || "Gagal mencari"); if(!d.result.songs || d.result.songs.length === 0) throw new Error("Lagu tidak ditemukan");
     
     resDiv.innerHTML = d.result.songs.map((song) => {
-      const isFav = getStore('fav_music').some(s => s.videoId === song.videoId);
       return `<div class="mp-item" onclick='playMusicSong(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
         <img src="${song.thumbnail}" loading="lazy">
         <div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div>
@@ -687,7 +644,8 @@ async function searchMusic() {
   } catch(e) { resDiv.innerHTML = `<div style="text-align:center;color:var(--danger);font-size:12px;padding:10px">${e.message}</div>`; }
 }
 
-function playMusicSong(song) {
+// FUNGSI UTAMA: MAIN MUSIK PAKE HTML5 AUDIO + PROXY VERCEL
+async function playMusicSong(song) {
   if(!song) return;
   currentSong = song;
   
@@ -696,20 +654,83 @@ function playMusicSong(song) {
   $('mpNowCover').src = song.thumbnail;
   $('musicPlayerControl').classList.add('show');
   
-  // Cek status favorit
   const isFav = getStore('fav_music').some(s => s.videoId === song.videoId);
   if(isFav) document.getElementById('mpFavBtn').classList.add('active');
   else document.getElementById('mpFavBtn').classList.remove('active');
 
-  // Panggil IFrame
-  initYTPlayer(song.videoId);
-  switchTab('lirik');
+  // UI Loading
+  musicFab.classList.remove('playing');
+  $('mpPlayIcon').innerHTML = `<span class="spin" style="width:14px;height:14px;border-width:2px;border-top-color:transparent"></span>`;
   
-  // Ambil lirik
+  try {
+    // 1. Ambil link audio mentah dari ytplay
+    const r = await fetch('/api/ytmusic', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ action: 'play', videoId: song.videoId })
+    });
+    const d = await r.json();
+    
+    if(d.status && d.result && d.result.download && d.result.download.audio) {
+      
+      // 2. UBAH LINK NYA KE PROXY VERCEL LU
+      const proxiedAudio = `/api/proxy?url=${encodeURIComponent(d.result.download.audio)}&fn=audio.m4a`;
+      
+      audio.src = proxiedAudio;
+      audio.load();
+      
+      // 3. Mainkan! (Karena udah dipicu klik user, browser bakal ngizinin)
+      audio.play().then(() => {
+        musicFab.classList.add('playing');
+        musicPanel.classList.add('playing');
+        $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+        
+        // 4. SET MEDIA SESSION (BIAR ADA NOTIFIKASI DI LAYAR KUNCI)
+        if ('mediaSession' in navigator) {
+          navigator.mediaSession.metadata = new MediaMetadata({
+            title: song.title,
+            artist: song.artist,
+            album: 'PlayMusic IZZ',
+            artwork: [
+              { src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }
+            ]
+          });
+          navigator.mediaSession.setActionHandler('play', () => audio.play());
+          navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+        }
+
+      }).catch(err => {
+        // Kalau masih diblokir (kasus jarang), suruh user klik tombol play
+        $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+        alert("Klik tombol play sekali lagi untuk memulai.");
+      });
+      
+    } else {
+      throw new Error("Link audio tidak ditemukan");
+    }
+  } catch(e) {
+    console.error(e);
+    alert("Gagal: " + e.message);
+    $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+  }
+
+  switchTab('lirik');
   fetchLyrics(song);
 }
 
-function togglePlay() { if(!ytPlayer) return; if(isPlaying) ytPlayer.pauseVideo(); else ytPlayer.playVideo(); }
+function togglePlay() {
+  if(!audio.src) return;
+  if(audio.paused) {
+    audio.play();
+    musicFab.classList.add('playing');
+    musicPanel.classList.add('playing');
+    $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
+  } else {
+    audio.pause();
+    musicFab.classList.remove('playing');
+    musicPanel.classList.remove('playing');
+    $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+  }
+}
 
 async function fetchLyrics(song) {
   lyricsData = null;
@@ -738,7 +759,6 @@ function openFullLyrics() {
 
 function closeLyrics() { $('lyricsModal').classList.remove('show'); }
 
-/* DOWNLOAD HANDLER & LOADER (SAMA) */
 function bindDownload(root) { root.querySelectorAll('[data-dl]').forEach(btn => { btn.addEventListener('click', async (e) => { e.preventDefault(); if (btn.disabled) return; const url = btn.dataset.dl; const filename = btn.dataset.fn || 'media.mp4'; const original = btn.innerHTML; btn.innerHTML = '<span class="spin" style="width:12px;height:12px;border-width:2px;border-top-color:transparent"></span>'; btn.disabled = true; try { const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}&fn=${encodeURIComponent(filename)}`; const check = await fetch(proxyUrl, { method: 'HEAD' }).catch(() => null); if (check && check.ok) { const a = document.createElement('a'); a.href = proxyUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); btn.innerHTML = '✓'; } else { throw new Error("Proxy timeout"); } } catch (err) { window.open(url, '_blank'); btn.innerHTML = '✓'; } finally { setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2200); } }); }); }
 (function bootLoader() { const loader = $('loader'); const fill = $('ldFill'); const hint = $('ldHint'); const hints = ['MEMUAT SISTEM...', 'MENYIAPKAN API...', 'HAMPIR SIAP...']; let pct = 0; let hi = 0; const t1 = setInterval(() => { pct = Math.min(pct + 12 + Math.random() * 10, 100); fill.style.width = pct + '%'; if (pct >= 40 && hi === 0) { hi = 1; hint.textContent = hints[1]; } if (pct >= 75 && hi === 1) { hi = 2; hint.textContent = hints[2]; } if (pct >= 100) { clearInterval(t1); setTimeout(() => { loader.classList.add('hide'); setTimeout(() => loader.remove(), 600); }, 300); } }, 180); })();
 </script>
