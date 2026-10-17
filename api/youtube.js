@@ -1,6 +1,6 @@
 /* ============================================================
-   YOUTUBE API — By Egaa v11
-   Menggunakan RapidAPI (youtube138) untuk Search & Download
+   YOUTUBE API — By Egaa v12 (Deep Search Fix)
+   Menggunakan RapidAPI (youtube138)
    ============================================================ */
 
 const axios = require('axios');
@@ -14,7 +14,7 @@ const rapidHeaders = {
 };
 
 /* ============================================================
-   SEARCH (Menggunakan Endpoint Search RapidAPI)
+   SEARCH
    ============================================================ */
 async function search(query) {
   try {
@@ -30,7 +30,6 @@ async function search(query) {
 
     if (!data || !data.contents) throw new Error("Hasil tidak ditemukan");
 
-    // Filter hanya video yang muncul
     const videos = [];
     data.contents.forEach(item => {
       if (item.video) {
@@ -47,7 +46,6 @@ async function search(query) {
     });
 
     if (videos.length === 0) throw new Error("Tidak ada video yang ditemukan");
-
     return { query, total: videos.length, results: videos };
   } catch (err) {
     throw new Error(`Pencarian gagal: ${err.message}`);
@@ -55,7 +53,7 @@ async function search(query) {
 }
 
 /* ============================================================
-   DOWNLOAD (Menggunakan Endpoint Video Details RapidAPI)
+   DOWNLOAD (Deep Search Data)
    ============================================================ */
 async function download(url) {
   const vidMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
@@ -73,38 +71,73 @@ async function download(url) {
     const res = await axios.request(options);
     const data = res.data;
 
-    if (!data || !data.formats) throw new Error("Gagal mengambil link video");
+    // --- DEEP SEARCH LOGIC ---
+    // Kadang RapidAPI ngasih format di `formats`, `adaptiveFormats`, atau `streamingData.formats`
+    let allFormats = [];
+    if (data.formats && Array.isArray(data.formats)) allFormats = allFormats.concat(data.formats);
+    if (data.adaptiveFormats && Array.isArray(data.adaptiveFormats)) allFormats = allFormats.concat(data.adaptiveFormats);
+    if (data.streamingData?.formats) allFormats = allFormats.concat(data.streamingData.formats);
+    if (data.streamingData?.adaptiveFormats) allFormats = allFormats.concat(data.streamingData.adaptiveFormats);
+    
+    // Kalau formatnya kosong, coba cari di properti lain (kadang namanya `links` atau `urls`)
+    if (allFormats.length === 0) {
+      const stringified = JSON.stringify(data);
+      const urlMatches = stringified.match(/"url":"(https:\/\/[^"]+)"/g);
+      if (urlMatches) {
+        // Extract unique URLs
+        const urls = [...new Set(urlMatches.map(m => m.split(':"')[1].slice(0, -1)))];
+        urls.forEach(u => {
+           if (u.includes('googlevideo.com')) allFormats.push({ url: u, mimeType: 'video/mp4', qualityLabel: 'Unknown' });
+        });
+      }
+    }
+
+    if (allFormats.length === 0) {
+      throw new Error("Format video kosong di response API.");
+    }
 
     const mp4 = [];
     const mp3 = [];
 
-    // Ambil format MP4 (Video)
-    data.formats.forEach(f => {
-      // Hanya ambil format mp4 dengan audio (biasanya mimeType video/mp4; codecs="avc1...")
-      if (f.mimeType.includes('video/mp4') && f.hasAudio) {
-        mp4.push({
-          quality: f.qualityLabel || 'Video',
-          format: 'mp4',
-          url: f.url,
-          has_audio: true
-        });
-      }
+    allFormats.forEach(f => {
+      // Pastikan ada URL
+      if (!f.url && !f.link) return;
+      const videoUrl = f.url || f.link;
       
-      // Ambil format Audio (MP4 Audio / WebM Audio) buat di-convert jadi MP3 (tapi linknya tetep m4a/webm)
-      if (f.mimeType.includes('audio') && !f.hasVideo) {
+      const mime = f.mimeType || f.mime || '';
+      const quality = f.qualityLabel || f.quality || 'Default';
+      
+      // Deteksi Audio
+      if (mime.includes('audio')) {
         mp3.push({
-          quality: `${f.qualityLabel || '128kbps'}`,
-          format: 'm4a', // m4a lebih universal untuk audio-only dari YouTube
-          url: f.url
+          quality: f.audioQuality || f.bitrate ? `${Math.round((f.bitrate||128000)/1000)}kbps` : 'Audio',
+          format: mime.includes('mp4') ? 'm4a' : 'webm',
+          url: videoUrl
+        });
+      } 
+      // Deteksi Video
+      else if (mime.includes('video') || videoUrl.includes('mime=video')) {
+        // Kita cuma mau yang ada audionya (progressive) biar bisa diputar
+        // Tapi kalau gak ada info hasAudio, kita masukin aja semua
+        const hasAudio = f.hasAudio !== undefined ? f.hasAudio : (mime.includes('avc1') || mime.includes('mp4a'));
+        
+        mp4.push({
+          quality: quality,
+          format: 'mp4',
+          url: videoUrl,
+          has_audio: hasAudio
         });
       }
     });
 
-    // Urutkan dari kualitas tertinggi ke terendah
-    mp4.sort((a, b) => parseInt(b.quality) - parseInt(a.quality));
+    // Urutkan MP4 berdasarkan resolusi (angka di qualityLabel)
+    mp4.sort((a, b) => {
+      const getNum = (str) => parseInt(str.replace(/[^0-9]/g, '')) || 0;
+      return getNum(b.quality) - getNum(a.quality);
+    });
 
     if (mp4.length === 0 && mp3.length === 0) {
-      throw new Error("Tidak ada format yang tersedia untuk diunduh");
+      throw new Error("Gak nemu format MP4/MP3 di dalam data API.");
     }
 
     return {
@@ -114,9 +147,10 @@ async function download(url) {
       duration: data.lengthSeconds ? `${data.lengthSeconds}s` : null,
       thumbnail: `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`,
       url: `https://www.youtube.com/watch?v=${videoId}`,
-      mp4: mp4.slice(0, 5), // Ambil 5 kualitas terbaik
+      // Buang duplikat berdasarkan resolusi
+      mp4: [...new Map(mp4.map(m => [m.quality, m])).values()].slice(0, 6),
       mp4video_only: [],
-      mp3: mp3.slice(0, 3)
+      mp3: [...new Map(mp3.map(m => [m.quality, m])).values()].slice(0, 3)
     };
   } catch (err) {
     throw new Error(`Gagal download: ${err.message}`);
