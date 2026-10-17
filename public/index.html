@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* (SEMUA CSS LU UTUH 100%) */
 :root {
   --bg: #f0e9dc; --bg-2: #e8dfce; --surface: #fdfaf3; --ink: #1a1a1a; --ink-2: #4a4a4a; --muted: #8a857a;
   --c-coral: #f4a8a8; --c-purple: #b8a9e8; --c-mint: #8ee0d0; --c-yellow: #f5d76e; --c-blue: #8bc4f0;
@@ -252,66 +251,105 @@ body::before {
 .foot-version { padding: 4px 8px; background: var(--c-yellow); border: 1.5px solid var(--ink); border-radius: 6px; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; }
 
 /* =======================================================
-   FLOATING MUSIC BUTTON & PANEL
+   FLOATING MUSIC BUTTON & PANEL (UPGRADED UI)
    ======================================================= */
-.music-fab { position: fixed; bottom: 24px; right: 24px; z-index: 999; width: 60px; height: 60px; background: var(--c-coral); border: var(--bw-thick) solid var(--ink); box-shadow: 6px 6px 0 var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s var(--ease); animation: fabBounce 3s ease-in-out infinite; }
+.music-fab { 
+  position: fixed; bottom: 24px; right: 24px; z-index: 999; 
+  width: 64px; height: 64px; background: var(--c-coral); 
+  border: var(--bw-thick) solid var(--ink); box-shadow: 0 0 0 4px rgba(26,26,26,0.1), 6px 6px 0 var(--ink); 
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+  cursor: pointer; transition: all 0.4s var(--ease); animation: fabBounce 3s ease-in-out infinite;
+}
 @keyframes fabBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-.music-fab:hover { transform: scale(1.08) translateY(-4px); }
-.music-fab:active { transform: scale(0.95) translateY(0); box-shadow: 2px 2px 0 var(--ink); }
+.music-fab:hover { transform: scale(1.1) translateY(-4px); box-shadow: 0 0 0 6px rgba(244,168,168,0.3), 6px 6px 0 var(--ink); }
+.music-fab:active { transform: scale(0.95) translateY(0); box-shadow: 0 0 0 2px rgba(244,168,168,0.3), 2px 2px 0 var(--ink); }
 .music-fab.playing svg { animation: sp 4s linear infinite; }
 
-.music-panel { position: fixed; bottom: 100px; right: 24px; width: 340px; max-width: calc(100vw - 48px); background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: 8px 8px 0 var(--ink); border-radius: var(--r-lg); z-index: 998; display: none; flex-direction: column; overflow: hidden; transform-origin: bottom right; animation: panelIn 0.3s var(--ease); }
-@keyframes panelIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+.music-panel { 
+  position: fixed; bottom: 100px; right: 24px; width: 360px; max-width: calc(100vw - 48px); 
+  background: var(--surface); border: var(--bw-thick) solid var(--ink); 
+  box-shadow: 10px 10px 0 var(--ink); border-radius: 20px; 
+  z-index: 998; display: none; flex-direction: column; overflow: hidden; 
+  transform-origin: bottom right; animation: panelIn 0.4s var(--ease);
+}
+@keyframes panelIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .music-panel.show { display: flex; }
-.mp-header { padding: 14px; background: var(--ink); color: var(--surface); display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-.mp-close { cursor: pointer; background: none; border: none; color: var(--surface); font-weight: bold; font-size: 16px; }
 
-.mp-tabs { display: flex; border-bottom: var(--bw) solid var(--ink); background: var(--bg-2); }
-.mp-tab { flex: 1; text-align: center; padding: 10px 0; font-size: 11px; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; transition: 0.2s; }
-.mp-tab.active { color: var(--ink); border-bottom-color: var(--c-coral); background: var(--surface); }
+.mp-header { padding: 16px 18px; background: var(--ink); color: var(--surface); display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.mp-close { cursor: pointer; background: rgba(255,255,255,0.1); border: none; color: var(--surface); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; transition: 0.2s; }
+.mp-close:hover { background: rgba(255,255,255,0.2); }
+
+/* TABS UPGRADED */
+.mp-tabs { display: flex; border-bottom: var(--bw-thick) solid var(--ink); background: var(--surface); padding: 0 4px; }
+.mp-tab { flex: 1; text-align: center; padding: 12px 0; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 4px solid transparent; transition: 0.25s var(--ease); margin-bottom: -3px; }
+.mp-tab svg { width: 18px; height: 18px; transition: 0.25s var(--ease); }
+.mp-tab.active { color: var(--ink); border-bottom-color: var(--c-coral); }
+.mp-tab.active svg { color: var(--c-coral); transform: scale(1.1); }
+.mp-tab:hover:not(.active) { background: var(--bg); color: var(--ink-2); }
+
 .mp-tab-content { display: none; flex-direction: column; }
-.mp-tab-content.active { display: flex; }
+.mp-tab-content.active { display: flex; animation: fadeIn 0.3s var(--ease); }
 
 /* TAB SEARCH */
-#tab-search .mp-search-wrap { padding: 14px; border-bottom: var(--bw) solid var(--ink); background: var(--bg); display: flex; gap: 8px; }
-#tab-search .mp-search { flex: 1; padding: 10px; border: var(--bw) solid var(--ink); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; background: var(--surface); }
-#tab-search .mp-search-btn { padding: 0 14px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); font-weight: 800; cursor: pointer; }
-.mp-results { max-height: 250px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 6px; }
-.mp-item { display: flex; align-items: center; gap: 10px; padding: 8px; border: 2px solid transparent; border-radius: var(--r-sm); cursor: pointer; transition: 0.15s; }
-.mp-item:hover { background: var(--bg-2); border-color: var(--ink); }
-.mp-item img { width: 40px; height: 40px; border-radius: 6px; border: 1px solid var(--ink); object-fit: cover; }
+#tab-search .mp-search-wrap { padding: 16px; border-bottom: var(--bw) solid var(--ink-soft); background: var(--bg); display: flex; gap: 8px; }
+#tab-search .mp-search { flex: 1; padding: 12px 14px; border: var(--bw) solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; background: var(--surface); transition: 0.2s; }
+#tab-search .mp-search:focus { box-shadow: 0 0 0 3px var(--c-blue); }
+#tab-search .mp-search-btn { padding: 0 18px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: 99px; font-weight: 800; cursor: pointer; transition: 0.2s; }
+#tab-search .mp-search-btn:hover { background: var(--c-coral); color: var(--ink); }
+
+.mp-results { max-height: 280px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.mp-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 2px solid transparent; border-radius: var(--r); cursor: pointer; transition: 0.2s var(--ease); background: var(--surface); }
+.mp-item:hover { background: var(--bg-2); border-color: var(--ink); transform: translateX(2px); }
+.mp-item img { width: 46px; height: 46px; border-radius: 8px; border: 2px solid var(--ink); object-fit: cover; box-shadow: 2px 2px 0 var(--ink); }
 .mp-item-info { flex: 1; min-width: 0; }
-.mp-item-title { font-weight: 800; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
-.mp-item .action-btn { background: none; border: none; cursor: pointer; padding: 5px; color: var(--muted); transition: 0.2s; }
-.mp-item .action-btn:hover { color: var(--ink); }
-.mp-item .action-btn.active { color: var(--danger); }
+.mp-item-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.mp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--muted); }
+.mp-item .duration { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); margin-left: auto; padding-left: 8px;}
+.mp-item .action-btn { background: transparent; border: none; cursor: pointer; padding: 6px; color: var(--muted); transition: 0.2s; display: grid; place-items: center; border-radius: 50%; }
+.mp-item .action-btn:hover { color: var(--ink); background: var(--bg-2); }
+.mp-item .action-btn.active { color: var(--c-coral); }
 
 /* TAB LIRIK */
-.lyrics-container { padding: 15px; overflow-y: auto; max-height: 300px; font-size: 14px; font-weight: 700; line-height: 1.8; color: var(--ink); text-align: center; }
-.lyric-line { margin-bottom: 12px; transition: all 0.3s var(--ease); opacity: 0.4; transform: scale(0.95); }
-.lyric-line.active { color: var(--ink); opacity: 1; transform: scale(1.02); font-size: 16px; }
+.lyrics-container { padding: 20px; overflow-y: auto; max-height: 320px; font-size: 15px; font-weight: 700; line-height: 2; color: var(--ink); text-align: center; }
+.lyric-line { margin-bottom: 14px; transition: all 0.4s var(--ease); opacity: 0.3; transform: scale(0.95); }
+.lyric-line.active { color: var(--ink); opacity: 1; transform: scale(1.05); font-size: 17px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
 /* TAB FAVORIT / PLAYLIST */
-#tab-favorit .mp-results, #tab-playlist .mp-results { max-height: 300px; }
-.tab-empty { padding: 30px 20px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.share-btn-wrap { padding: 10px; border-top: var(--bw) solid var(--ink); text-align: center; background: var(--bg-2); }
-.share-btn { width: 100%; padding: 10px; background: var(--c-blue); border: var(--bw) solid var(--ink); font-weight: 800; font-size: 11px; font-family: 'JetBrains Mono', monospace; cursor: pointer; box-shadow: var(--sh-sm); }
-.share-btn:hover { background: var(--c-mint); }
+#tab-favorit .mp-results, #tab-playlist .mp-results { max-height: 280px; }
+.tab-empty { padding: 40px 20px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.share-btn-wrap { padding: 12px 16px; border-top: var(--bw) solid var(--ink-soft); text-align: center; background: var(--bg); }
+.share-btn { width: 100%; padding: 12px; background: var(--c-blue); border: var(--bw) solid var(--ink); border-radius: var(--r); font-weight: 800; font-size: 12px; font-family: 'JetBrains Mono', monospace; cursor: pointer; box-shadow: var(--sh-sm); display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+.share-btn:hover { background: var(--c-mint); transform: translate(-2px,-2px); box-shadow: var(--sh); }
+.share-btn svg { width: 16px; height: 16px; }
 
-/* PLAYER CONTROL */
-.mp-player { padding: 14px; background: var(--c-mint); border-top: var(--bw) solid var(--ink); display: none; }
+/* PLAYER CONTROL (UPGRADED) */
+.mp-player { padding: 16px 20px; background: var(--c-mint); border-top: var(--bw-thick) solid var(--ink); display: none; }
 .mp-player.show { display: block; }
-.mp-now { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-.mp-now img { width: 44px; height: 44px; border-radius: 6px; border: var(--bw) solid var(--ink); animation: sp 8s linear infinite; animation-play-state: paused; }
+.mp-now { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.mp-now img { width: 52px; height: 52px; border-radius: 8px; border: var(--bw-thick) solid var(--ink); box-shadow: 2px 2px 0 var(--ink); animation: sp 8s linear infinite; animation-play-state: paused; }
 .music-panel.playing .mp-now img { animation-play-state: running; }
 .mp-now-info { flex: 1; min-width: 0; }
-.mp-now-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-now-artist { font-family: 'JetBrains Mono', monospace; font-size: 10px; }
-.mp-controls { display: flex; justify-content: center; gap: 12px; margin-top: 8px; }
-.mp-btn-circle { width: 44px; height: 44px; border-radius: 50%; border: var(--bw) solid var(--ink); background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: 2px 2px 0 var(--ink); transition: 0.15s; }
-.mp-btn-circle:hover { transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--ink); }
-.mp-btn-circle.play { background: var(--c-yellow); width: 54px; height: 54px; }
+.mp-now-title { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.mp-now-artist { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); }
+
+/* PROGRESS BAR & DURATION */
+.mp-progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.mp-time { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: var(--ink-2); min-width: 36px; text-align: center; }
+.mp-progress { flex: 1; height: 8px; background: rgba(26,26,26,0.1); border: 2px solid var(--ink); border-radius: 99px; position: relative; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
+.mp-progress-fill { height: 100%; width: 0%; background: var(--c-coral); border-radius: 99px; position: relative; }
+.mp-progress-fill::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: var(--surface); border: 2px solid var(--ink); border-radius: 50%; box-shadow: 1px 1px 0 var(--ink); opacity: 0; transition: opacity 0.2s; }
+.mp-progress:hover .mp-progress-fill::after { opacity: 1; }
+.mp-progress input[type="range"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; z-index: 2; }
+
+/* CONTROL BUTTONS (PREV, PLAY, NEXT) */
+.mp-controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
+.mp-btn-circle { width: 44px; height: 44px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-sm); transition: 0.15s var(--ease); }
+.mp-btn-circle:hover { transform: translate(-2px,-2px); box-shadow: var(--sh); background: var(--c-yellow); }
+.mp-btn-circle:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
+.mp-btn-circle.play { background: var(--ink); color: var(--surface); width: 60px; height: 60px; box-shadow: var(--sh); }
+.mp-btn-circle.play:hover { background: var(--c-coral); color: var(--ink); }
+.mp-btn-circle.small { width: 40px; height: 40px; background: transparent; box-shadow: none; border-color: var(--ink); }
+.mp-btn-circle.small:hover { background: var(--ink); color: var(--surface); transform: none; box-shadow: none; }
 
 @media (max-width: 640px) {
   .shell { padding: 20px 16px 60px; } .top { margin-bottom: 20px; } .brand { padding: 8px 12px 8px 8px; }
@@ -413,7 +451,7 @@ body::before {
 
 <!-- FLOATING BUTTON MUSIC -->
 <div class="music-fab" id="musicFab" onclick="toggleMusicPanel()">
-  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
+  <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
 </div>
 
 <!-- MUSIC PANEL -->
@@ -424,10 +462,22 @@ body::before {
   </div>
   
   <div class="mp-tabs">
-    <div class="mp-tab active" onclick="switchTab('search')">Search</div>
-    <div class="mp-tab" onclick="switchTab('lirik')">Lirik</div>
-    <div class="mp-tab" onclick="switchTab('favorit')">Favorit</div>
-    <div class="mp-tab" onclick="switchTab('playlist')">Playlist</div>
+    <div class="mp-tab active" onclick="switchTab('search')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      Search
+    </div>
+    <div class="mp-tab" onclick="switchTab('lirik')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+      Lirik
+    </div>
+    <div class="mp-tab" onclick="switchTab('favorit')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Favorit
+    </div>
+    <div class="mp-tab" onclick="switchTab('playlist')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
+      Playlist
+    </div>
   </div>
 
   <div class="mp-tab-content active" id="tab-search">
@@ -449,10 +499,14 @@ body::before {
   <div class="mp-tab-content" id="tab-playlist">
     <div class="mp-results" id="playlistResults"></div>
     <div class="share-btn-wrap">
-      <button class="share-btn" onclick="sharePlaylist()">🔗 Bagikan Playlist Ini</button>
+      <button class="share-btn" onclick="sharePlaylist()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+        Bagikan Playlist
+      </button>
     </div>
   </div>
 
+  <!-- PLAYER CONTROL (SPOTIFY STYLE) -->
   <div class="mp-player" id="musicPlayerControl">
     <div class="mp-now">
       <img src="" id="mpNowCover">
@@ -461,12 +515,27 @@ body::before {
         <div class="mp-now-artist" id="mpNowArtist">—</div>
       </div>
     </div>
+    
+    <!-- PROGRESS BAR -->
+    <div class="mp-progress-wrap">
+      <span class="mp-time" id="mpTimeCurrent">0:00</span>
+      <div class="mp-progress">
+        <div class="mp-progress-fill" id="mpProgressFill"></div>
+        <input type="range" id="mpProgressInput" min="0" max="100" value="0" step="0.1">
+      </div>
+      <span class="mp-time" id="mpTimeDuration">0:00</span>
+    </div>
+
+    <!-- CONTROLS -->
     <div class="mp-controls">
-      <button class="mp-btn-circle fav" id="mpFavBtn" onclick="toggleFavoriteCurrent()" title="Favorit">
-        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <button class="mp-btn-circle small" onclick="playPrev()" title="Previous">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
       </button>
       <button class="mp-btn-circle play" id="mpPlayBtn" onclick="togglePlay()">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" id="mpPlayIcon"><path d="M8 5v14l11-7z"/></svg>
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" id="mpPlayIcon"><path d="M8 5v14l11-7z"/></svg>
+      </button>
+      <button class="mp-btn-circle small" onclick="playNext()" title="Next">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
       </button>
     </div>
   </div>
@@ -532,7 +601,6 @@ async function runDownload() {
     const thumb = data.thumbnail ? `<img class="thumb" src="${esc(data.thumbnail)}" alt="" referrerpolicy="no-referrer">` : '';
     
     // Preview Media (Video / Audio)
-    // Kalau SPOTIFY atau SOUNDCLOUD -> Audio. Kalau LINK/PLATFORM LAIN -> Video.
     let preview = '';
     const isMusicPlatform = det.key === 'spotify' || det.key === 'soundcloud';
     
@@ -540,7 +608,6 @@ async function runDownload() {
       const prevA = medias.find(m => m.is_audio && m.url);
       if(prevA) preview = `<div class="prev"><span class="prev-tag">Preview Audio</span><div class="prev-audio"><div class="ap-head"><div class="ap-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg></div><div class="ap-title">${esc(data.title)}</div></div><audio controls preload="metadata" src="${esc(prevA.url)}"></audio></div></div>`;
     } else {
-      // Kalau bukan music platform, paksa cari media video / ekstensi mp4
       const prevV = medias.find(m => (!m.is_audio || m.type === 'video' || m.extension === 'mp4') && m.url && m.type !== 'image');
       if(prevV) preview = `<div class="prev"><span class="prev-tag">Preview Video</span><video controls playsinline preload="metadata" src="${esc(prevV.url)}"></video></div>`;
     }
@@ -560,14 +627,14 @@ async function runDownload() {
 
 function fmtNum(n) { n = Number(n) || 0; if (n >= 1e9) return (n/1e9).toFixed(1) + 'B'; if (n >= 1e6) return (n/1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n/1e3).toFixed(1) + 'K'; return String(n); }
 
-/* STATUS API (SAMA) */
+/* STATUS API */
 let statusLoaded = false; const statusGrid = $('statusGrid'); const statusOverall = $('statusOverall'); const statusSub = $('statusSub'); const metricOnline = $('metricOnline'); const metricLatency = $('metricLatency'); const refreshBtn = $('refreshBtn'); const liveBtn = $('liveBtn'); const liveText = $('liveText');
 async function loadStatus(showLoader = true) { if (showLoader) { refreshBtn.disabled = true; liveBtn.classList.add('checking'); liveBtn.classList.remove('degraded', 'critical'); liveText.textContent = 'Checking'; } try { const r = await fetch('/api/status', { method: 'GET' }); const data = await r.json(); if (!data.status) throw new Error('Gagal cek status'); statusLoaded = true; const overallMap = { healthy: { text: 'Semua Sistem Normal', cls: 'healthy' }, degraded: { text: 'Beberapa Layanan Terganggu', cls: 'degraded' }, critical: { text: 'Semua Layanan Down', cls: 'critical' } }; const om = overallMap[data.overall] || overallMap.degraded; statusOverall.textContent = om.text; statusOverall.className = 'status-text ' + om.cls; statusSub.textContent = `${data.online}/${data.total} layanan online`; metricOnline.textContent = `${data.online}/${data.total}`; metricLatency.textContent = `${data.avg_latency}ms`; statusGrid.innerHTML = data.services.map(s => { let barClass = 'good'; if (s.status === 'down') barClass = 'down'; else if (s.latency > 3000) barClass = 'slow'; else if (s.latency > 1000) barClass = 'mid'; const barPct = s.status === 'down' ? 100 : Math.min(100, (s.latency / 3000) * 100); return `<div class="svc"><div class="svc-left"><span class="svc-dot ${s.status}"></span><div class="svc-info"><div class="svc-name">${esc(s.name)}</div><div class="svc-label">${esc(s.label)}</div></div></div><div class="svc-right"><div class="latency-wrap"><div class="latency-bar"><div class="latency-fill ${barClass}" style="width:${barPct}%"></div></div><span class="latency-text">${s.latency}ms</span></div><span class="svc-badge ${s.status}">${s.status === 'online' ? 'Online' : 'Down'}</span></div></div>`; }).join(''); liveBtn.classList.remove('checking', 'degraded', 'critical'); if (data.overall === 'healthy') liveText.textContent = 'Online'; else if (data.overall === 'degraded') { liveBtn.classList.add('degraded'); liveText.textContent = 'Degraded'; } else { liveBtn.classList.add('critical'); liveText.textContent = 'Down'; } } catch (err) { statusOverall.textContent = 'Gagal Cek Status'; statusOverall.className = 'status-text critical'; statusSub.textContent = err.message; statusGrid.innerHTML = `<div class="st err">${esc(err.message)}</div>`; liveBtn.classList.remove('checking', 'degraded'); liveBtn.classList.add('critical'); liveText.textContent = 'Error'; } finally { refreshBtn.disabled = false; liveBtn.classList.remove('checking'); } }
 refreshBtn.addEventListener('click', () => loadStatus(true)); liveBtn.addEventListener('click', () => { tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === 'status')); panels.forEach(p => p.classList.toggle('active', p.id === 'panel-status')); loadStatus(true); }); window.addEventListener('load', () => { setTimeout(() => loadStatus(false), 800); });
 
 
 /* =========================================
-   LOGIKA MUSIC & PLAYER (FITUR LENGKAP)
+   LOGIKA MUSIC & PLAYER (FITUR SPOTIFY-LIKE)
    ========================================= */
 let currentSong = null;
 let currentPlaylist = []; 
@@ -589,6 +656,14 @@ function switchTab(tabName) {
 
   if(tabName === 'favorit') renderList('favorit');
   if(tabName === 'playlist') renderList('playlist');
+}
+
+// Format detik ke menit:detik
+function formatTime(sec) {
+  if(!sec || isNaN(sec)) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 // STORAGE HELPER
@@ -647,6 +722,7 @@ function renderList(type) {
         <div class="mp-item-title">${esc(song.title)}</div>
         <div class="mp-item-artist">${esc(song.artist)}</div>
       </div>
+      <span class="duration">${song.duration ? song.duration : ''}</span>
       <button class="action-btn" onclick='removeFromList(event, "${type}", "${song.videoId}")'>
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </button>
@@ -666,7 +742,7 @@ function removeFromList(e, type, videoId) {
   }
 }
 
-// FITUR SHARE PLAYLIST
+// FITUR SHARE PLAYLIST (WEB SHARE API)
 function sharePlaylist() {
   const pls = getStore('playlist_music');
   if(!pls.length) return alert("Playlist masih kosong, tambahin lagu dulu!");
@@ -674,11 +750,19 @@ function sharePlaylist() {
   const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify(pls))));
   const shareUrl = `${window.location.origin}${window.location.pathname}?playlist=${dataStr}`;
   
-  navigator.clipboard.writeText(shareUrl).then(() => {
-    alert("Link Playlist berhasil dicopy! Kirim ke temen lu biar dia bisa dengerin.");
-  }).catch(() => {
-    prompt("Copy link ini secara manual:", shareUrl);
-  });
+  if (navigator.share) {
+    navigator.share({
+      title: 'Playlist Saya',
+      text: 'Dengerin playlist lagu favorit gw di Downloader AIO!',
+      url: shareUrl
+    }).catch(err => console.log('Share cancelled', err));
+  } else {
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      alert("Link Playlist berhasil dicopy! (Browser lu belum support share langsung)");
+    }).catch(() => {
+      prompt("Copy link ini secara manual:", shareUrl);
+    });
+  }
 }
 
 // IMPORT PLAYLIST DARI URL
@@ -716,6 +800,7 @@ async function searchMusic() {
       return `<div class="mp-item" onclick='playMusicByIndex(${index})'>
         <img src="${song.thumbnail}" loading="lazy">
         <div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div>
+        <span class="duration">${song.duration || ''}</span>
         <button class="action-btn ${isPl ? 'active' : ''}" onclick='togglePlaylistItem(event, ${JSON.stringify(song).replace(/'/g, "&#39;")})' title="Tambah ke Playlist">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
@@ -797,16 +882,48 @@ async function playMusicSong(song) {
   fetchLyrics(song);
 }
 
-// AUTO-NEXT
-audio.addEventListener('ended', () => {
-  musicFab.classList.remove('playing');
-  musicPanel.classList.remove('playing');
-  $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
-  
+// UPDATE PROGRESS BAR & DURASI
+const progressInput = $('mpProgressInput');
+const progressFill = $('mpProgressFill');
+const timeCurrent = $('mpTimeCurrent');
+const timeDuration = $('mpTimeDuration');
+
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  progressFill.style.width = pct + '%';
+  progressInput.value = pct;
+  timeCurrent.textContent = formatTime(audio.currentTime);
+  timeDuration.textContent = formatTime(audio.duration);
+});
+
+// FITUR SEEK (GESER PROGRESS BAR)
+progressInput.addEventListener('input', (e) => {
+  if (!audio.duration) return;
+  const pct = parseFloat(e.target.value);
+  const newTime = (pct / 100) * audio.duration;
+  audio.currentTime = newTime;
+  progressFill.style.width = pct + '%';
+  timeCurrent.textContent = formatTime(newTime);
+});
+
+// TOMBOL NEXT & PREV
+function playNext() {
   if(currentPlaylist.length > 0 && currentPlayIndex < currentPlaylist.length - 1) {
     currentPlayIndex++;
     playMusicSong(currentPlaylist[currentPlayIndex]);
   }
+}
+function playPrev() {
+  if(currentPlaylist.length > 0 && currentPlayIndex > 0) {
+    currentPlayIndex--;
+    playMusicSong(currentPlaylist[currentPlayIndex]);
+  }
+}
+
+// AUTO-NEXT
+audio.addEventListener('ended', () => {
+  playNext();
 });
 
 function togglePlay() {
