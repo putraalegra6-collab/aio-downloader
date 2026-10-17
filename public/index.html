@@ -609,13 +609,13 @@ const timeCurrent = $('mpTimeCurrent');
 const timeDuration = $('mpTimeDuration');
 
 let currentSong = null;
-let currentPlaylist = [];       // antrean lagu yang sedang diputar
+let currentPlaylist = [];
 let currentPlayIndex = -1;
-let searchResults = [];         // hasil pencarian terakhir
+let searchResults = [];
 let listCache = { favorit: [], playlist: [] };
 let currentLyricsLines = [];
 let lyricsSyncInterval = null;
-let fallbackDuration = 0;       // durasi resmi lagu (detik) dari data lagu
+let officialDuration = 0;   // durasi resmi lagu (detik), dari data pencarian / respons play
 
 const ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
 const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
@@ -643,26 +643,60 @@ function formatTime(sec) {
   return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${s}` : `${m}:${s}`;
 }
 
-// Terima angka (detik), "225", "3:45", atau "1:02:10" -> detik
-function parseDuration(d) {
-  if (typeof d === 'number') return isFinite(d) ? d : 0;
-  if (typeof d !== 'string') return 0;
-  const t = d.trim();
+// Ubah string durasi ke detik: "3:21", "1:02:10", "201", "PT3M21S", "3 min 21 sec"
+function parseDurationString(t) {
+  t = t.trim();
+  if (!t) return 0;
   if (/^\d+(\.\d+)?$/.test(t)) return Number(t);
-  if (t.includes(':')) return t.split(':').reduce((acc, p) => acc * 60 + (parseFloat(p) || 0), 0);
+  const iso = t.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?$/i);
+  if (iso) return (+iso[1] || 0) * 3600 + (+iso[2] || 0) * 60 + (+iso[3] || 0);
+  if (/^\d+(:\d+){1,2}(\.\d+)?$/.test(t)) return t.split(':').reduce((acc, p) => acc * 60 + (parseFloat(p) || 0), 0);
+  const h = t.match(/(\d+)\s*(h|hr|hour|jam)/i);
+  const m = t.match(/(\d+)\s*(m|min|minute|menit)/i);
+  const s = t.match(/(\d+)\s*(s|sec|second|detik)/i);
+  if (h || m || s) return (h ? +h[1] * 3600 : 0) + (m ? +m[1] * 60 : 0) + (s ? +s[1] : 0);
   return 0;
 }
-function fmtDur(d) { const s = parseDuration(d); return s ? formatTime(s) : (typeof d === 'string' ? d : ''); }
 
-// Durasi resmi lagu diprioritaskan. audio.duration hanya cadangan kalau data lagu tidak punya durasi.
+// Ubah berbagai bentuk nilai durasi (angka, string, objek) ke detik
+function toSeconds(v, keyName = '') {
+  if (v == null) return 0;
+  if (typeof v === 'number') {
+    if (!isFinite(v)) return 0;
+    // Kalau nama field menyebut milidetik, atau angkanya terlalu besar untuk detik, bagi 1000
+    if (/ms|milli/i.test(keyName) || v > 100000) return v / 1000;
+    return v;
+  }
+  if (typeof v === 'string') return parseDurationString(v);
+  if (typeof v === 'object') {
+    return toSeconds(v.seconds ?? v.totalSeconds ?? v.text ?? v.simpleText ?? v.label ?? v.value ?? 0, keyName);
+  }
+  return 0;
+}
+
+// Ambil durasi resmi dari objek lagu, cek beberapa nama field yang umum
+const DURATION_KEYS = ['duration', 'durationSeconds', 'duration_seconds', 'durationText', 'duration_text', 'lengthSeconds', 'length', 'durationMs', 'duration_ms', 'length_ms', 'time'];
+function getOfficialDuration(obj) {
+  if (!obj || typeof obj !== 'object') return 0;
+  for (const k of DURATION_KEYS) {
+    if (obj[k] == null || obj[k] === '') continue;
+    const sec = toSeconds(obj[k], k);
+    if (sec > 10) return sec; // di bawah 10 detik dianggap nilai salah
+  }
+  return 0;
+}
+
+// Durasi yang dipakai untuk tampilan dan seek: durasi resmi lebih dulu, audio.duration cadangan
 function getDuration() {
-  if (fallbackDuration > 0) return fallbackDuration;
-  return (isFinite(audio.duration) && audio.duration > 0) ? audio.duration : 0;
+  if (officialDuration > 10) return officialDuration;
+  const real = isFinite(audio.duration) && audio.duration > 10 ? audio.duration : 0;
+  return real;
 }
 
 function updateProgress() {
   const dur = getDuration();
-  const cur = audio.currentTime || 0;
+  let cur = audio.currentTime || 0;
+  if (dur > 0 && cur > dur) cur = dur;
   const pct = dur > 0 ? Math.min(100, (cur / dur) * 100) : 0;
   progressFill.style.width = pct + '%';
   progressInput.value = pct;
@@ -698,19 +732,21 @@ function renderList(type) {
     $(containerId).innerHTML = `<div class="tab-empty">Belum ada lagu di ${type}.</div>`;
     return;
   }
-  $(containerId).innerHTML = items.map((song, i) => `
+  $(containerId).innerHTML = items.map((song, i) => {
+    const d = getOfficialDuration(song);
+    return `
     <div class="mp-item" onclick="playMusicFromList('${type}', ${i})">
       <img src="${esc(song.thumbnail)}" alt="">
       <div class="mp-item-info">
         <div class="mp-item-title">${esc(song.title)}</div>
         <div class="mp-item-artist">${esc(song.artist)}</div>
       </div>
-      <span class="duration">${esc(fmtDur(song.duration))}</span>
+      <span class="duration">${d ? formatTime(d) : ''}</span>
       <button class="action-btn" onclick="removeFromList(event, '${type}', '${esc(song.videoId)}')">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </button>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function removeFromList(e, type, videoId) {
@@ -768,10 +804,11 @@ async function searchMusic() {
 
     resDiv.innerHTML = searchResults.map((song, i) => {
       const isPl = plsStore.some(s => s.videoId === song.videoId);
+      const d2 = getOfficialDuration(song);
       return `<div class="mp-item" onclick="playMusicFromSearch(${i})">
         <img src="${esc(song.thumbnail)}" loading="lazy" alt="">
         <div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div>
-        <span class="duration">${esc(fmtDur(song.duration))}</span>
+        <span class="duration">${d2 ? formatTime(d2) : ''}</span>
         <button class="action-btn ${isPl ? 'active' : ''}" onclick="togglePlaylistItem(event, ${i})" title="Tambah ke Playlist">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
@@ -792,8 +829,8 @@ async function playMusicSong(song, list, index) {
   currentPlaylist = list && list.length ? list : [song];
   currentPlayIndex = index != null ? index : currentPlaylist.indexOf(song);
 
-  // Durasi resmi dari data lagu, ini yang dipakai untuk tampilan
-  fallbackDuration = parseDuration(song.duration);
+  // Durasi resmi dari data lagu (ini yang tampil di layar)
+  officialDuration = getOfficialDuration(song);
 
   $('mpNowTitle').textContent = song.title;
   $('mpNowArtist').textContent = song.artist;
@@ -807,7 +844,7 @@ async function playMusicSong(song, list, index) {
   progressFill.style.width = '0%';
   progressInput.value = 0;
   timeCurrent.textContent = '0:00';
-  timeDuration.textContent = fallbackDuration ? formatTime(fallbackDuration) : '0:00';
+  timeDuration.textContent = officialDuration ? formatTime(officialDuration) : '0:00';
 
   switchTab('lirik');
   fetchLyrics(song);
@@ -822,8 +859,8 @@ async function playMusicSong(song, list, index) {
     const audioUrl = d && d.result && d.result.download && d.result.download.audio;
     if (!d.status || !audioUrl) throw new Error('Link audio tidak ditemukan');
 
-    // Kalau data lagu tidak punya durasi, ambil dari respons play
-    if (!fallbackDuration) fallbackDuration = parseDuration(d.result.duration);
+    // Kalau data pencarian tidak punya durasi, pakai durasi dari respons play
+    if (!officialDuration) officialDuration = getOfficialDuration(d.result);
 
     audio.src = `/api/proxy?url=${encodeURIComponent(audioUrl)}&fn=audio.m4a`;
     audio.load();
@@ -902,7 +939,7 @@ progressInput.addEventListener('input', (e) => {
   const newTime = (pct / 100) * dur;
   progressFill.style.width = pct + '%';
   timeCurrent.textContent = formatTime(newTime);
-  try { audio.currentTime = newTime; } catch {}
+  try { audio.currentTime = Math.min(newTime, audio.duration || newTime); } catch {}
 });
 
 // LIRIK
