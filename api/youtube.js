@@ -1,7 +1,7 @@
 /* ============================================================
-   YOUTUBE API — By Egaa v6
-   Search: Vamx API (bypass YouTube block)
-   Download: Invidious multi-instance (stream ready)
+   YOUTUBE API — By Egaa v7
+   Search: Vamx API (Primary) + Invidious (Fallback)
+   Download: Invidious Multi-instance
    ============================================================ */
 
 const axios = require('axios');
@@ -9,37 +9,31 @@ const axios = require('axios');
 const VAMX_KEY = 'vamx_live_1bb188197b9ec7df7c75165aee481b59';
 const UA = "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36";
 
+const INVIDIOUS = [
+  'https://inv.nadeko.net',
+  'https://invidious.nerdvpn.de',
+  'https://yewtu.be',
+  'https://invidious.f5.si',
+  'https://iv.melmac.space',
+  'https://invidious.privacyredirect.com'
+];
+
 /* ============================================================
-   SEARCH — Via Vamx API
+   SEARCH - FALLBACK SYSTEM
    ============================================================ */
-async function search(query) {
+async function searchViaVamx(query) {
   const api = `https://vamxapi.my.id/api/v1/search/youtube?q=${encodeURIComponent(query)}&limit=15&type=video&order=relevance`;
-
   const res = await axios.get(api, {
-    timeout: 25000,
-    headers: {
-      'x-api-key': VAMX_KEY,
-      'User-Agent': UA,
-      'Accept': 'application/json'
-    },
-    validateStatus: () => true
+    timeout: 15000,
+    headers: { 'x-api-key': VAMX_KEY, 'User-Agent': UA }
   });
-
-  if (res.status !== 200) throw new Error(`Vamx API HTTP ${res.status}`);
   
-  // Handle response structure (kadang beda-beda formatnya)
-  const json = res.data;
-  let results = [];
+  if (res.data?.status === false) throw new Error("Vamx limit");
   
-  if (Array.isArray(json)) results = json;
-  else if (json.data && Array.isArray(json.data)) results = json.data;
-  else if (json.result && Array.isArray(json.result)) results = json.result;
-  else if (json.videos && Array.isArray(json.videos)) results = json.videos;
+  let results = res.data?.data || res.data?.result || res.data || [];
+  if (!Array.isArray(results) || results.length === 0) throw new Error("Vamx kosong");
 
-  if (!results.length) throw new Error("Hasil tidak ditemukan / limit Vamx habis");
-
-  // Normalisasi ke format kita
-  const normalized = results.map(v => ({
+  return results.map(v => ({
     videoId: v.videoId || v.id || (v.url ? v.url.split('v=')[1] : null),
     title: v.title || 'Tanpa Judul',
     url: v.url || `https://www.youtube.com/watch?v=${v.videoId || v.id}`,
@@ -48,21 +42,58 @@ async function search(query) {
     channel: { name: v.channel || v.author?.name || 'Unknown' },
     thumbnail: v.thumbnail || v.thumbnails?.[0]?.url || `https://i.ytimg.com/vi/${v.videoId || v.id}/hqdefault.jpg`
   })).filter(v => v.videoId);
+}
 
-  if (!normalized.length) throw new Error("Data Vamx tidak valid");
+async function searchViaInvidious(query) {
+  let errors = [];
+  for (const inst of INVIDIOUS) {
+    try {
+      const res = await axios.get(`${inst}/api/v1/search?q=${encodeURIComponent(query)}&type=video`, {
+        timeout: 15000,
+        headers: { 'User-Agent': UA }
+      });
+      
+      if (res.status === 200 && Array.isArray(res.data) && res.data.length > 0) {
+        return res.data.map(v => ({
+          videoId: v.videoId,
+          title: v.title || 'Tanpa Judul',
+          url: `https://www.youtube.com/watch?v=${v.videoId}`,
+          duration: v.lengthSeconds ? `${v.lengthSeconds}s` : null,
+          views: v.viewCount ? `${v.viewCount} views` : null,
+          channel: { name: v.author || 'Unknown' },
+          thumbnail: v.videoThumbnails?.[0]?.url || `https://i.ytimg.com/vi/${v.videoId}/hqdefault.jpg`
+        }));
+      }
+      errors.push(`${inst}: kosong`);
+    } catch (e) {
+      errors.push(`${inst}: err`);
+    }
+  }
+  throw new Error("Semua server search gagal: " + errors.join(' | '));
+}
 
-  return { query, total: normalized.length, results: normalized };
+async function search(query) {
+  try {
+    // Coba Vamx dulu
+    console.log("Searching via Vamx...");
+    const res = await searchViaVamx(query);
+    if (res.length > 0) return { query, total: res.length, results: res };
+  } catch (err) {
+    console.log("Vamx gagal, pindah ke Invidious...", err.message);
+  }
+
+  // Kalau Vamx limit/gagal, pake Invidious
+  const res = await searchViaInvidious(query);
+  return { query, total: res.length, results: res };
 }
 
 /* ============================================================
-   DOWNLOAD — Multi-instance Invidious / Cobalt
+   DOWNLOAD
    ============================================================ */
-const VIDEO_ID_REGEX = /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/;
-
 function extractVideoId(input) {
   const s = String(input).trim();
   if (/^[A-Za-z0-9_-]{11}$/.test(s)) return s;
-  const m = s.match(VIDEO_ID_REGEX);
+  const m = s.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/|live\/))([A-Za-z0-9_-]{11})/);
   return m ? m[1] : null;
 }
 
@@ -70,38 +101,26 @@ async function download(url) {
   const videoId = extractVideoId(url);
   if (!videoId) throw new Error("Video ID tidak valid");
 
-  // Endpoint Invidious publik (kita coba satu-satu)
-  const instances = [
-    'https://inv.nadeko.net',
-    'https://invidious.nerdvpn.de',
-    'https://yewtu.be',
-    'https://invidious.f5.si',
-    'https://iv.melmac.space',
-    'https://invidious.privacyredirect.com'
-  ];
-
   let data = null;
   let errors = [];
 
-  for (const inst of instances) {
+  for (const inst of INVIDIOUS) {
     try {
       const res = await axios.get(`${inst}/api/v1/videos/${videoId}`, {
         timeout: 15000,
-        headers: { 'User-Agent': UA, 'Accept': 'application/json' },
-        validateStatus: () => true
+        headers: { 'User-Agent': UA, 'Accept': 'application/json' }
       });
 
       if (res.status === 200 && res.data && res.data.title) {
         data = res.data;
         break;
       }
-      errors.push(`${inst.replace('https://','')}: ${res.status}`);
     } catch (err) {
       errors.push(`${inst.replace('https://','')}: ${err.message}`);
     }
   }
 
-  if (!data) throw new Error(`Gagal download. Server: ${errors.join(' | ')}`);
+  if (!data) throw new Error(`Gagal download. Server sibuk.`);
 
   const title = data.title || 'Video';
   const author = data.author || null;
@@ -112,76 +131,39 @@ async function download(url) {
   const mp4v = [];
   const mp3 = [];
 
-  // Format video+audio (progressive)
   (data.formatStreams || []).forEach(f => {
     if (!f.url) return;
     const hMatch = (f.qualityLabel || '').match(/(\d+)p/);
     const height = hMatch ? parseInt(hMatch[1]) : 0;
-    mp4.push({
-      quality: f.qualityLabel || 'Video',
-      format: 'mp4',
-      url: f.url,
-      height,
-      has_audio: true
-    });
+    mp4.push({ quality: f.qualityLabel || 'Video', format: 'mp4', url: f.url, height, has_audio: true });
   });
 
-  // Format video-only (adaptive)
   (data.adaptiveFormats || []).filter(f => f.type && f.type.startsWith('video')).forEach(f => {
     if (!f.url) return;
     const hMatch = (f.qualityLabel || '').match(/(\d+)p/);
     const height = hMatch ? parseInt(hMatch[1]) : 0;
-    if (height < 144) return;
-    
-    // Skip kalau udah ada di progressive
-    if (mp4.find(m => m.height === height)) return;
-    
-    mp4v.push({
-      quality: f.qualityLabel + ' (video only)',
-      format: 'mp4',
-      url: f.url,
-      height,
-      has_audio: false
-    });
+    if (height < 144 || mp4.find(m => m.height === height)) return;
+    mp4v.push({ quality: f.qualityLabel + ' (video only)', format: 'mp4', url: f.url, height, has_audio: false });
   });
 
-  // Format audio
   (data.adaptiveFormats || []).filter(f => f.type && f.type.startsWith('audio')).forEach(f => {
     if (!f.url) return;
     const bitrate = f.bitrate ? Math.round(f.bitrate / 1000) : 128;
-    mp3.push({
-      quality: `${bitrate}kbps`,
-      format: 'mp3',
-      url: f.url,
-      bitrate
-    });
+    mp3.push({ quality: `${bitrate}kbps`, format: 'mp3', url: f.url, bitrate });
   });
 
-  // Sort & dedupe
   mp4.sort((a, b) => b.height - a.height);
   mp4v.sort((a, b) => b.height - a.height);
   mp3.sort((a, b) => b.bitrate - a.bitrate);
 
-  const mp4u = [...new Map(mp4.map(m => [m.height, m])).values()];
-  const mp4vu = [...new Map(mp4v.map(m => [m.height, m])).values()];
-  const mp3u = [...new Map(mp3.map(m => [m.bitrate, m])).values()];
-
-  if (!mp4u.length && !mp4vu.length && !mp3u.length) {
-    throw new Error('Video ini tidak punya format yang bisa diunduh');
-  }
-
   return {
     videoId, title, author, duration, thumbnail, url,
-    source: 'invidious',
-    mp4: mp4u.slice(0, 6),
-    mp4video_only: mp4vu.slice(0, 4),
-    mp3: mp3u.slice(0, 4)
+    mp4: [...new Map(mp4.map(m => [m.height, m])).values()].slice(0, 6),
+    mp4video_only: [...new Map(mp4v.map(m => [m.height, m])).values()].slice(0, 4),
+    mp3: [...new Map(mp3.map(m => [m.bitrate, m])).values()].slice(0, 4)
   };
 }
 
-/* ============================================================
-   HANDLER
-   ============================================================ */
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
