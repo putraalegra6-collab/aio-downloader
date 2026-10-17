@@ -279,7 +279,6 @@ body::before {
 .mp-close { cursor: pointer; background: rgba(255,255,255,0.1); border: none; color: var(--surface); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; transition: 0.2s; }
 .mp-close:hover { background: rgba(255,255,255,0.2); }
 
-/* TABS UPGRADED */
 .mp-tabs { display: flex; border-bottom: var(--bw-thick) solid var(--ink); background: var(--surface); padding: 0 4px; }
 .mp-tab { flex: 1; text-align: center; padding: 12px 0; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 4px solid transparent; transition: 0.25s var(--ease); margin-bottom: -3px; }
 .mp-tab svg { width: 18px; height: 18px; transition: 0.25s var(--ease); }
@@ -290,7 +289,6 @@ body::before {
 .mp-tab-content { display: none; flex-direction: column; }
 .mp-tab-content.active { display: flex; animation: fadeIn 0.3s var(--ease); }
 
-/* TAB SEARCH */
 #tab-search .mp-search-wrap { padding: 16px; border-bottom: var(--bw) solid var(--ink-soft); background: var(--bg); display: flex; gap: 8px; }
 #tab-search .mp-search { flex: 1; padding: 12px 14px; border: var(--bw) solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; background: var(--surface); transition: 0.2s; }
 #tab-search .mp-search:focus { box-shadow: 0 0 0 3px var(--c-blue); }
@@ -304,17 +302,14 @@ body::before {
 .mp-item-info { flex: 1; min-width: 0; }
 .mp-item-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
 .mp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--muted); }
-.mp-item .duration { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); margin-left: auto; padding-left: 8px;}
 .mp-item .action-btn { background: transparent; border: none; cursor: pointer; padding: 6px; color: var(--muted); transition: 0.2s; display: grid; place-items: center; border-radius: 50%; }
 .mp-item .action-btn:hover { color: var(--ink); background: var(--bg-2); }
 .mp-item .action-btn.active { color: var(--c-coral); }
 
-/* TAB LIRIK */
 .lyrics-container { padding: 20px; overflow-y: auto; max-height: 320px; font-size: 15px; font-weight: 700; line-height: 2; color: var(--ink); text-align: center; }
 .lyric-line { margin-bottom: 14px; transition: all 0.4s var(--ease); opacity: 0.3; transform: scale(0.95); }
 .lyric-line.active { color: var(--ink); opacity: 1; transform: scale(1.05); font-size: 17px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
-/* TAB FAVORIT / PLAYLIST */
 #tab-favorit .mp-results, #tab-playlist .mp-results { max-height: 280px; }
 .tab-empty { padding: 40px 20px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .share-btn-wrap { padding: 12px 16px; border-top: var(--bw) solid var(--ink-soft); text-align: center; background: var(--bg); }
@@ -322,7 +317,7 @@ body::before {
 .share-btn:hover { background: var(--c-mint); transform: translate(-2px,-2px); box-shadow: var(--sh); }
 .share-btn svg { width: 16px; height: 16px; }
 
-/* PLAYER CONTROL (UPGRADED) */
+/* PLAYER CONTROL (SIMPLE & WORK) */
 .mp-player { padding: 16px 20px; background: var(--c-mint); border-top: var(--bw-thick) solid var(--ink); display: none; }
 .mp-player.show { display: block; }
 .mp-now { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
@@ -332,24 +327,12 @@ body::before {
 .mp-now-title { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
 .mp-now-artist { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); }
 
-/* PROGRESS BAR & DURATION */
-.mp-progress-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
-.mp-time { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: var(--ink-2); min-width: 36px; text-align: center; }
-.mp-progress { flex: 1; height: 8px; background: rgba(26,26,26,0.1); border: 2px solid var(--ink); border-radius: 99px; position: relative; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.1); }
-.mp-progress-fill { height: 100%; width: 0%; background: var(--c-coral); border-radius: 99px; position: relative; }
-.mp-progress-fill::after { content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%); width: 12px; height: 12px; background: var(--surface); border: 2px solid var(--ink); border-radius: 50%; box-shadow: 1px 1px 0 var(--ink); opacity: 0; transition: opacity 0.2s; }
-.mp-progress:hover .mp-progress-fill::after { opacity: 1; }
-.mp-progress input[type="range"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; z-index: 2; }
-
-/* CONTROL BUTTONS (PREV, PLAY, NEXT) */
-.mp-controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
-.mp-btn-circle { width: 44px; height: 44px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-sm); transition: 0.15s var(--ease); }
+.mp-controls { display: flex; justify-content: center; align-items: center; gap: 24px; }
+.mp-btn-circle { width: 48px; height: 48px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-sm); transition: 0.15s var(--ease); }
 .mp-btn-circle:hover { transform: translate(-2px,-2px); box-shadow: var(--sh); background: var(--c-yellow); }
 .mp-btn-circle:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
-.mp-btn-circle.play { background: var(--ink); color: var(--surface); width: 60px; height: 60px; box-shadow: var(--sh); }
+.mp-btn-circle.play { background: var(--ink); color: var(--surface); width: 64px; height: 64px; box-shadow: var(--sh); }
 .mp-btn-circle.play:hover { background: var(--c-coral); color: var(--ink); }
-.mp-btn-circle.small { width: 40px; height: 40px; background: transparent; box-shadow: none; border-color: var(--ink); }
-.mp-btn-circle.small:hover { background: var(--ink); color: var(--surface); transform: none; box-shadow: none; }
 
 @media (max-width: 640px) {
   .shell { padding: 20px 16px 60px; } .top { margin-bottom: 20px; } .brand { padding: 8px 12px 8px 8px; }
@@ -506,7 +489,7 @@ body::before {
     </div>
   </div>
 
-  <!-- PLAYER CONTROL (SPOTIFY STYLE) -->
+  <!-- PLAYER CONTROL (SIMPLE & WORK) -->
   <div class="mp-player" id="musicPlayerControl">
     <div class="mp-now">
       <img src="" id="mpNowCover">
@@ -516,26 +499,16 @@ body::before {
       </div>
     </div>
     
-    <!-- PROGRESS BAR -->
-    <div class="mp-progress-wrap">
-      <span class="mp-time" id="mpTimeCurrent">0:00</span>
-      <div class="mp-progress">
-        <div class="mp-progress-fill" id="mpProgressFill"></div>
-        <input type="range" id="mpProgressInput" min="0" max="100" value="0" step="0.1">
-      </div>
-      <span class="mp-time" id="mpTimeDuration">0:00</span>
-    </div>
-
-    <!-- CONTROLS -->
+    <!-- CONTROLS (PREV, PLAY, NEXT) -->
     <div class="mp-controls">
-      <button class="mp-btn-circle small" onclick="playPrev()" title="Previous">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      <button class="mp-btn-circle" onclick="playPrev()" title="Previous">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
       </button>
       <button class="mp-btn-circle play" id="mpPlayBtn" onclick="togglePlay()">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" id="mpPlayIcon"><path d="M8 5v14l11-7z"/></svg>
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" id="mpPlayIcon"><path d="M8 5v14l11-7z"/></svg>
       </button>
-      <button class="mp-btn-circle small" onclick="playNext()" title="Next">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      <button class="mp-btn-circle" onclick="playNext()" title="Next">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
       </button>
     </div>
   </div>
@@ -551,7 +524,7 @@ function blip(freq, dur = 0.05, gain = 0.028, delay = 0) { if (!actx) return; co
 const S = { tap: () => { initAudio(); blip(680); }, tab: () => { initAudio(); blip(560); blip(840, 0.045, 0.024, 0.03); }, ok: () => { initAudio(); blip(620, 0.05, 0.03); blip(880, 0.06, 0.026, 0.05); }, err: () => { initAudio(); blip(240, 0.11, 0.03); } };
 document.addEventListener('pointerdown', (e) => { const el = e.target.closest('.go, .tab, .b, .live, .refresh-btn, .music-fab, .mp-item, .mp-btn-circle, .mp-tab, .action-btn'); if (!el) return; if (el.classList.contains('tab') || el.classList.contains('mp-tab')) S.tab(); else S.tap(); }, { passive: true });
 
-/* TABS UTAMA & DOWNLOAD (LOGIKA BARU DENGAN PREVIEW) */
+/* TABS UTAMA & DOWNLOAD */
 const tabs = document.querySelectorAll('.tab'); const panels = document.querySelectorAll('.panel');
 tabs.forEach(t => t.addEventListener('click', () => { const tab = t.dataset.tab; tabs.forEach(x => x.classList.toggle('active', x === t)); panels.forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`)); if (tab === 'status' && !statusLoaded) loadStatus(); }));
 const esc = (s) => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
@@ -634,7 +607,7 @@ refreshBtn.addEventListener('click', () => loadStatus(true)); liveBtn.addEventLi
 
 
 /* =========================================
-   LOGIKA MUSIC & PLAYER (FITUR SPOTIFY-LIKE)
+   LOGIKA MUSIC & PLAYER (STRIPPED DOWN FOR 100% WORK)
    ========================================= */
 let currentSong = null;
 let currentPlaylist = []; 
@@ -656,29 +629,6 @@ function switchTab(tabName) {
 
   if(tabName === 'favorit') renderList('favorit');
   if(tabName === 'playlist') renderList('playlist');
-}
-
-// Format detik ke menit:detik (PINTAR)
-function formatTime(sec) {
-  if(!sec || isNaN(sec)) return "0:00";
-  sec = parseFloat(sec);
-  const m = Math.floor(sec / 60);
-  const s = Math.floor(sec % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-// Parser durasi dari API IZZ (kadang "3.00", kadang "3:00")
-function parseDurationAPI(durStr) {
-  if (!durStr) return 0;
-  if (typeof durStr === 'number') return durStr;
-  // Kalau format "3:00" atau "3.00"
-  const str = String(durStr);
-  if (str.includes(':')) {
-    const parts = str.split(':');
-    return (parseInt(parts[0]) * 60) + (parseInt(parts[1]) || 0);
-  }
-  // Kalau format "3.00" (menit), convert ke detik
-  return parseFloat(str) * 60;
 }
 
 // STORAGE HELPER
@@ -737,7 +687,6 @@ function renderList(type) {
         <div class="mp-item-title">${esc(song.title)}</div>
         <div class="mp-item-artist">${esc(song.artist)}</div>
       </div>
-      <span class="duration">${song.duration ? song.duration : ''}</span>
       <button class="action-btn" onclick='removeFromList(event, "${type}", "${song.videoId}")'>
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
       </button>
@@ -815,7 +764,6 @@ async function searchMusic() {
       return `<div class="mp-item" onclick='playMusicByIndex(${index})'>
         <img src="${song.thumbnail}" loading="lazy">
         <div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div>
-        <span class="duration">${song.duration || ''}</span>
         <button class="action-btn ${isPl ? 'active' : ''}" onclick='togglePlaylistItem(event, ${JSON.stringify(song).replace(/'/g, "&#39;")})' title="Tambah ke Playlist">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
@@ -897,31 +845,6 @@ async function playMusicSong(song) {
   fetchLyrics(song);
 }
 
-// UPDATE PROGRESS BAR & DURASI
-const progressInput = $('mpProgressInput');
-const progressFill = $('mpProgressFill');
-const timeCurrent = $('mpTimeCurrent');
-const timeDuration = $('mpTimeDuration');
-
-audio.addEventListener('timeupdate', () => {
-  if (!audio.duration) return;
-  const pct = (audio.currentTime / audio.duration) * 100;
-  progressFill.style.width = pct + '%';
-  progressInput.value = pct;
-  timeCurrent.textContent = formatTime(audio.currentTime);
-  timeDuration.textContent = formatTime(audio.duration);
-});
-
-// FITUR SEEK (GESER PROGRESS BAR)
-progressInput.addEventListener('input', (e) => {
-  if (!audio.duration) return;
-  const pct = parseFloat(e.target.value);
-  const newTime = (pct / 100) * audio.duration;
-  audio.currentTime = newTime;
-  progressFill.style.width = pct + '%';
-  timeCurrent.textContent = formatTime(newTime);
-});
-
 // TOMBOL NEXT & PREV
 function playNext() {
   if(currentPlaylist.length > 0 && currentPlayIndex < currentPlaylist.length - 1) {
@@ -936,7 +859,7 @@ function playPrev() {
   }
 }
 
-// AUTO-NEXT
+// AUTO-NEXT KALO LAGU HABIS
 audio.addEventListener('ended', () => {
   playNext();
 });
@@ -956,7 +879,7 @@ function togglePlay() {
   }
 }
 
-// FETCH & SINKRON LIRIK LANGSUNG DI PANEL
+// FETCH & SINKRON LIRIK
 async function fetchLyrics(song) {
   currentLyricsLines = [];
   const container = $('lyricsContent');
