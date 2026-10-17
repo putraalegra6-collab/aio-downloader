@@ -658,12 +658,27 @@ function switchTab(tabName) {
   if(tabName === 'playlist') renderList('playlist');
 }
 
-// Format detik ke menit:detik
+// Format detik ke menit:detik (PINTAR)
 function formatTime(sec) {
   if(!sec || isNaN(sec)) return "0:00";
+  sec = parseFloat(sec);
   const m = Math.floor(sec / 60);
   const s = Math.floor(sec % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+// Parser durasi dari API IZZ (kadang "3.00", kadang "3:00")
+function parseDurationAPI(durStr) {
+  if (!durStr) return 0;
+  if (typeof durStr === 'number') return durStr;
+  // Kalau format "3:00" atau "3.00"
+  const str = String(durStr);
+  if (str.includes(':')) {
+    const parts = str.split(':');
+    return (parseInt(parts[0]) * 60) + (parseInt(parts[1]) || 0);
+  }
+  // Kalau format "3.00" (menit), convert ke detik
+  return parseFloat(str) * 60;
 }
 
 // STORAGE HELPER
