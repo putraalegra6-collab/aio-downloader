@@ -9,7 +9,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-/* (CSS DARI LU UTUH 100%) */
+/* =========================================
+   CSS DARI LU (UTUH)
+   ========================================= */
 :root {
   --bg: #f0e9dc; --bg-2: #e8dfce; --surface: #fdfaf3; --ink: #1a1a1a; --ink-2: #4a4a4a; --muted: #8a857a;
   --c-coral: #f4a8a8; --c-purple: #b8a9e8; --c-mint: #8ee0d0; --c-yellow: #f5d76e; --c-blue: #8bc4f0;
@@ -252,38 +254,22 @@ body::before {
 .foot-by { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--c-coral); border: 2px solid var(--ink); border-radius: 99px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 11px; letter-spacing: 0.2px; text-transform: none; }
 .foot-version { padding: 4px 8px; background: var(--c-yellow); border: 1.5px solid var(--ink); border-radius: 6px; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; }
 
-/* =======================================================
-   FLOATING MUSIC BUTTON & PANEL (UI BARU)
-   ======================================================= */
-.music-fab {
-  position: fixed; bottom: 24px; right: 24px; z-index: 999;
-  width: 60px; height: 60px; background: var(--c-coral);
-  border: var(--bw-thick) solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
-  border-radius: 50%; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: all 0.3s var(--ease); animation: fabBounce 3s ease-in-out infinite;
-}
+/* FLOATING MUSIC & PANEL */
+.music-fab { position: fixed; bottom: 24px; right: 24px; z-index: 999; width: 60px; height: 60px; background: var(--c-coral); border: var(--bw-thick) solid var(--ink); box-shadow: 6px 6px 0 var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s var(--ease); animation: fabBounce 3s ease-in-out infinite; }
 @keyframes fabBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
 .music-fab:hover { transform: scale(1.08) translateY(-4px); }
 .music-fab:active { transform: scale(0.95) translateY(0); box-shadow: 2px 2px 0 var(--ink); }
 .music-fab.playing svg { animation: sp 4s linear infinite; }
-
-.music-panel {
-  position: fixed; bottom: 100px; right: 24px; width: 340px; max-width: calc(100vw - 48px);
-  background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: 8px 8px 0 var(--ink);
-  border-radius: var(--r-lg); z-index: 998; display: none; flex-direction: column; overflow: hidden;
-  transform-origin: bottom right; animation: panelIn 0.3s var(--ease);
-}
+.music-panel { position: fixed; bottom: 100px; right: 24px; width: 340px; max-width: calc(100vw - 48px); background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: 8px 8px 0 var(--ink); border-radius: var(--r-lg); z-index: 998; display: none; flex-direction: column; overflow: hidden; transform-origin: bottom right; animation: panelIn 0.3s var(--ease); }
 @keyframes panelIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
 .music-panel.show { display: flex; }
 .mp-header { padding: 14px; background: var(--ink); color: var(--surface); display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; text-transform: uppercase; }
 .mp-close { cursor: pointer; background: none; border: none; color: var(--surface); font-weight: bold; font-size: 16px; }
-
 .mp-tabs { display: flex; border-bottom: var(--bw) solid var(--ink); background: var(--bg-2); }
 .mp-tab { flex: 1; text-align: center; padding: 10px 0; font-size: 11px; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; transition: 0.2s; }
 .mp-tab.active { color: var(--ink); border-bottom-color: var(--c-coral); background: var(--surface); }
 .mp-tab-content { display: none; flex-direction: column; }
 .mp-tab-content.active { display: flex; }
-
 #tab-search .mp-search-wrap { padding: 14px; border-bottom: var(--bw) solid var(--ink); background: var(--bg); display: flex; gap: 8px; }
 #tab-search .mp-search { flex: 1; padding: 10px; border: var(--bw) solid var(--ink); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; background: var(--surface); }
 #tab-search .mp-search-btn { padding: 0 14px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); font-weight: 800; cursor: pointer; }
@@ -296,12 +282,10 @@ body::before {
 .mp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted); }
 .mp-item .fav-btn { background: none; border: none; cursor: pointer; padding: 5px; color: var(--muted); transition: 0.2s; }
 .mp-item .fav-btn.active { color: var(--danger); }
-
 .lyrics-preview { padding: 20px; text-align: center; font-size: 14px; font-weight: 600; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; }
 .lyrics-preview button { margin-top: 16px; padding: 10px 16px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: 99px; font-weight: bold; cursor: pointer; }
 #tab-favorit .mp-results, #tab-playlist .mp-results { max-height: 300px; }
 .tab-empty { padding: 30px 20px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 10px; }
-
 .mp-player { padding: 14px; background: var(--c-mint); border-top: var(--bw) solid var(--ink); display: none; }
 .mp-player.show { display: block; }
 .mp-now { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
@@ -317,7 +301,6 @@ body::before {
 .mp-btn-circle.lyric { background: var(--c-purple); }
 .mp-btn-circle.fav { background: var(--bg-2); }
 .mp-btn-circle.fav.active { background: var(--c-coral); }
-
 .lyrics-modal { position: fixed; inset: 0; z-index: 1000; background: var(--bg); display: none; flex-direction: column; padding: 20px; }
 .lyrics-modal.show { display: flex; }
 .lyrics-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 16px; border-bottom: var(--bw) solid var(--ink); }
@@ -544,10 +527,13 @@ refreshBtn.addEventListener('click', () => loadStatus(true)); liveBtn.addEventLi
 
 
 /* =========================================
-   LOGIKA MUSIC & PLAYER (BACKGROUND PLAY)
+   LOGIKA MUSIC & PLAYER (AUTO-NEXT & SINKRON LIRIK)
    ========================================= */
 let currentSong = null;
-let lyricsData = null;
+let currentPlaylist = []; // Nyimpen list lagu yang lagi aktif (search/favorit)
+let currentPlayIndex = -1; // Nandain lagu ke berapa
+let currentLyricsLines = []; // Nyimpen array lirik sinkron
+let lyricsSyncInterval = null;
 const audio = $('audioPlayer');
 const musicPanel = $('musicPanel');
 const musicFab = $('musicFab');
@@ -603,7 +589,7 @@ function renderList(type) {
   }
   
   $(containerId).innerHTML = items.map(song => `
-    <div class="mp-item" onclick='playMusicSong(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
+    <div class="mp-item" onclick='playMusicFromList(${JSON.stringify(song).replace(/'/g, "&#39;")}, "${type}")'>
       <img src="${song.thumbnail}">
       <div class="mp-item-info">
         <div class="mp-item-title">${esc(song.title)}</div>
@@ -635,8 +621,10 @@ async function searchMusic() {
     const r = await fetch(`/api/ytmusic?action=search&query=${encodeURIComponent(q)}`); const d = await r.json();
     if(!d.status) throw new Error(d.message || "Gagal mencari"); if(!d.result.songs || d.result.songs.length === 0) throw new Error("Lagu tidak ditemukan");
     
-    resDiv.innerHTML = d.result.songs.map((song) => {
-      return `<div class="mp-item" onclick='playMusicSong(${JSON.stringify(song).replace(/'/g, "&#39;")})'>
+    currentPlaylist = d.result.songs; // Set playlist aktif untuk auto-next
+
+    resDiv.innerHTML = d.result.songs.map((song, index) => {
+      return `<div class="mp-item" onclick='playMusicByIndex(${index})'>
         <img src="${song.thumbnail}" loading="lazy">
         <div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div>
       </div>`;
@@ -644,7 +632,21 @@ async function searchMusic() {
   } catch(e) { resDiv.innerHTML = `<div style="text-align:center;color:var(--danger);font-size:12px;padding:10px">${e.message}</div>`; }
 }
 
-// FUNGSI UTAMA: MAIN MUSIK PAKE HTML5 AUDIO + PROXY VERCEL
+// Fungsi buat muter dari list favorit/playlist
+function playMusicFromList(song, type) {
+  const storeKey = type === 'favorit' ? 'fav_music' : 'playlist_music';
+  currentPlaylist = getStore(storeKey);
+  currentPlayIndex = currentPlaylist.findIndex(s => s.videoId === song.videoId);
+  playMusicSong(song);
+}
+
+// Fungsi muter berdasarkan index di playlist search
+function playMusicByIndex(index) {
+  currentPlayIndex = index;
+  playMusicSong(currentPlaylist[index]);
+}
+
+// FUNGSI UTAMA: MAIN MUSIK
 async function playMusicSong(song) {
   if(!song) return;
   currentSong = song;
@@ -658,12 +660,10 @@ async function playMusicSong(song) {
   if(isFav) document.getElementById('mpFavBtn').classList.add('active');
   else document.getElementById('mpFavBtn').classList.remove('active');
 
-  // UI Loading
   musicFab.classList.remove('playing');
   $('mpPlayIcon').innerHTML = `<span class="spin" style="width:14px;height:14px;border-width:2px;border-top-color:transparent"></span>`;
   
   try {
-    // 1. Ambil link audio mentah dari ytplay
     const r = await fetch('/api/ytmusic', {
       method: 'POST', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ action: 'play', videoId: song.videoId })
@@ -671,35 +671,25 @@ async function playMusicSong(song) {
     const d = await r.json();
     
     if(d.status && d.result && d.result.download && d.result.download.audio) {
-      
-      // 2. UBAH LINK NYA KE PROXY VERCEL LU
       const proxiedAudio = `/api/proxy?url=${encodeURIComponent(d.result.download.audio)}&fn=audio.m4a`;
       
       audio.src = proxiedAudio;
       audio.load();
       
-      // 3. Mainkan! (Karena udah dipicu klik user, browser bakal ngizinin)
       audio.play().then(() => {
         musicFab.classList.add('playing');
         musicPanel.classList.add('playing');
         $('mpPlayIcon').innerHTML = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
         
-        // 4. SET MEDIA SESSION (BIAR ADA NOTIFIKASI DI LAYAR KUNCI)
         if ('mediaSession' in navigator) {
           navigator.mediaSession.metadata = new MediaMetadata({
-            title: song.title,
-            artist: song.artist,
-            album: 'PlayMusic IZZ',
-            artwork: [
-              { src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }
-            ]
+            title: song.title, artist: song.artist, album: 'PlayMusic IZZ',
+            artwork: [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }]
           });
           navigator.mediaSession.setActionHandler('play', () => audio.play());
           navigator.mediaSession.setActionHandler('pause', () => audio.pause());
         }
-
       }).catch(err => {
-        // Kalau masih diblokir (kasus jarang), suruh user klik tombol play
         $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
         alert("Klik tombol play sekali lagi untuk memulai.");
       });
@@ -717,6 +707,19 @@ async function playMusicSong(song) {
   fetchLyrics(song);
 }
 
+// FITUR AUTO-NEXT: PAS LAGU HABIS
+audio.addEventListener('ended', () => {
+  musicFab.classList.remove('playing');
+  musicPanel.classList.remove('playing');
+  $('mpPlayIcon').innerHTML = '<path d="M8 5v14l11-7z"/>';
+  
+  // Kalau ada lagu berikutnya, puter!
+  if(currentPlaylist.length > 0 && currentPlayIndex < currentPlaylist.length - 1) {
+    currentPlayIndex++;
+    playMusicSong(currentPlaylist[currentPlayIndex]);
+  }
+});
+
 function togglePlay() {
   if(!audio.src) return;
   if(audio.paused) {
@@ -732,13 +735,17 @@ function togglePlay() {
   }
 }
 
+// FETCH LIRIK DARI IZZ
 async function fetchLyrics(song) {
-  lyricsData = null;
+  currentLyricsLines = [];
   try {
-    const r = await fetch(`/api/lirik?title=${encodeURIComponent(song.title)}&artist=${encodeURIComponent(song.artist)}`);
+    const r = await fetch(`/api/lirik?videoId=${song.videoId}&title=${encodeURIComponent(song.title)}&artist=${encodeURIComponent(song.artist)}`);
     const d = await r.json();
-    if(d.status && d.lyrics) {
-      lyricsData = d.lyrics;
+    
+    if(d.status && d.result && d.result.lyrics && d.result.lyrics.lines) {
+      currentLyricsLines = d.result.lyrics.lines;
+    } else if (d.status && d.lyrics) {
+      currentLyricsLines = d.lyrics; // Fallback
     }
   } catch(e) { console.log("Gagal ambil lirik", e); }
 }
@@ -750,14 +757,52 @@ function openFullLyrics() {
   $('lyricsArtist').textContent = currentSong.artist;
   
   const container = $('lyricsContent');
-  if(lyricsData) {
-    container.innerHTML = `<div style="white-space: pre-wrap; font-size:16px; line-height:2; color:var(--ink)">${esc(lyricsData)}</div>`;
+  
+  if(currentLyricsLines && currentLyricsLines.length > 0) {
+    container.innerHTML = currentLyricsLines.map((line, i) => {
+      const text = line.text || line;
+      const time = line.time || 0;
+      return `<div class="lyric-line" id="lyr-${i}" data-time="${time}">${esc(text)}</div>`;
+    }).join('');
+    startLyricsSync();
   } else {
     container.innerHTML = "<div style='color:var(--danger)'>Lirik tidak ditemukan untuk lagu ini.</div>";
   }
 }
 
-function closeLyrics() { $('lyricsModal').classList.remove('show'); }
+// SINKRONISASI LIRIK
+function startLyricsSync() {
+  if(lyricsSyncInterval) clearInterval(lyricsSyncInterval);
+  
+  lyricsSyncInterval = setInterval(() => {
+    if(!audio || audio.paused) return;
+    
+    const currentTime = audio.currentTime;
+    const lines = document.querySelectorAll('.lyric-line');
+    let activeIndex = -1;
+    
+    lines.forEach((line, index) => {
+      const lineTime = parseFloat(line.dataset.time);
+      if(lineTime <= currentTime + 0.5) { // Toleransi 0.5 detik
+        activeIndex = index;
+      }
+    });
+    
+    lines.forEach(l => l.classList.remove('active'));
+    if(activeIndex !== -1) {
+      const activeLine = document.getElementById(`lyr-${activeIndex}`);
+      if(activeLine) {
+        activeLine.classList.add('active');
+        activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, 500);
+}
+
+function closeLyrics() { 
+  $('lyricsModal').classList.remove('show'); 
+  if(lyricsSyncInterval) clearInterval(lyricsSyncInterval);
+}
 
 function bindDownload(root) { root.querySelectorAll('[data-dl]').forEach(btn => { btn.addEventListener('click', async (e) => { e.preventDefault(); if (btn.disabled) return; const url = btn.dataset.dl; const filename = btn.dataset.fn || 'media.mp4'; const original = btn.innerHTML; btn.innerHTML = '<span class="spin" style="width:12px;height:12px;border-width:2px;border-top-color:transparent"></span>'; btn.disabled = true; try { const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}&fn=${encodeURIComponent(filename)}`; const check = await fetch(proxyUrl, { method: 'HEAD' }).catch(() => null); if (check && check.ok) { const a = document.createElement('a'); a.href = proxyUrl; a.download = filename; document.body.appendChild(a); a.click(); document.body.removeChild(a); btn.innerHTML = '✓'; } else { throw new Error("Proxy timeout"); } } catch (err) { window.open(url, '_blank'); btn.innerHTML = '✓'; } finally { setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2200); } }); }); }
 (function bootLoader() { const loader = $('loader'); const fill = $('ldFill'); const hint = $('ldHint'); const hints = ['MEMUAT SISTEM...', 'MENYIAPKAN API...', 'HAMPIR SIAP...']; let pct = 0; let hi = 0; const t1 = setInterval(() => { pct = Math.min(pct + 12 + Math.random() * 10, 100); fill.style.width = pct + '%'; if (pct >= 40 && hi === 0) { hi = 1; hint.textContent = hints[1]; } if (pct >= 75 && hi === 1) { hi = 2; hint.textContent = hints[2]; } if (pct >= 100) { clearInterval(t1); setTimeout(() => { loader.classList.add('hide'); setTimeout(() => loader.remove(), 600); }, 300); } }, 180); })();
