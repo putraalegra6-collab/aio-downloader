@@ -4,6 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#f0e9dc" />
+<meta name="google-site-verification" content="yukCWmGvRBf0Zs6BMJoR-zg_o8bGLoaoha7IvY01JHc" />
+<meta name="description" content="Downloader AIO: tempel link TikTok, Instagram, YouTube, Spotify, dan lainnya, preview dulu lalu download." />
 <title>Downloader AIO — By Egaa</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -200,9 +202,7 @@ body::before {
 .b.dl { background: var(--ink); color: var(--surface); }
 .b.dl:hover { background: var(--c-coral); color: var(--ink); }
 
-/* =========================================
-   STATUS PAGE (REDESIGN v3, TANPA EMOJI)
-   ========================================= */
+/* STATUS PAGE */
 .sh-hero { position: relative; overflow: hidden; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 24px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 22px; }
 .sh-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--ok) 0 33%, var(--c-yellow) 33% 66%, var(--c-coral) 66% 100%); }
 .sh-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
@@ -265,7 +265,7 @@ body::before {
 .refresh-btn:disabled { opacity: 0.55; cursor: wait; }
 .refresh-btn:disabled svg { animation: sp 0.8s linear infinite; }
 
-/* FOOTER (SAMA SEPERTI SEBELUMNYA) */
+/* FOOTER */
 .foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 22px; margin-top: 48px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-2); flex-wrap: wrap; }
 .foot-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .foot-version { padding: 4px 8px; background: var(--c-yellow); border: 1.5px solid var(--ink); border-radius: 6px; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; }
@@ -391,11 +391,11 @@ body::before {
   <nav class="tabs">
     <button class="tab active" data-tab="dl">
       <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></span>
-      <span class="tlabel"><span class="tmain">Download</span><span class="tsub">Url</span></span>
+      <span class="tlabel"><span class="tmain">Download</span><span class="tsub">Universal</span></span>
     </button>
     <button class="tab" data-tab="status">
       <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12h4l2-8 4 16 2-8h4"/></svg></span>
-      <span class="tlabel"><span class="tmain">Status</span><span class="tsub">Status Api</span></span>
+      <span class="tlabel"><span class="tmain">Status</span><span class="tsub">System Health</span></span>
     </button>
   </nav>
 
@@ -411,7 +411,7 @@ body::before {
           </div>
           <button class="go" id="dlgo"><span>Proses</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
-        <div class="inp-hint"><span>Link yang didukung akan terdeteksi yaa</span></div>
+        <div class="inp-hint"><span>Link yang didukung akan terdeteksi otomatis</span></div>
       </div>
       <div class="result" id="dlout"></div>
     </section>
@@ -658,9 +658,7 @@ async function runDownload() {
 
 function fmtNum(n) { n = Number(n) || 0; if (n >= 1e9) return (n/1e9).toFixed(1) + 'B'; if (n >= 1e6) return (n/1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n/1e3).toFixed(1) + 'K'; return String(n); }
 
-/* =========================================
-   STATUS PAGE (TANPA EMOJI, IKON SVG)
-   ========================================= */
+/* STATUS PAGE */
 let statusLoaded = false;
 const statusHero = $('statusHero');
 const statusGrid = $('statusGrid');
@@ -773,9 +771,7 @@ liveBtn.addEventListener('click', () => {
 });
 window.addEventListener('load', () => { setTimeout(() => loadStatus(false), 800); });
 
-/* =========================================
-   LOGIKA MUSIC & PLAYER
-   ========================================= */
+/* MUSIC & PLAYER */
 const audio = $('audioPlayer');
 const musicPanel = $('musicPanel');
 const musicFab = $('musicFab');
