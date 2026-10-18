@@ -187,6 +187,7 @@ body::before {
 .b.dl { background: var(--ink); color: var(--surface); }
 .b.dl:hover { background: var(--c-coral); color: var(--ink); }
 
+/* STATUS PAGE - UPGRADED */
 .status-summary { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 22px; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); margin-bottom: 18px; flex-wrap: wrap; }
 .status-main { flex: 1; min-width: 220px; }
 .status-text { font-weight: 800; font-size: 20px; letter-spacing: -0.4px; line-height: 1.1; margin-bottom: 6px; }
@@ -398,6 +399,7 @@ body::before {
       <div class="result" id="dlout"></div>
     </section>
 
+    <!-- STATUS API - DIPERBAGUS -->
     <section class="panel" id="panel-status">
       <div class="status-summary">
         <div class="status-main">
@@ -592,9 +594,18 @@ async function runDownload() {
 
 function fmtNum(n) { n = Number(n) || 0; if (n >= 1e9) return (n/1e9).toFixed(1) + 'B'; if (n >= 1e6) return (n/1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n/1e3).toFixed(1) + 'K'; return String(n); }
 
-/* STATUS API */
+/* STATUS API - UPGRADED UI LOGIC */
 let statusLoaded = false; const statusGrid = $('statusGrid'); const statusOverall = $('statusOverall'); const statusSub = $('statusSub'); const metricOnline = $('metricOnline'); const metricLatency = $('metricLatency'); const refreshBtn = $('refreshBtn'); const liveBtn = $('liveBtn'); const liveText = $('liveText');
-async function loadStatus(showLoader = true) { if (showLoader) { refreshBtn.disabled = true; liveBtn.classList.add('checking'); liveBtn.classList.remove('degraded', 'critical'); liveText.textContent = 'Checking'; } try { const r = await fetch('/api/status', { method: 'GET' }); const data = await r.json(); if (!data.status) throw new Error('Gagal cek status'); statusLoaded = true; const overallMap = { healthy: { text: 'Semua Sistem Normal', cls: 'healthy' }, degraded: { text: 'Beberapa Layanan Terganggu', cls: 'degraded' }, critical: { text: 'Semua Layanan Down', cls: 'critical' } }; const om = overallMap[data.overall] || overallMap.degraded; statusOverall.textContent = om.text; statusOverall.className = 'status-text ' + om.cls; statusSub.textContent = `${data.online}/${data.total} layanan online`; metricOnline.textContent = `${data.online}/${data.total}`; metricLatency.textContent = `${data.avg_latency}ms`; statusGrid.innerHTML = data.services.map(s => { let barClass = 'good'; if (s.status === 'down') barClass = 'down'; else if (s.latency > 3000) barClass = 'slow'; else if (s.latency > 1000) barClass = 'mid'; const barPct = s.status === 'down' ? 100 : Math.min(100, (s.latency / 3000) * 100); return `<div class="svc"><div class="svc-left"><span class="svc-dot ${s.status}"></span><div class="svc-info"><div class="svc-name">${esc(s.name)}</div><div class="svc-label">${esc(s.label)}</div></div></div><div class="svc-right"><div class="latency-wrap"><div class="latency-bar"><div class="latency-fill ${barClass}" style="width:${barPct}%"></div></div><span class="latency-text">${s.latency}ms</span></div><span class="svc-badge ${s.status}">${s.status === 'online' ? 'Online' : 'Down'}</span></div></div>`; }).join(''); liveBtn.classList.remove('checking', 'degraded', 'critical'); if (data.overall === 'healthy') liveText.textContent = 'Online'; else if (data.overall === 'degraded') { liveBtn.classList.add('degraded'); liveText.textContent = 'Degraded'; } else { liveBtn.classList.add('critical'); liveText.textContent = 'Down'; } } catch (err) { statusOverall.textContent = 'Gagal Cek Status'; statusOverall.className = 'status-text critical'; statusSub.textContent = err.message; statusGrid.innerHTML = `<div class="st err">${esc(err.message)}</div>`; liveBtn.classList.remove('checking', 'degraded'); liveBtn.classList.add('critical'); liveText.textContent = 'Error'; } finally { refreshBtn.disabled = false; liveBtn.classList.remove('checking'); } }
+async function loadStatus(showLoader = true) { 
+  if (showLoader) { refreshBtn.disabled = true; liveBtn.classList.add('checking'); liveBtn.classList.remove('degraded', 'critical'); liveText.textContent = 'Checking'; } 
+  try { 
+    const r = await fetch('/api/status', { method: 'GET' }); const data = await r.json(); if (!data.status) throw new Error('Gagal cek status'); statusLoaded = true; 
+    const overallMap = { healthy: { text: 'Semua Sistem Normal', cls: 'healthy' }, degraded: { text: 'Beberapa Layanan Terganggu', cls: 'degraded' }, critical: { text: 'Semua Layanan Down', cls: 'critical' } }; 
+    const om = overallMap[data.overall] || overallMap.degraded; statusOverall.textContent = om.text; statusOverall.className = 'status-text ' + om.cls; statusSub.textContent = `${data.online}/${data.total} layanan online`; metricOnline.textContent = `${data.online}/${data.total}`; metricLatency.textContent = `${data.avg_latency}ms`; 
+    statusGrid.innerHTML = data.services.map(s => { let barClass = 'good'; if (s.status === 'down') barClass = 'down'; else if (s.latency > 3000) barClass = 'slow'; else if (s.latency > 1000) barClass = 'mid'; const barPct = s.status === 'down' ? 100 : Math.min(100, (s.latency / 3000) * 100); return `<div class="svc"><div class="svc-left"><span class="svc-dot ${s.status}"></span><div class="svc-info"><div class="svc-name">${esc(s.name)}</div><div class="svc-label">${esc(s.label)}</div></div></div><div class="svc-right"><div class="latency-wrap"><div class="latency-bar"><div class="latency-fill ${barClass}" style="width:${barPct}%"></div></div><span class="latency-text">${s.latency}ms</span></div><span class="svc-badge ${s.status}">${s.status === 'online' ? 'Online' : 'Down'}</span></div></div>`; }).join(''); 
+    liveBtn.classList.remove('checking', 'degraded', 'critical'); if (data.overall === 'healthy') liveText.textContent = 'Online'; else if (data.overall === 'degraded') { liveBtn.classList.add('degraded'); liveText.textContent = 'Degraded'; } else { liveBtn.classList.add('critical'); liveText.textContent = 'Down'; } 
+  } catch (err) { statusOverall.textContent = 'Gagal Cek Status'; statusOverall.className = 'status-text critical'; statusSub.textContent = err.message; statusGrid.innerHTML = `<div class="st err">${esc(err.message)}</div>`; liveBtn.classList.remove('checking', 'degraded'); liveBtn.classList.add('critical'); liveText.textContent = 'Error'; } finally { refreshBtn.disabled = false; liveBtn.classList.remove('checking'); } 
+}
 refreshBtn.addEventListener('click', () => loadStatus(true)); liveBtn.addEventListener('click', () => { tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === 'status')); panels.forEach(p => p.classList.toggle('active', p.id === 'panel-status')); loadStatus(true); }); window.addEventListener('load', () => { setTimeout(() => loadStatus(false), 800); });
 
 /* =========================================
@@ -615,7 +626,7 @@ let searchResults = [];
 let listCache = { favorit: [], playlist: [] };
 let currentLyricsLines = [];
 let lyricsSyncInterval = null;
-let officialDuration = 0;   // durasi resmi lagu (detik), dari data pencarian / respons play
+let officialDuration = 0;
 
 const ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
 const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
@@ -634,161 +645,49 @@ function switchTab(tabName) {
   if (tabName === 'playlist') renderList('playlist');
 }
 
-// Detik -> "m:ss" atau "h:mm:ss"
-function formatTime(sec) {
-  if (!isFinite(sec) || sec <= 0) return '0:00';
-  const h = Math.floor(sec / 3600);
-  const m = Math.floor((sec % 3600) / 60);
-  const s = Math.floor(sec % 60).toString().padStart(2, '0');
-  return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${s}` : `${m}:${s}`;
-}
-
-// Ubah string durasi ke detik: "3:21", "1:02:10", "201", "PT3M21S", "3 min 21 sec"
-function parseDurationString(t) {
-  t = t.trim();
-  if (!t) return 0;
-  if (/^\d+(\.\d+)?$/.test(t)) return Number(t);
-  const iso = t.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?$/i);
-  if (iso) return (+iso[1] || 0) * 3600 + (+iso[2] || 0) * 60 + (+iso[3] || 0);
-  if (/^\d+(:\d+){1,2}(\.\d+)?$/.test(t)) return t.split(':').reduce((acc, p) => acc * 60 + (parseFloat(p) || 0), 0);
-  const h = t.match(/(\d+)\s*(h|hr|hour|jam)/i);
-  const m = t.match(/(\d+)\s*(m|min|minute|menit)/i);
-  const s = t.match(/(\d+)\s*(s|sec|second|detik)/i);
-  if (h || m || s) return (h ? +h[1] * 3600 : 0) + (m ? +m[1] * 60 : 0) + (s ? +s[1] : 0);
-  return 0;
-}
-
-// Ubah berbagai bentuk nilai durasi (angka, string, objek) ke detik
-function toSeconds(v, keyName = '') {
-  if (v == null) return 0;
-  if (typeof v === 'number') {
-    if (!isFinite(v)) return 0;
-    // Kalau nama field menyebut milidetik, atau angkanya terlalu besar untuk detik, bagi 1000
-    if (/ms|milli/i.test(keyName) || v > 100000) return v / 1000;
-    return v;
-  }
-  if (typeof v === 'string') return parseDurationString(v);
-  if (typeof v === 'object') {
-    return toSeconds(v.seconds ?? v.totalSeconds ?? v.text ?? v.simpleText ?? v.label ?? v.value ?? 0, keyName);
-  }
-  return 0;
-}
-
-// Ambil durasi resmi dari objek lagu, cek beberapa nama field yang umum
+function formatTime(sec) { if (!isFinite(sec) || sec <= 0) return '0:00'; const h = Math.floor(sec / 3600); const m = Math.floor((sec % 3600) / 60); const s = Math.floor(sec % 60).toString().padStart(2, '0'); return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${s}` : `${m}:${s}`; }
+function parseDurationString(t) { t = t.trim(); if (!t) return 0; if (/^\d+(\.\d+)?$/.test(t)) return Number(t); const iso = t.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?$/i); if (iso) return (+iso[1] || 0) * 3600 + (+iso[2] || 0) * 60 + (+iso[3] || 0); if (/^\d+(:\d+){1,2}(\.\d+)?$/.test(t)) return t.split(':').reduce((acc, p) => acc * 60 + (parseFloat(p) || 0), 0); const h = t.match(/(\d+)\s*(h|hr|hour|jam)/i); const m = t.match(/(\d+)\s*(m|min|minute|menit)/i); const s = t.match(/(\d+)\s*(s|sec|second|detik)/i); if (h || m || s) return (h ? +h[1] * 3600 : 0) + (m ? +m[1] * 60 : 0) + (s ? +s[1] : 0); return 0; }
+function toSeconds(v, keyName = '') { if (v == null) return 0; if (typeof v === 'number') { if (!isFinite(v)) return 0; if (/ms|milli/i.test(keyName) || v > 100000) return v / 1000; return v; } if (typeof v === 'string') return parseDurationString(v); if (typeof v === 'object') { return toSeconds(v.seconds ?? v.totalSeconds ?? v.text ?? v.simpleText ?? v.label ?? v.value ?? 0, keyName); } return 0; }
 const DURATION_KEYS = ['duration', 'durationSeconds', 'duration_seconds', 'durationText', 'duration_text', 'lengthSeconds', 'length', 'durationMs', 'duration_ms', 'length_ms', 'time'];
-function getOfficialDuration(obj) {
-  if (!obj || typeof obj !== 'object') return 0;
-  for (const k of DURATION_KEYS) {
-    if (obj[k] == null || obj[k] === '') continue;
-    const sec = toSeconds(obj[k], k);
-    if (sec > 10) return sec; // di bawah 10 detik dianggap nilai salah
-  }
-  return 0;
-}
+function getOfficialDuration(obj) { if (!obj || typeof obj !== 'object') return 0; for (const k of DURATION_KEYS) { if (obj[k] == null || obj[k] === '') continue; const sec = toSeconds(obj[k], k); if (sec > 10) return sec; } return 0; }
+function getDuration() { if (officialDuration > 10) return officialDuration; const real = isFinite(audio.duration) && audio.duration > 10 ? audio.duration : 0; return real; }
+function updateProgress() { const dur = getDuration(); let cur = audio.currentTime || 0; if (dur > 0 && cur > dur) cur = dur; const pct = dur > 0 ? Math.min(100, (cur / dur) * 100) : 0; progressFill.style.width = pct + '%'; progressInput.value = pct; timeCurrent.textContent = formatTime(cur); timeDuration.textContent = dur > 0 ? formatTime(dur) : '0:00'; }
 
-// Durasi yang dipakai untuk tampilan dan seek: durasi resmi lebih dulu, audio.duration cadangan
-function getDuration() {
-  if (officialDuration > 10) return officialDuration;
-  const real = isFinite(audio.duration) && audio.duration > 10 ? audio.duration : 0;
-  return real;
-}
-
-function updateProgress() {
-  const dur = getDuration();
-  let cur = audio.currentTime || 0;
-  if (dur > 0 && cur > dur) cur = dur;
-  const pct = dur > 0 ? Math.min(100, (cur / dur) * 100) : 0;
-  progressFill.style.width = pct + '%';
-  progressInput.value = pct;
-  timeCurrent.textContent = formatTime(cur);
-  timeDuration.textContent = dur > 0 ? formatTime(dur) : '0:00';
-}
-
-// STORAGE
 function getStore(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } }
 function setStore(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
 
-// PLAYLIST (dari hasil search)
-function togglePlaylistItem(e, index) {
+function togglePlaylistItem(e, index) { e.stopPropagation(); const song = searchResults[index]; if (!song) return; const btn = e.currentTarget; let pls = getStore('playlist_music'); const idx = pls.findIndex(s => s.videoId === song.videoId); if (idx > -1) { pls.splice(idx, 1); btn.classList.remove('active'); } else { pls.push(song); btn.classList.add('active'); } setStore('playlist_music', pls); if ($('tab-playlist').classList.contains('active')) renderList('playlist'); }
+
+// TAMBAH FAVORIT (DARI HASIL SEARCH)
+function toggleFavoriteItem(e, index) {
   e.stopPropagation();
-  const song = searchResults[index]; if (!song) return;
+  const song = searchResults[index];
+  if (!song) return;
   const btn = e.currentTarget;
-  let pls = getStore('playlist_music');
-  const idx = pls.findIndex(s => s.videoId === song.videoId);
-  if (idx > -1) { pls.splice(idx, 1); btn.classList.remove('active'); }
-  else { pls.push(song); btn.classList.add('active'); }
-  setStore('playlist_music', pls);
-  if ($('tab-playlist').classList.contains('active')) renderList('playlist');
+  let favs = getStore('fav_music');
+  const idx = favs.findIndex(s => s.videoId === song.videoId);
+  if (idx > -1) { favs.splice(idx, 1); btn.classList.remove('active'); }
+  else { favs.push(song); btn.classList.add('active'); }
+  setStore('fav_music', favs);
+  if ($('tab-favorit').classList.contains('active')) renderList('favorit');
 }
 
-// RENDER FAVORIT / PLAYLIST
 function renderList(type) {
   const storeKey = type === 'favorit' ? 'fav_music' : 'playlist_music';
   const containerId = type === 'favorit' ? 'favoritResults' : 'playlistResults';
   const items = getStore(storeKey);
   listCache[type] = items;
-
-  if (!items.length) {
-    $(containerId).innerHTML = `<div class="tab-empty">Belum ada lagu di ${type}.</div>`;
-    return;
-  }
-  $(containerId).innerHTML = items.map((song, i) => {
-    const d = getOfficialDuration(song);
-    return `
-    <div class="mp-item" onclick="playMusicFromList('${type}', ${i})">
-      <img src="${esc(song.thumbnail)}" alt="">
-      <div class="mp-item-info">
-        <div class="mp-item-title">${esc(song.title)}</div>
-        <div class="mp-item-artist">${esc(song.artist)}</div>
-      </div>
-      <span class="duration">${d ? formatTime(d) : ''}</span>
-      <button class="action-btn" onclick="removeFromList(event, '${type}', '${esc(song.videoId)}')">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-      </button>
-    </div>`;
-  }).join('');
+  if (!items.length) { $(containerId).innerHTML = `<div class="tab-empty">Belum ada lagu di ${type}.</div>`; return; }
+  $(containerId).innerHTML = items.map((song, i) => { const d = getOfficialDuration(song); return `<div class="mp-item" onclick="playMusicFromList('${type}', ${i})"><img src="${esc(song.thumbnail)}" alt=""><div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div><span class="duration">${d ? formatTime(d) : ''}</span><button class="action-btn" onclick="removeFromList(event, '${type}', '${esc(song.videoId)}')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div>`; }).join('');
 }
 
-function removeFromList(e, type, videoId) {
-  e.stopPropagation();
-  const storeKey = type === 'favorit' ? 'fav_music' : 'playlist_music';
-  setStore(storeKey, getStore(storeKey).filter(s => s.videoId !== videoId));
-  renderList(type);
-}
+function removeFromList(e, type, videoId) { e.stopPropagation(); const storeKey = type === 'favorit' ? 'fav_music' : 'playlist_music'; setStore(storeKey, getStore(storeKey).filter(s => s.videoId !== videoId)); renderList(type); }
 
-// SHARE PLAYLIST
-function sharePlaylist() {
-  const pls = getStore('playlist_music');
-  if (!pls.length) return alert('Playlist masih kosong, tambahin lagu dulu!');
-  const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify(pls))));
-  const shareUrl = `${window.location.origin}${window.location.pathname}?playlist=${dataStr}`;
-  if (navigator.share) {
-    navigator.share({ title: 'Playlist Saya', text: 'Dengerin playlist lagu favorit gw di Downloader AIO!', url: shareUrl }).catch(() => {});
-  } else {
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      alert('Link Playlist berhasil dicopy! (Browser lu belum support share langsung)');
-    }).catch(() => prompt('Copy link ini secara manual:', shareUrl));
-  }
-}
+function sharePlaylist() { const pls = getStore('playlist_music'); if (!pls.length) return alert('Playlist masih kosong, tambahin lagu dulu!'); const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify(pls)))); const shareUrl = `${window.location.origin}${window.location.pathname}?playlist=${dataStr}`; if (navigator.share) { navigator.share({ title: 'Playlist Saya', text: 'Dengerin playlist lagu favorit gw di Downloader AIO!', url: shareUrl }).catch(() => {}); } else { navigator.clipboard.writeText(shareUrl).then(() => { alert('Link Playlist berhasil dicopy! (Browser lu belum support share langsung)'); }).catch(() => prompt('Copy link ini secara manual:', shareUrl)); } }
 
-// IMPORT PLAYLIST DARI URL
-function checkImportedPlaylist() {
-  const plData = new URLSearchParams(window.location.search).get('playlist');
-  if (!plData) return;
-  try {
-    const decoded = JSON.parse(decodeURIComponent(escape(atob(plData))));
-    if (Array.isArray(decoded) && decoded.length > 0) {
-      if (confirm(`Mau import ${decoded.length} lagu dari playlist temen lu?`)) {
-        setStore('playlist_music', decoded);
-        window.history.replaceState({}, document.title, window.location.pathname);
-        alert('Playlist berhasil di-import! Buka tab Playlist.');
-      }
-    }
-  } catch (e) { console.log('Gagal import playlist', e); }
-}
+function checkImportedPlaylist() { const plData = new URLSearchParams(window.location.search).get('playlist'); if (!plData) return; try { const decoded = JSON.parse(decodeURIComponent(escape(atob(plData)))); if (Array.isArray(decoded) && decoded.length > 0) { if (confirm(`Mau import ${decoded.length} lagu dari playlist temen lu?`)) { setStore('playlist_music', decoded); window.history.replaceState({}, document.title, window.location.pathname); alert('Playlist berhasil di-import! Buka tab Playlist.'); } } } catch (e) { console.log('Gagal import playlist', e); } }
 window.addEventListener('load', checkImportedPlaylist);
 
-// SEARCH MUSIC
 async function searchMusic() {
   const q = $('musicSearch').value.trim(); if (!q) return;
   const resDiv = $('musicResults');
@@ -798,17 +697,20 @@ async function searchMusic() {
     const d = await r.json();
     if (!d.status) throw new Error(d.message || 'Gagal mencari');
     if (!d.result || !d.result.songs || !d.result.songs.length) throw new Error('Lagu tidak ditemukan');
-
     searchResults = d.result.songs;
     const plsStore = getStore('playlist_music');
-
+    const favStore = getStore('fav_music');
     resDiv.innerHTML = searchResults.map((song, i) => {
       const isPl = plsStore.some(s => s.videoId === song.videoId);
+      const isFav = favStore.some(s => s.videoId === song.videoId);
       const d2 = getOfficialDuration(song);
       return `<div class="mp-item" onclick="playMusicFromSearch(${i})">
         <img src="${esc(song.thumbnail)}" loading="lazy" alt="">
         <div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div>
         <span class="duration">${d2 ? formatTime(d2) : ''}</span>
+        <button class="action-btn ${isFav ? 'active' : ''}" onclick="toggleFavoriteItem(event, ${i})" title="Tambah ke Favorit">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
         <button class="action-btn ${isPl ? 'active' : ''}" onclick="togglePlaylistItem(event, ${i})" title="Tambah ke Playlist">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
         </button>
@@ -822,21 +724,16 @@ async function searchMusic() {
 function playMusicFromSearch(i) { playMusicSong(searchResults[i], searchResults, i); }
 function playMusicFromList(type, i) { const list = listCache[type] || []; playMusicSong(list[i], list, i); }
 
-// FUNGSI UTAMA: PUTAR LAGU
 async function playMusicSong(song, list, index) {
   if (!song) return;
   currentSong = song;
   currentPlaylist = list && list.length ? list : [song];
   currentPlayIndex = index != null ? index : currentPlaylist.indexOf(song);
-
-  // Durasi resmi dari data lagu (ini yang tampil di layar)
   officialDuration = getOfficialDuration(song);
-
   $('mpNowTitle').textContent = song.title;
   $('mpNowArtist').textContent = song.artist;
   $('mpNowCover').src = song.thumbnail || '';
   $('musicPlayerControl').classList.add('show');
-
   audio.pause();
   musicFab.classList.remove('playing');
   musicPanel.classList.remove('playing');
@@ -845,23 +742,14 @@ async function playMusicSong(song, list, index) {
   progressInput.value = 0;
   timeCurrent.textContent = '0:00';
   timeDuration.textContent = officialDuration ? formatTime(officialDuration) : '0:00';
-
   switchTab('lirik');
   fetchLyrics(song);
-
   try {
-    const r = await fetch('/api/ytmusic', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'play', videoId: song.videoId })
-    });
+    const r = await fetch('/api/ytmusic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'play', videoId: song.videoId }) });
     const d = await r.json();
     const audioUrl = d && d.result && d.result.download && d.result.download.audio;
     if (!d.status || !audioUrl) throw new Error('Link audio tidak ditemukan');
-
-    // Kalau data pencarian tidak punya durasi, pakai durasi dari respons play
     if (!officialDuration) officialDuration = getOfficialDuration(d.result);
-
     audio.src = `/api/proxy?url=${encodeURIComponent(audioUrl)}&fn=audio.m4a`;
     audio.load();
     updateProgress();
@@ -875,74 +763,22 @@ async function playMusicSong(song, list, index) {
   }
 }
 
-function setupMediaSession(song) {
-  if (!('mediaSession' in navigator)) return;
-  try {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: song.title, artist: song.artist, album: 'Downloader AIO',
-      artwork: song.thumbnail ? [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }] : []
-    });
-    navigator.mediaSession.setActionHandler('play', () => audio.play());
-    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-    navigator.mediaSession.setActionHandler('previoustrack', playPrev);
-    navigator.mediaSession.setActionHandler('nexttrack', playNext);
-  } catch {}
-}
+function setupMediaSession(song) { if (!('mediaSession' in navigator)) return; try { navigator.mediaSession.metadata = new MediaMetadata({ title: song.title, artist: song.artist, album: 'Downloader AIO', artwork: song.thumbnail ? [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }] : [] }); navigator.mediaSession.setActionHandler('play', () => audio.play()); navigator.mediaSession.setActionHandler('pause', () => audio.pause()); navigator.mediaSession.setActionHandler('previoustrack', playPrev); navigator.mediaSession.setActionHandler('nexttrack', playNext); } catch {} }
 
-// EVENT AUDIO
 audio.addEventListener('timeupdate', updateProgress);
 audio.addEventListener('loadedmetadata', updateProgress);
 audio.addEventListener('durationchange', updateProgress);
-audio.addEventListener('play', () => {
-  musicFab.classList.add('playing');
-  musicPanel.classList.add('playing');
-  setPlayIcon(ICON_PAUSE);
-});
-audio.addEventListener('pause', () => {
-  musicFab.classList.remove('playing');
-  musicPanel.classList.remove('playing');
-  setPlayIcon(ICON_PLAY);
-});
+audio.addEventListener('play', () => { musicFab.classList.add('playing'); musicPanel.classList.add('playing'); setPlayIcon(ICON_PAUSE); });
+audio.addEventListener('pause', () => { musicFab.classList.remove('playing'); musicPanel.classList.remove('playing'); setPlayIcon(ICON_PLAY); });
 audio.addEventListener('ended', playNext);
-audio.addEventListener('error', () => {
-  if (!audio.getAttribute('src')) return;
-  console.error('Audio error', audio.error);
-  setPlayIcon(ICON_PLAY);
-});
+audio.addEventListener('error', () => { if (!audio.getAttribute('src')) return; console.error('Audio error', audio.error); setPlayIcon(ICON_PLAY); });
 
-// PLAY / PAUSE
-function togglePlay() {
-  if (!audio.getAttribute('src')) return;
-  if (audio.paused) audio.play().catch(() => setPlayIcon(ICON_PLAY));
-  else audio.pause();
-}
+function togglePlay() { if (!audio.getAttribute('src')) return; if (audio.paused) audio.play().catch(() => setPlayIcon(ICON_PLAY)); else audio.pause(); }
+function playNext() { if (currentPlayIndex < currentPlaylist.length - 1) { const i = currentPlayIndex + 1; playMusicSong(currentPlaylist[i], currentPlaylist, i); } }
+function playPrev() { if (currentPlayIndex > 0) { const i = currentPlayIndex - 1; playMusicSong(currentPlaylist[i], currentPlaylist, i); } }
 
-// NEXT & PREV
-function playNext() {
-  if (currentPlayIndex < currentPlaylist.length - 1) {
-    const i = currentPlayIndex + 1;
-    playMusicSong(currentPlaylist[i], currentPlaylist, i);
-  }
-}
-function playPrev() {
-  if (currentPlayIndex > 0) {
-    const i = currentPlayIndex - 1;
-    playMusicSong(currentPlaylist[i], currentPlaylist, i);
-  }
-}
+progressInput.addEventListener('input', (e) => { const dur = getDuration(); if (!dur) return; const pct = parseFloat(e.target.value); const newTime = (pct / 100) * dur; progressFill.style.width = pct + '%'; timeCurrent.textContent = formatTime(newTime); try { audio.currentTime = Math.min(newTime, audio.duration || newTime); } catch {} });
 
-// SEEK
-progressInput.addEventListener('input', (e) => {
-  const dur = getDuration();
-  if (!dur) return;
-  const pct = parseFloat(e.target.value);
-  const newTime = (pct / 100) * dur;
-  progressFill.style.width = pct + '%';
-  timeCurrent.textContent = formatTime(newTime);
-  try { audio.currentTime = Math.min(newTime, audio.duration || newTime); } catch {}
-});
-
-// LIRIK
 async function fetchLyrics(song) {
   currentLyricsLines = [];
   const container = $('lyricsContent');
@@ -953,13 +789,8 @@ async function fetchLyrics(song) {
     if (d.status && d.result && d.result.lyrics && d.result.lyrics.lines) currentLyricsLines = d.result.lyrics.lines;
     else if (d.status && d.lyrics) currentLyricsLines = d.lyrics;
   } catch (e) { console.log('Gagal ambil lirik', e); }
-
   if (currentLyricsLines && currentLyricsLines.length) {
-    container.innerHTML = currentLyricsLines.map((line, i) => {
-      const text = line.text || line;
-      const time = line.time || 0;
-      return `<div class="lyric-line" id="lyr-${i}" data-time="${time}">${esc(text)}</div>`;
-    }).join('');
+    container.innerHTML = currentLyricsLines.map((line, i) => { const text = line.text || line; const time = line.time || 0; return `<div class="lyric-line" id="lyr-${i}" data-time="${time}">${esc(text)}</div>`; }).join('');
     startLyricsSync();
   } else {
     container.innerHTML = "<div style='color:var(--danger)'>Lirik tidak ditemukan untuk lagu ini.</div>";
@@ -975,10 +806,7 @@ function startLyricsSync() {
     let activeIndex = -1;
     lines.forEach((line, index) => { if (parseFloat(line.dataset.time) <= t + 0.5) activeIndex = index; });
     lines.forEach(l => l.classList.remove('active'));
-    if (activeIndex !== -1) {
-      const activeLine = document.getElementById(`lyr-${activeIndex}`);
-      if (activeLine) { activeLine.classList.add('active'); activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-    }
+    if (activeIndex !== -1) { const activeLine = document.getElementById(`lyr-${activeIndex}`); if (activeLine) { activeLine.classList.add('active'); activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
   }, 500);
 }
 
