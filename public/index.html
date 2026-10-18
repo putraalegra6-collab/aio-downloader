@@ -22,28 +22,29 @@
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14.5px; line-height: 1.55; font-weight: 500; letter-spacing: -0.1px; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; position: relative; }
+body { background: var(--bg); color: var(--ink); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14.5px; line-height: 1.5; font-weight: 500; -webkit-font-smoothing: antialiased; min-height: 100vh; overflow-x: hidden; position: relative; }
 body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0; background-image: radial-gradient(circle at 1.5px 1.5px, rgba(26,26,26,0.045) 1.5px, transparent 2px); background-size: 32px 32px; }
-.shell { max-width: 880px; margin: 0 auto; padding: 32px 24px 60px; position: relative; z-index: 1; }
+.shell { max-width: 880px; margin: 0 auto; padding: 28px 24px 40px; position: relative; z-index: 1; }
+button { font-family: inherit; }
 
-#loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 26px; transition: opacity 0.5s var(--ease), visibility 0.5s; }
+#loader { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; transition: opacity .4s var(--ease), visibility .4s; }
 #loader.hide { opacity: 0; visibility: hidden; pointer-events: none; }
-.ld-mark { width: 76px; height: 76px; background: var(--c-coral); border: var(--bw-thick) solid var(--ink); box-shadow: 6px 6px 0 var(--ink); border-radius: var(--r); display: grid; place-items: center; animation: ldFloat 1.4s ease-in-out infinite; }
+.ld-mark { width: 72px; height: 72px; background: var(--c-coral); border: var(--bw-thick) solid var(--ink); box-shadow: 6px 6px 0 var(--ink); border-radius: var(--r); display: grid; place-items: center; animation: ldFloat 1.4s ease-in-out infinite; }
 @keyframes ldFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-.ld-text { font-weight: 800; font-size: 15px; letter-spacing: 0.5px; text-transform: uppercase; }
-.ld-bar { width: 220px; height: 8px; background: var(--bg-2); border: var(--bw) solid var(--ink); border-radius: 99px; overflow: hidden; box-shadow: var(--sh-sm); }
-.ld-bar-fill { height: 100%; width: 0%; background: var(--c-coral); transition: width 0.3s var(--ease); }
-.ld-hint { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); }
+.ld-text { font-weight: 800; font-size: 14px; letter-spacing: .5px; text-transform: uppercase; }
+.ld-bar { width: 200px; height: 8px; background: var(--bg-2); border: var(--bw) solid var(--ink); border-radius: 99px; overflow: hidden; }
+.ld-bar-fill { height: 100%; width: 0; background: var(--c-coral); transition: width .3s var(--ease); }
 
-.top { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
-.brand { display: flex; align-items: center; gap: 12px; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r); padding: 10px 16px 10px 10px; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+/* HEADER */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r); padding: 9px 16px 9px 9px; transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
 .brand:hover { transform: translate(-2px,-2px); box-shadow: var(--sh-lg); }
-.mark { width: 42px; height: 42px; background: var(--c-coral); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); display: grid; place-items: center; flex-shrink: 0; }
+.mark { width: 40px; height: 40px; background: var(--c-coral); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); display: grid; place-items: center; flex-shrink: 0; }
 .brand-info { display: flex; flex-direction: column; line-height: 1.1; }
-.brand-name { font-weight: 800; font-size: 14px; letter-spacing: -0.2px; }
-.brand-by { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.8px; text-transform: uppercase; margin-top: 3px; }
+.brand-name { font-weight: 800; font-size: 14px; letter-spacing: -.2px; }
+.brand-by { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--ink-2); letter-spacing: .8px; text-transform: uppercase; margin-top: 3px; }
 .brand-by b { color: var(--ink); background: var(--c-yellow); border: 1.5px solid var(--ink); border-radius: 4px; padding: 1px 6px; font-weight: 700; }
-.live { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--c-mint); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease); }
+.live { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; background: var(--c-mint); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease); }
 .live:hover { transform: translate(-2px,-2px); box-shadow: var(--sh); }
 .live:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
 .live .d { width: 8px; height: 8px; background: var(--ok); border: 1.5px solid var(--ink); border-radius: 50%; flex-shrink: 0; }
@@ -51,146 +52,143 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .live.critical { background: var(--danger); color: #fff; }
 .live.critical .d { background: #fff; }
 .live.checking .d { background: var(--c-orange); animation: pulse 1s infinite; }
-@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-.hero { margin-bottom: 26px; }
-.hero h1 { font-weight: 800; font-size: clamp(26px, 4.2vw, 38px); line-height: 1.12; letter-spacing: -1px; margin-bottom: 12px; }
+/* HERO */
+.hero { margin-bottom: 20px; }
+.hero h1 { font-weight: 800; font-size: clamp(24px, 4vw, 34px); line-height: 1.15; letter-spacing: -.8px; margin-bottom: 10px; }
 .hero h1 .hl { background: var(--c-yellow); border: var(--bw) solid var(--ink); border-radius: 6px; padding: 1px 10px; display: inline-block; box-shadow: var(--sh-sm); }
 .hero h1 .hl.alt { background: var(--c-purple); }
-.hero p { font-size: 14px; font-weight: 500; color: var(--ink-2); max-width: 560px; line-height: 1.65; }
+.hero p { font-size: 14px; color: var(--ink-2); max-width: 580px; line-height: 1.6; }
 
-.tabs { display: flex; gap: 10px; margin-bottom: 22px; flex-wrap: wrap; }
-.tab { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 13.5px; color: var(--ink); cursor: pointer; transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s; text-align: left; }
-.tab .ticon { width: 34px; height: 34px; flex-shrink: 0; display: grid; place-items: center; background: var(--bg-2); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); color: var(--ink); transition: background 0.15s, color 0.15s; }
+/* TABS */
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.tab { display: flex; align-items: center; gap: 12px; padding: 13px 16px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-weight: 700; font-size: 13.5px; color: var(--ink); cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease), background .15s; text-align: left; min-width: 0; }
+.tab .ticon { width: 34px; height: 34px; flex-shrink: 0; display: grid; place-items: center; background: var(--bg-2); border: var(--bw) solid var(--ink); border-radius: var(--r-sm); transition: background .15s, color .15s; }
 .tab .tlabel { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.tab .tlabel .tmain { font-weight: 800; font-size: 13.5px; line-height: 1.1; }
-.tab .tlabel .tsub { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
+.tab .tmain { font-weight: 800; font-size: 13.5px; line-height: 1.1; }
+.tab .tsub { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 600; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; }
 .tab.active { background: var(--c-yellow); }
 .tab.active .ticon { background: var(--ink); color: var(--c-yellow); }
-.tab.active .tlabel .tsub { color: var(--ink-2); }
+.tab.active .tsub { color: var(--ink-2); }
 .tab:not(.active):hover { transform: translate(-2px,-2px); box-shadow: var(--sh); }
 .tab:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
 
 .panel { display: none; }
-.panel.active { display: block; animation: fadeIn 0.35s var(--ease); }
+.panel.active { display: block; animation: fadeIn .35s var(--ease); }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-.inp-card { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 22px; margin-bottom: 18px; position: relative; overflow: hidden; }
-.inp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--c-coral) 0%, var(--c-coral) 20%, var(--c-yellow) 20%, var(--c-yellow) 40%, var(--c-mint) 40%, var(--c-mint) 60%, var(--c-purple) 60%, var(--c-purple) 80%, var(--c-blue) 80%, var(--c-blue) 100%); }
+/* INPUT */
+.inp-card { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 20px; position: relative; overflow: hidden; }
+.inp-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, var(--c-coral) 0 20%, var(--c-yellow) 20% 40%, var(--c-mint) 40% 60%, var(--c-purple) 60% 80%, var(--c-blue) 80% 100%); }
 .inp-label { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-2); margin-bottom: 12px; }
 .inp-label .ldot { width: 8px; height: 8px; background: var(--c-coral); border: 1.5px solid var(--ink); border-radius: 50%; }
-.inp-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.input-wrap { flex: 1; min-width: 200px; display: flex; align-items: center; gap: 12px; background: var(--bg); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); padding: 0 14px; transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s; }
+.inp-row { display: flex; gap: 10px; }
+.input-wrap { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: var(--bg); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); padding: 0 14px; transition: transform .15s var(--ease), box-shadow .15s var(--ease), background .15s; }
 .input-wrap:focus-within { background: var(--surface); transform: translate(-2px,-2px); box-shadow: 4px 4px 0 var(--c-blue); }
-.input-wrap .ic { display: flex; flex-shrink: 0; color: var(--ink-2); }
-.input-wrap input { flex: 1; min-width: 0; padding: 16px 0; background: transparent; border: none; outline: none; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 500; color: var(--ink); }
+.input-wrap input { flex: 1; min-width: 0; padding: 14px 0; background: transparent; border: none; outline: none; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink); }
 .input-wrap input::placeholder { color: var(--muted); }
-.detect { display: none; align-items: center; gap: 8px; padding: 8px 14px 8px 12px; border: 2.5px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; flex-shrink: 0; white-space: nowrap; animation: pillIn 0.35s var(--ease); box-shadow: 2px 2px 0 var(--ink); }
+.detect { display: none; align-items: center; gap: 7px; padding: 6px 12px; border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; flex-shrink: 0; white-space: nowrap; background: var(--c-mint); }
 .detect.show { display: inline-flex; }
-.detect .pdot { width: 8px; height: 8px; background: var(--ink); border: 1.5px solid currentColor; border-radius: 50%; animation: pdPulse 1.5s ease-in-out infinite; }
-@keyframes pillIn { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
-@keyframes pdPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }
-.detect[data-platform="tiktok"] { background: #000; color: #fff; border-color: #000; box-shadow: 2px 2px 0 #25F4EE; }
-.detect[data-platform="tiktok"] .pdot { background: #25F4EE; border-color: #fff; }
-.detect[data-platform="instagram"] { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: #fff; border-color: #dc2743; box-shadow: 2px 2px 0 #dc2743; }
-.detect[data-platform="instagram"] .pdot { background: #fff; border-color: #fff; }
-.detect[data-platform="youtube"] { background: #FF0000; color: #fff; border-color: #FF0000; box-shadow: 2px 2px 0 #FF0000; }
-.detect[data-platform="youtube"] .pdot { background: #fff; border-color: #fff; }
-.detect[data-platform="facebook"] { background: #1877F2; color: #fff; border-color: #1877F2; box-shadow: 2px 2px 0 #1877F2; }
-.detect[data-platform="facebook"] .pdot { background: #fff; border-color: #fff; }
-.detect[data-platform="twitter"] { background: #000; color: #fff; border-color: #000; box-shadow: 2px 2px 0 #1DA1F2; }
-.detect[data-platform="twitter"] .pdot { background: #1DA1F2; border-color: #1DA1F2; }
-.detect[data-platform="spotify"] { background: #1DB954; color: #fff; border-color: #1DB954; box-shadow: 2px 2px 0 #1DB954; }
-.detect[data-platform="spotify"] .pdot { background: #fff; border-color: #fff; }
-.detect[data-platform="soundcloud"] { background: #FF5500; color: #fff; border-color: #FF5500; box-shadow: 2px 2px 0 #FF5500; }
-.detect[data-platform="soundcloud"] .pdot { background: #fff; border-color: #fff; }
-.detect[data-platform="pinterest"] { background: #E60023; color: #fff; border-color: #E60023; box-shadow: 2px 2px 0 #E60023; }
-.detect[data-platform="pinterest"] .pdot { background: #fff; border-color: #fff; }
-.detect[data-platform="link"] { background: var(--c-mint); color: var(--ink); border-color: var(--ink); box-shadow: 2px 2px 0 var(--ink); }
-.detect[data-platform="link"] .pdot { background: var(--ok); border-color: var(--ink); }
-.inp-hint { display: flex; align-items: center; gap: 8px; margin-top: 14px; padding: 10px 12px; background: var(--bg); border: 2px dashed var(--ink); border-radius: var(--r-sm); font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; letter-spacing: 0.4px; color: var(--muted); text-transform: uppercase; transition: opacity 0.3s var(--ease); }
-.inp-hint.hide { opacity: 0; height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
-.go { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 16px 24px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 13px; letter-spacing: 0.2px; text-transform: uppercase; cursor: pointer; transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s, color 0.15s; white-space: nowrap; flex-shrink: 0; }
+.detect .pdot { width: 7px; height: 7px; background: var(--ink); border-radius: 50%; }
+.detect[data-platform="tiktok"] { background: #000; color: #fff; border-color: #000; }
+.detect[data-platform="tiktok"] .pdot { background: #25F4EE; }
+.detect[data-platform="instagram"] { background: linear-gradient(45deg,#f09433,#dc2743,#bc1888); color: #fff; border-color: #dc2743; }
+.detect[data-platform="instagram"] .pdot { background: #fff; }
+.detect[data-platform="youtube"] { background: #FF0000; color: #fff; border-color: #FF0000; }
+.detect[data-platform="youtube"] .pdot { background: #fff; }
+.detect[data-platform="spotify"] { background: #1DB954; color: #fff; border-color: #1DB954; }
+.detect[data-platform="spotify"] .pdot { background: #fff; }
+.detect[data-platform="facebook"] { background: #1877F2; color: #fff; border-color: #1877F2; }
+.detect[data-platform="facebook"] .pdot { background: #fff; }
+.detect[data-platform="twitter"] { background: #000; color: #fff; border-color: #000; }
+.detect[data-platform="soundcloud"] { background: #FF5500; color: #fff; border-color: #FF5500; }
+.detect[data-platform="soundcloud"] .pdot { background: #fff; }
+.detect[data-platform="pinterest"] { background: #E60023; color: #fff; border-color: #E60023; }
+.detect[data-platform="pinterest"] .pdot { background: #fff; }
+.go { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 22px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-weight: 800; font-size: 13px; letter-spacing: .2px; text-transform: uppercase; cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease), background .15s, color .15s; white-space: nowrap; flex-shrink: 0; min-height: 50px; }
 .go:hover:not(:disabled) { transform: translate(-3px,-3px); box-shadow: 6px 6px 0 var(--ink); background: var(--c-coral); color: var(--ink); }
 .go:active:not(:disabled) { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
-.go:disabled { opacity: 0.55; cursor: wait; }
-.go svg { transition: transform 0.2s var(--ease); }
-.go:hover:not(:disabled) svg { transform: translateX(3px); }
+.go:disabled { opacity: .55; cursor: wait; }
 
-.result { display: flex; flex-direction: column; gap: 16px; }
-.st { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 32px 20px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: var(--ink-2); animation: fadeIn 0.3s var(--ease); }
+/* RESULT */
+.result { margin-top: 16px; }
+.st { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 26px 18px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--ink-2); animation: fadeIn .3s var(--ease); }
 .st.err { background: var(--c-coral); color: var(--ink); }
-.spin { width: 16px; height: 16px; border: 2.5px solid var(--ink); border-top-color: transparent; border-radius: 50%; animation: sp 0.7s linear infinite; display: inline-block; }
+.spin { width: 15px; height: 15px; border: 2.5px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: sp .7s linear infinite; display: inline-block; flex-shrink: 0; }
 @keyframes sp { to { transform: rotate(360deg); } }
 
-/* RESULT CARD (GENERIC: TIKTOK / IG / YT / DLL) */
-.card { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); overflow: hidden; animation: fadeIn 0.4s var(--ease) backwards; }
-.card-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; background: var(--ink); color: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
-.card-bar .tag { padding: 4px 10px; background: var(--c-yellow); color: var(--ink); border: 2px solid var(--surface); border-radius: 99px; font-size: 10px; white-space: nowrap; }
-.card-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+.card { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); overflow: hidden; animation: fadeIn .4s var(--ease); }
+.card-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 18px; background: var(--ink); color: var(--surface); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; }
+.tag { padding: 4px 10px; background: var(--c-yellow); color: var(--ink); border: 2px solid var(--surface); border-radius: 99px; font-size: 10px; white-space: nowrap; }
+.card-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; }
 
-.creator { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg-2); border: 2px solid var(--ink); border-radius: var(--r); }
-.creator-avatar { width: 46px; height: 46px; flex-shrink: 0; border: 2px solid var(--ink); border-radius: 50%; background: var(--surface); overflow: hidden; display: grid; place-items: center; color: var(--muted); }
-.creator-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.creator { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--bg-2); border: 2px solid var(--ink); border-radius: var(--r); min-width: 0; }
+.av { width: 48px; height: 48px; flex-shrink: 0; border: 2px solid var(--ink); border-radius: 50%; background: var(--c-mint); overflow: hidden; display: grid; place-items: center; font-weight: 800; font-size: 17px; }
+.av img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .creator-info { min-width: 0; flex: 1; }
-.creator-name { font-weight: 800; font-size: 14px; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.creator-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; margin-top: 2px; }
+.creator-name { font-weight: 800; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.creator-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; margin-top: 2px; }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.stat { background: var(--surface); border: 2px solid var(--ink); border-radius: var(--r-sm); padding: 9px 6px; text-align: center; min-width: 0; }
+.stat b { display: block; font-size: 15px; font-weight: 800; letter-spacing: -.3px; line-height: 1.2; }
+.stat span { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
 
 .media { position: relative; border: var(--bw) solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); overflow: hidden; background: #000; }
-.media video { display: block; width: 100%; max-height: 420px; background: #000; }
-.media-audio { background: var(--c-mint); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-.media-audio-head { display: flex; align-items: center; gap: 14px; }
-.media-audio-head img { width: 64px; height: 64px; border: var(--bw) solid var(--ink); border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; }
-.media-audio audio { width: 100%; height: 42px; }
-.media-img { width: 100%; max-height: 420px; object-fit: contain; background: var(--bg-2); display: block; }
-.media-tag { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 5px 11px; background: var(--c-yellow); border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.media video { display: block; width: 100%; max-height: 440px; background: #000; }
+.media img { width: 100%; max-height: 440px; object-fit: contain; background: var(--bg-2); display: block; }
+.media-tag { position: absolute; top: 10px; left: 10px; z-index: 2; padding: 4px 10px; background: var(--c-yellow); border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+.audio-box { background: var(--c-mint); padding: 16px; display: flex; flex-direction: column; gap: 12px; border: var(--bw) solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); }
+.audio-head { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.audio-head img { width: 60px; height: 60px; border: var(--bw) solid var(--ink); border-radius: var(--r-sm); object-fit: cover; flex-shrink: 0; }
+.audio-box audio { width: 100%; height: 40px; }
 
-.title-block { display: flex; flex-direction: column; gap: 10px; }
-.title-text { font-weight: 800; font-size: 18px; line-height: 1.3; letter-spacing: -0.3px; word-break: break-word; }
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; padding: 5px 11px; background: var(--bg-2); border: 2px solid var(--ink); border-radius: 99px; }
+.title-text { font-weight: 800; font-size: 17px; line-height: 1.3; letter-spacing: -.3px; word-break: break-word; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.chip { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; padding: 4px 10px; background: var(--bg-2); border: 2px solid var(--ink); border-radius: 99px; }
 .chip.mint { background: var(--c-mint); }
 
-.dl-section { display: flex; flex-direction: column; gap: 10px; }
-.dl-heading { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-2); }
-.dl-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
-.dl-item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg); border: var(--bw) solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); }
-.dl-type { padding: 4px 9px; border: 2px solid var(--ink); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; background: var(--c-yellow); white-space: nowrap; }
+.dl-group { display: flex; flex-direction: column; gap: 10px; }
+.dl-heading { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-2); }
+.dl-heading b { background: var(--ink); color: var(--surface); border-radius: 99px; padding: 1px 8px; font-size: 9.5px; }
+.dl-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.dl-item { display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--bg); border: var(--bw) solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); min-width: 0; }
+.dl-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dl-type { padding: 3px 8px; border: 2px solid var(--ink); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; background: var(--c-yellow); }
 .dl-type.audio { background: var(--c-mint); }
 .dl-type.image { background: var(--c-purple); }
-.dl-info { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.dl-name { font-weight: 800; font-size: 13.5px; letter-spacing: -0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dl-ext { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; color: var(--muted); }
-.b { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 14px; border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r-sm); background: var(--ink); color: var(--surface); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: 11.5px; text-transform: uppercase; cursor: pointer; transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s; white-space: nowrap; user-select: none; min-width: 110px; }
+.dl-ext { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--muted); }
+.dl-name { font-weight: 800; font-size: 13.5px; letter-spacing: -.2px; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; word-break: break-word; min-height: 2.6em; }
+.b { width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; border: var(--bw) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r-sm); background: var(--ink); color: var(--surface); font-weight: 700; font-size: 11.5px; text-transform: uppercase; cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease), background .15s; user-select: none; margin-top: auto; }
 .b:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--ink); background: var(--c-coral); color: var(--ink); }
 .b:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
-.b:disabled { opacity: 0.7; cursor: wait; }
+.b:disabled { opacity: .7; cursor: wait; }
 
-/* SPOTIFY / SOUNDCLOUD (TIDAK DIUBAH) */
+/* SPOTIFY (TIDAK DIUBAH) */
 .sp-hero { display: flex; align-items: center; gap: 18px; padding: 22px; background: linear-gradient(135deg, var(--c-mint), var(--c-teal)); border-bottom: var(--bw-thick) solid var(--ink); }
 .sp-avatar { width: 96px; height: 96px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); overflow: hidden; flex-shrink: 0; display: grid; place-items: center; box-shadow: var(--sh-sm); color: var(--muted); }
 .sp-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .sp-hero-info { min-width: 0; flex: 1; }
 .sp-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-2); margin-bottom: 4px; }
-.sp-artist { font-weight: 800; font-size: 22px; letter-spacing: -0.5px; line-height: 1.15; word-break: break-word; }
+.sp-artist { font-weight: 800; font-size: 22px; letter-spacing: -.5px; line-height: 1.15; word-break: break-word; }
 .sp-track { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 600; color: var(--ink-2); margin-top: 4px; word-break: break-word; }
 .sp-body { display: grid; grid-template-columns: 170px 1fr; gap: 20px; padding: 20px; align-items: center; }
 .sp-cover { width: 100%; aspect-ratio: 1 / 1; border: var(--bw-thick) solid var(--ink); border-radius: var(--r); box-shadow: var(--sh); overflow: hidden; background: var(--bg-2); }
 .sp-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.sp-title { font-weight: 800; font-size: 20px; line-height: 1.25; letter-spacing: -0.4px; margin-bottom: 12px; word-break: break-word; }
+.sp-title { font-weight: 800; font-size: 20px; line-height: 1.25; letter-spacing: -.4px; margin-bottom: 12px; word-break: break-word; }
 .sp-preview { margin: 0 20px 20px; padding: 16px; background: var(--bg); border: var(--bw) solid var(--ink); border-radius: var(--r); }
 .sp-preview-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-2); margin-bottom: 10px; }
-.sp-preview audio { width: 100%; height: 42px; }
+.sp-preview audio { width: 100%; height: 40px; }
 .sp-empty { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
 .sp-dl { padding: 0 20px 20px; }
-.sp-dl .dl-list { gap: 10px; }
 
-/* STATUS PAGE */
-.sh { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 24px; margin-bottom: 18px; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 20px; }
+/* STATUS (TIDAK DIUBAH) */
+.sh { background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 24px; margin-bottom: 16px; position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 20px; }
 .sh::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--ok) 0 33%, var(--c-yellow) 33% 66%, var(--c-coral) 66% 100%); }
 .sh-head { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; }
-.sh-title { font-weight: 800; font-size: 26px; letter-spacing: -0.8px; line-height: 1.1; margin-bottom: 6px; }
-.sh-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; line-height: 1.6; }
+.sh-title { font-weight: 800; font-size: 26px; letter-spacing: -.8px; line-height: 1.1; margin-bottom: 6px; }
+.sh-sub { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: .4px; line-height: 1.6; }
 .sh-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: var(--c-mint); margin-bottom: 12px; }
 .sh-badge.degraded { background: var(--c-yellow); }
 .sh-badge.critical { background: var(--danger); color: #fff; }
@@ -201,24 +199,23 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .sh-badge.checking .sh-dot { background: var(--muted); }
 .sh-stats { display: grid; grid-template-columns: repeat(2, 120px); gap: 12px; }
 .sh-stat { padding: 14px; background: var(--bg); border: 2.5px solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); display: flex; flex-direction: column; gap: 6px; }
-.sh-stat b { font-size: 22px; font-weight: 800; letter-spacing: -0.6px; line-height: 1; white-space: nowrap; }
+.sh-stat b { font-size: 22px; font-weight: 800; letter-spacing: -.6px; line-height: 1; white-space: nowrap; }
 .sh-stat span { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
 .segbar { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 6px; }
 .seg { height: 10px; border: 2px solid var(--ink); border-radius: 99px; background: var(--bg-2); }
 .seg.online { background: var(--ok); }
 .seg.down { background: var(--danger); }
-
 .status-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; align-items: stretch; }
-.svc { background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); padding: 18px; display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.svc { background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); padding: 18px; display: flex; flex-direction: column; gap: 16px; transition: transform .2s var(--ease), box-shadow .2s var(--ease); }
 .svc:hover { transform: translate(-3px,-3px); box-shadow: var(--sh-lg); }
 .svc-head { display: flex; align-items: center; gap: 12px; }
 .svc-ic { width: 46px; height: 46px; flex-shrink: 0; border: 2.5px solid var(--ink); border-radius: var(--r); display: grid; place-items: center; background: var(--c-mint); box-shadow: var(--sh-sm); color: var(--ink); }
 .svc-ic svg { width: 22px; height: 22px; }
 .svc.down .svc-ic { background: var(--c-coral); }
 .svc-id { min-width: 0; flex: 1; }
-.svc-name { font-weight: 800; font-size: 15px; letter-spacing: -0.3px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.svc-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; background: var(--c-mint); flex-shrink: 0; }
+.svc-name { font-weight: 800; font-size: 15px; letter-spacing: -.3px; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.svc-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: .4px; text-transform: uppercase; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; white-space: nowrap; background: var(--c-mint); flex-shrink: 0; }
 .pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
 .pill.down { background: var(--danger); color: #fff; }
 .pill.down i { background: #fff; }
@@ -232,7 +229,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .grade.slow { background: var(--c-orange); }
 .grade.offline { background: var(--danger); color: #fff; }
 .bar { width: 100%; height: 10px; background: var(--bg-2); border: 2px solid var(--ink); border-radius: 99px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 99px; transition: width 0.6s var(--ease); }
+.bar-fill { height: 100%; border-radius: 99px; transition: width .6s var(--ease); }
 .bar-fill.fast { background: var(--ok); }
 .bar-fill.mid { background: var(--c-yellow); }
 .bar-fill.slow { background: var(--c-orange); }
@@ -240,127 +237,122 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .status-empty { grid-column: 1 / -1; }
 .skel { height: 150px; border: var(--bw) solid var(--ink); border-radius: var(--r-lg); background: linear-gradient(90deg, var(--surface) 25%, var(--bg-2) 50%, var(--surface) 75%); background-size: 200% 100%; animation: shimmer 1.2s infinite linear; }
 @keyframes shimmer { to { background-position: -200% 0; } }
-.refresh-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 16px; padding: 14px 20px; background: var(--ink); color: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 12px; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; transition: transform 0.15s var(--ease), box-shadow 0.15s var(--ease), background 0.15s; }
+.refresh-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; margin-top: 14px; padding: 14px 20px; background: var(--ink); color: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-sm); border-radius: var(--r); font-weight: 800; font-size: 12px; letter-spacing: .5px; text-transform: uppercase; cursor: pointer; transition: transform .15s var(--ease), box-shadow .15s var(--ease), background .15s; }
 .refresh-btn:hover { transform: translate(-3px,-3px); box-shadow: var(--sh); background: var(--c-yellow); color: var(--ink); }
 .refresh-btn:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
-.refresh-btn:disabled { opacity: 0.55; cursor: wait; }
-.refresh-btn:disabled svg { animation: sp 0.8s linear infinite; }
+.refresh-btn:disabled { opacity: .55; cursor: wait; }
+.refresh-btn:disabled svg { animation: sp .8s linear infinite; }
 
 /* FOOTER */
-.foot { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 22px; margin-top: 48px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; color: var(--ink-2); flex-wrap: wrap; }
+.foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; margin-top: 28px; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase; color: var(--ink-2); flex-wrap: wrap; }
 .foot-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .foot-version { padding: 4px 8px; background: var(--c-yellow); border: 1.5px solid var(--ink); border-radius: 6px; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; }
-.foot-by { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--c-coral); border: 2px solid var(--ink); border-radius: 99px; font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--ink); }
+.foot-by { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: var(--c-coral); border: 2px solid var(--ink); border-radius: 99px; font-weight: 800; font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--ink); }
 
-/* FLOATING MUSIC */
-.music-fab { position: fixed; bottom: 24px; right: 24px; z-index: 999; width: 64px; height: 64px; background: var(--c-coral); border: var(--bw-thick) solid var(--ink); box-shadow: 0 0 0 4px rgba(26,26,26,0.1), 6px 6px 0 var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s var(--ease); animation: fabBounce 3s ease-in-out infinite; }
-@keyframes fabBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
-.music-fab:hover { transform: scale(1.1) translateY(-4px); box-shadow: 0 0 0 6px rgba(244,168,168,0.3), 6px 6px 0 var(--ink); }
-.music-fab:active { transform: scale(0.95) translateY(0); box-shadow: 0 0 0 2px rgba(244,168,168,0.3), 2px 2px 0 var(--ink); }
-.music-panel { position: fixed; bottom: 100px; right: 24px; width: 360px; max-width: calc(100vw - 48px); background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: 10px 10px 0 var(--ink); border-radius: 20px; z-index: 998; display: none; flex-direction: column; overflow: hidden; transform-origin: bottom right; animation: panelIn 0.4s var(--ease); }
-@keyframes panelIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+/* MUSIC */
+.music-fab { position: fixed; bottom: 22px; right: 22px; z-index: 999; width: 60px; height: 60px; background: var(--c-coral); border: var(--bw-thick) solid var(--ink); box-shadow: 0 0 0 4px rgba(26,26,26,.1), 5px 5px 0 var(--ink); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform .3s var(--ease), box-shadow .3s var(--ease); }
+.music-fab:hover { transform: scale(1.08) translateY(-3px); }
+.music-fab:active { transform: scale(.95); }
+.music-fab.playing svg { animation: sp 4s linear infinite; }
+.music-panel { position: fixed; bottom: 96px; right: 22px; width: 360px; max-width: calc(100vw - 44px); height: 500px; max-height: calc(100vh - 120px); background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: 8px 8px 0 var(--ink); border-radius: 18px; z-index: 998; display: none; flex-direction: column; overflow: hidden; transform-origin: bottom right; animation: panelIn .35s var(--ease); }
+@keyframes panelIn { from { opacity: 0; transform: scale(.94) translateY(16px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .music-panel.show { display: flex; }
-.mp-header { padding: 16px 18px; background: var(--ink); color: var(--surface); display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-.mp-close { cursor: pointer; background: rgba(255,255,255,0.1); border: none; color: var(--surface); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; transition: 0.2s; }
-.mp-close:hover { background: rgba(255,255,255,0.2); }
-.mp-tabs { display: flex; border-bottom: var(--bw-thick) solid var(--ink); background: var(--surface); padding: 0 4px; }
-.mp-tab { flex: 1; text-align: center; padding: 12px 0; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 10.5px; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 4px solid transparent; transition: 0.25s var(--ease); margin-bottom: -3px; }
-.mp-tab svg { width: 18px; height: 18px; transition: 0.25s var(--ease); }
+.mp-header { padding: 14px 18px; background: var(--ink); color: var(--surface); display: flex; justify-content: space-between; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+.mp-close { cursor: pointer; background: rgba(255,255,255,.12); border: none; color: var(--surface); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; transition: background .2s; }
+.mp-close:hover { background: rgba(255,255,255,.25); }
+.mp-tabs { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: var(--bw) solid var(--ink); background: var(--surface); }
+.mp-tab { text-align: center; padding: 11px 0 9px; font-size: 10px; font-weight: 800; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; cursor: pointer; color: var(--muted); border-bottom: 3px solid transparent; transition: color .2s, border-color .2s; }
 .mp-tab.active { color: var(--ink); border-bottom-color: var(--c-coral); }
-.mp-tab.active svg { color: var(--c-coral); transform: scale(1.1); }
-.mp-tab:hover:not(.active) { background: var(--bg); color: var(--ink-2); }
-.mp-tab-content { display: none; flex-direction: column; }
-.mp-tab-content.active { display: flex; animation: fadeIn 0.3s var(--ease); }
-#tab-search .mp-search-wrap { padding: 16px; border-bottom: var(--bw) solid var(--ink-soft); background: var(--bg); display: flex; gap: 8px; }
-#tab-search .mp-search { flex: 1; min-width: 0; padding: 12px 14px; border: var(--bw) solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; background: var(--surface); transition: 0.2s; }
-#tab-search .mp-search:focus { box-shadow: 0 0 0 3px var(--c-blue); }
-#tab-search .mp-search-btn { padding: 0 18px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: 99px; font-weight: 800; cursor: pointer; transition: 0.2s; }
-#tab-search .mp-search-btn:hover { background: var(--c-coral); color: var(--ink); }
-.mp-results { max-height: 280px; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
-.mp-item { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 2px solid transparent; border-radius: var(--r); cursor: pointer; transition: 0.2s var(--ease); background: var(--surface); }
+.mp-body { flex: 1; min-height: 0; position: relative; }
+.mp-tab-content { display: none; position: absolute; inset: 0; flex-direction: column; }
+.mp-tab-content.active { display: flex; animation: fadeIn .25s var(--ease); }
+.mp-search-wrap { padding: 12px; border-bottom: var(--bw) solid var(--ink); background: var(--bg); display: flex; gap: 8px; }
+.mp-search { flex: 1; min-width: 0; padding: 10px 14px; border: var(--bw) solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 12px; outline: none; background: var(--surface); transition: box-shadow .2s; }
+.mp-search:focus { box-shadow: 0 0 0 3px var(--c-blue); }
+.mp-search-btn { padding: 0 16px; background: var(--ink); color: var(--surface); border: var(--bw) solid var(--ink); border-radius: 99px; font-weight: 800; cursor: pointer; transition: background .2s; }
+.mp-search-btn:hover { background: var(--c-coral); color: var(--ink); }
+.mp-results { flex: 1; overflow-y: auto; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+.mp-item { display: flex; align-items: center; gap: 10px; padding: 8px; border: 2px solid transparent; border-radius: var(--r); cursor: pointer; transition: background .2s, border-color .2s, transform .2s var(--ease); background: var(--surface); }
 .mp-item:hover { background: var(--bg-2); border-color: var(--ink); transform: translateX(2px); }
-.mp-item img { width: 46px; height: 46px; border-radius: 8px; border: 2px solid var(--ink); object-fit: cover; box-shadow: 2px 2px 0 var(--ink); flex-shrink: 0; }
+.mp-item img { width: 44px; height: 44px; border-radius: 8px; border: 2px solid var(--ink); object-fit: cover; flex-shrink: 0; background: var(--bg-2); }
 .mp-item-info { flex: 1; min-width: 0; }
-.mp-item-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
+.mp-item-title { font-weight: 800; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .mp-item-artist { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-item .duration { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); flex-shrink: 0; }
-.mp-item .action-btn { background: transparent; border: none; cursor: pointer; padding: 6px; color: var(--muted); transition: 0.2s; display: grid; place-items: center; border-radius: 50%; flex-shrink: 0; }
-.mp-item .action-btn:hover { color: var(--ink); background: var(--bg-2); }
-.mp-item .action-btn.active { color: var(--c-coral); }
-.lyrics-container { padding: 20px; overflow-y: auto; max-height: 320px; font-size: 15px; font-weight: 700; line-height: 2; color: var(--ink); text-align: center; }
-.lyric-line { margin-bottom: 14px; transition: all 0.4s var(--ease); opacity: 0.3; transform: scale(0.95); }
-.lyric-line.active { color: var(--ink); opacity: 1; transform: scale(1.05); font-size: 17px; text-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-.tab-empty { padding: 40px 20px; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 12px; }
-.share-btn-wrap { padding: 12px 16px; border-top: var(--bw) solid var(--ink-soft); text-align: center; background: var(--bg); }
-.share-btn { width: 100%; padding: 12px; background: var(--c-blue); border: var(--bw) solid var(--ink); border-radius: var(--r); font-weight: 800; font-size: 12px; font-family: 'JetBrains Mono', monospace; cursor: pointer; box-shadow: var(--sh-sm); display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-.share-btn:hover { background: var(--c-mint); transform: translate(-2px,-2px); box-shadow: var(--sh); }
-.share-btn svg { width: 16px; height: 16px; }
-.mp-player { padding: 16px 20px; background: var(--c-mint); border-top: var(--bw-thick) solid var(--ink); display: none; }
+.mp-item .duration { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-2); flex-shrink: 0; }
+.action-btn { background: transparent; border: none; cursor: pointer; padding: 5px; color: var(--muted); display: grid; place-items: center; border-radius: 50%; flex-shrink: 0; transition: color .2s, background .2s; }
+.action-btn:hover { color: var(--ink); background: var(--bg-2); }
+.action-btn.active { color: var(--c-coral); }
+.lyrics-container { flex: 1; overflow-y: auto; padding: 18px; font-size: 14px; font-weight: 700; line-height: 1.9; color: var(--ink); text-align: center; }
+.lyric-line { margin-bottom: 10px; transition: opacity .35s, transform .35s var(--ease); opacity: .35; transform: scale(.96); }
+.lyric-line.active { color: var(--ink); opacity: 1; transform: scale(1.03); font-size: 16px; }
+.empty { flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; padding: 24px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); }
+.share-wrap { padding: 10px 12px; border-top: var(--bw) solid var(--ink); background: var(--bg); }
+.share-btn { width: 100%; padding: 11px; background: var(--c-blue); border: var(--bw) solid var(--ink); border-radius: var(--r); font-weight: 800; font-size: 12px; font-family: 'JetBrains Mono', monospace; cursor: pointer; box-shadow: var(--sh-sm); transition: transform .15s var(--ease), background .2s; }
+.share-btn:hover { background: var(--c-mint); transform: translate(-2px,-2px); }
+.mp-player { padding: 14px 16px; background: var(--c-mint); border-top: var(--bw-thick) solid var(--ink); display: none; }
 .mp-player.show { display: block; }
-.mp-now { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-.mp-now img { width: 52px; height: 52px; border-radius: 8px; border: var(--bw-thick) solid var(--ink); box-shadow: 2px 2px 0 var(--ink); object-fit: cover; flex-shrink: 0; }
+.mp-now { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.mp-now img { width: 46px; height: 46px; border-radius: 8px; border: var(--bw) solid var(--ink); object-fit: cover; flex-shrink: 0; background: var(--surface); }
 .mp-now-info { flex: 1; min-width: 0; }
-.mp-now-title { font-weight: 800; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-.mp-now-artist { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.mp-progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.mp-time { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: var(--ink-2); min-width: 40px; text-align: center; }
-.mp-progress { flex: 1; height: 8px; background: rgba(26,26,26,0.1); border: 2px solid var(--ink); border-radius: 99px; position: relative; overflow: hidden; }
-.mp-progress-fill { height: 100%; width: 0%; background: var(--c-coral); border-radius: 99px; pointer-events: none; }
-.mp-progress input[type="range"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; z-index: 2; }
-.mp-controls { display: flex; justify-content: center; align-items: center; gap: 20px; }
-.mp-btn-circle { width: 44px; height: 44px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); display: grid; place-items: center; cursor: pointer; box-shadow: var(--sh-sm); transition: 0.15s var(--ease); color: var(--ink); }
-.mp-btn-circle:hover { transform: translate(-2px,-2px); box-shadow: var(--sh); background: var(--c-yellow); }
-.mp-btn-circle:active { transform: translate(1px,1px); box-shadow: 1px 1px 0 var(--ink); }
-.mp-btn-circle.play { background: var(--ink); color: var(--surface); width: 60px; height: 60px; box-shadow: var(--sh); }
-.mp-btn-circle.play:hover { background: var(--c-coral); color: var(--ink); }
-.mp-btn-circle.small { width: 40px; height: 40px; background: transparent; box-shadow: none; }
-.mp-btn-circle.small:hover { background: var(--ink); color: var(--surface); transform: none; box-shadow: none; }
+.mp-now-title { font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-now-artist { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-progress-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.mp-time { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; color: var(--ink-2); min-width: 38px; text-align: center; }
+.mp-progress { flex: 1; height: 8px; background: rgba(26,26,26,.12); border: 2px solid var(--ink); border-radius: 99px; position: relative; overflow: hidden; }
+.mp-progress-fill { height: 100%; width: 0; background: var(--c-coral); border-radius: 99px; pointer-events: none; }
+.mp-progress input[type="range"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; margin: 0; }
+.mp-controls { display: flex; justify-content: center; align-items: center; gap: 18px; }
+.mp-btn { width: 40px; height: 40px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: transparent; display: grid; place-items: center; cursor: pointer; transition: transform .15s var(--ease), background .2s; color: var(--ink); }
+.mp-btn:hover { background: var(--ink); color: var(--surface); transform: translateY(-1px); }
+.mp-btn.main { width: 56px; height: 56px; background: var(--ink); color: var(--surface); box-shadow: var(--sh-sm); }
+.mp-btn.main:hover { background: var(--c-coral); color: var(--ink); }
 
 @media (max-width: 640px) {
-  .shell { padding: 20px 16px 60px; }
-  .top { margin-bottom: 20px; }
-  .brand { padding: 8px 12px 8px 8px; }
-  .mark { width: 38px; height: 38px; }
-  .brand-name { font-size: 13px; }
+  .shell { padding: 18px 14px 34px; }
+  .top { margin-bottom: 18px; }
+  .brand { padding: 7px 12px 7px 7px; }
+  .mark { width: 36px; height: 36px; }
   .live { padding: 7px 11px; font-size: 9.5px; }
-  .hero h1 { font-size: 24px; letter-spacing: -0.6px; }
+  .hero h1 { font-size: 24px; letter-spacing: -.6px; }
   .hero p { font-size: 13.5px; }
-  .hero h1 .hl { padding: 1px 8px; }
-  .tab { min-width: 100%; padding: 12px 14px; }
-  .inp-card { padding: 16px; }
-  .inp-hint { font-size: 9.5px; padding: 8px 10px; }
-  .card-body { padding: 16px; }
-  .media-audio-head img { width: 52px; height: 52px; }
-  .dl-item { grid-template-columns: 1fr; gap: 10px; }
-  .dl-item .b { width: 100%; }
+  .tabs { gap: 8px; }
+  .tab { padding: 11px 12px; gap: 9px; }
+  .tab .ticon { width: 30px; height: 30px; }
+  .inp-card { padding: 14px; }
+  .inp-row { flex-direction: column; }
+  .go { width: 100%; }
+  .card-body { padding: 14px; }
+  .creator { padding: 10px; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .dl-grid { grid-template-columns: 1fr; }
+  .dl-name { min-height: 0; }
+  .audio-head img { width: 52px; height: 52px; }
   .sp-hero { padding: 16px; gap: 14px; }
   .sp-avatar { width: 72px; height: 72px; }
   .sp-artist { font-size: 18px; }
-  .sp-body { grid-template-columns: 1fr; padding: 16px; gap: 16px; }
-  .sp-cover { max-width: 220px; margin: 0 auto; width: 100%; }
+  .sp-body { grid-template-columns: 1fr; padding: 16px; gap: 14px; }
+  .sp-cover { max-width: 200px; margin: 0 auto; width: 100%; }
   .sp-title { font-size: 17px; text-align: center; }
-  .sp-preview { margin: 0 16px 16px; }
-  .sp-dl { padding: 0 16px 16px; }
+  .sp-preview { margin: 0 14px 14px; }
+  .sp-dl { padding: 0 14px 14px; }
   .sh { padding: 18px; }
   .sh-head { grid-template-columns: 1fr; }
   .sh-title { font-size: 22px; }
   .sh-stats { grid-template-columns: 1fr 1fr; width: 100%; }
-  .sh-stats .sh-stat { width: 100%; }
   .status-list { grid-template-columns: 1fr; }
   .svc { padding: 16px; }
   .foot { padding: 14px 16px; font-size: 10px; }
-  .music-fab { bottom: 16px; right: 16px; width: 56px; height: 56px; }
-  .music-panel { bottom: 84px; right: 16px; width: calc(100vw - 32px); }
+  .music-fab { bottom: 16px; right: 16px; width: 54px; height: 54px; }
+  .music-panel { bottom: 82px; right: 14px; width: calc(100vw - 28px); }
 }
 </style>
 </head>
 <body>
 
 <div id="loader">
-  <div class="ld-mark"><svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></div>
+  <div class="ld-mark"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></div>
   <div class="ld-text">Downloader AIO</div>
   <div class="ld-bar"><div class="ld-bar-fill" id="ldFill"></div></div>
-  <div class="ld-hint" id="ldHint">MEMUAT SISTEM...</div>
 </div>
 
 <div class="shell">
@@ -384,11 +376,11 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   </section>
 
   <nav class="tabs">
-    <button class="tab active" data-tab="dl">
+    <button class="tab active" data-tab="dl" type="button">
       <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></span>
       <span class="tlabel"><span class="tmain">Download</span><span class="tsub">Universal</span></span>
     </button>
-    <button class="tab" data-tab="status">
+    <button class="tab" data-tab="status" type="button">
       <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12h4l2-8 4 16 2-8h4"/></svg></span>
       <span class="tlabel"><span class="tmain">Status</span><span class="tsub">System Health</span></span>
     </button>
@@ -400,13 +392,11 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
         <div class="inp-label"><span class="ldot"></span><span>Tempel link dari platform</span></div>
         <div class="inp-row">
           <div class="input-wrap">
-            <span class="ic"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
             <input type="text" id="dlin" placeholder="https://..." autocomplete="off" spellcheck="false" inputmode="url" />
-            <div class="detect" id="dlpill"><span class="pdot"></span><span id="dlpilltext">—</span></div>
+            <span class="detect" id="dlpill"><span class="pdot"></span><span id="dlpilltext">Link</span></span>
           </div>
-          <button class="go" id="dlgo"><span>Proses</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          <button class="go" id="dlgo" type="button">Proses</button>
         </div>
-        <div class="inp-hint"><span>Link yang didukung akan terdeteksi otomatis</span></div>
       </div>
       <div class="result" id="dlout"></div>
     </section>
@@ -414,7 +404,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
     <section class="panel" id="panel-status">
       <div id="statusHero"></div>
       <div class="status-list" id="statusGrid"></div>
-      <button class="refresh-btn" id="refreshBtn">
+      <button class="refresh-btn" id="refreshBtn" type="button">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg>
         <span>Refresh Status</span>
       </button>
@@ -427,85 +417,67 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   </footer>
 </div>
 
-<div class="music-fab" id="musicFab" onclick="toggleMusicPanel()">
-  <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
-</div>
+<button class="music-fab" id="musicFab" type="button" aria-label="Musik">
+  <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
+</button>
 
 <div class="music-panel" id="musicPanel">
   <div class="mp-header">
     <span>PlayMusic</span>
-    <button class="mp-close" onclick="toggleMusicPanel()">✕</button>
+    <button class="mp-close" id="mpClose" type="button" aria-label="Tutup">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
   </div>
   <div class="mp-tabs">
-    <div class="mp-tab active" onclick="switchTab('search')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-      Search
+    <div class="mp-tab active" data-mp="search">Cari</div>
+    <div class="mp-tab" data-mp="lirik">Lirik</div>
+    <div class="mp-tab" data-mp="favorit">Favorit</div>
+    <div class="mp-tab" data-mp="playlist">Playlist</div>
+  </div>
+  <div class="mp-body">
+    <div class="mp-tab-content active" id="tab-search">
+      <div class="mp-search-wrap">
+        <input type="text" class="mp-search" id="musicSearch" placeholder="Cari judul atau artis" />
+        <button class="mp-search-btn" id="musicSearchBtn" type="button">Cari</button>
+      </div>
+      <div class="mp-results" id="musicResults"><div class="empty">Ketik judul lagu lalu tekan Cari.</div></div>
     </div>
-    <div class="mp-tab" onclick="switchTab('lirik')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
-      Lirik
+    <div class="mp-tab-content" id="tab-lirik">
+      <div class="lyrics-container" id="lyricsContent"><div class="empty">Pilih lagu untuk melihat lirik.</div></div>
     </div>
-    <div class="mp-tab" onclick="switchTab('favorit')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-      Favorit
+    <div class="mp-tab-content" id="tab-favorit">
+      <div class="mp-results" id="favoritResults"></div>
     </div>
-    <div class="mp-tab" onclick="switchTab('playlist')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18M3 12h18M3 18h12"/></svg>
-      Playlist
+    <div class="mp-tab-content" id="tab-playlist">
+      <div class="mp-results" id="playlistResults"></div>
+      <div class="share-wrap"><button class="share-btn" id="shareBtn" type="button">Bagikan Playlist</button></div>
     </div>
   </div>
-
-  <div class="mp-tab-content active" id="tab-search">
-    <div class="mp-search-wrap">
-      <input type="text" class="mp-search" id="musicSearch" placeholder="Cari lagu..." onkeydown="if(event.key==='Enter') searchMusic()">
-      <button class="mp-search-btn" onclick="searchMusic()">Cari</button>
-    </div>
-    <div class="mp-results" id="musicResults"></div>
-  </div>
-
-  <div class="mp-tab-content" id="tab-lirik">
-    <div class="lyrics-container" id="lyricsContent">Pilih lagu dulu untuk melihat lirik.</div>
-  </div>
-
-  <div class="mp-tab-content" id="tab-favorit">
-    <div class="mp-results" id="favoritResults"></div>
-  </div>
-
-  <div class="mp-tab-content" id="tab-playlist">
-    <div class="mp-results" id="playlistResults"></div>
-    <div class="share-btn-wrap">
-      <button class="share-btn" onclick="sharePlaylist()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-        Bagikan Playlist
-      </button>
-    </div>
-  </div>
-
   <div class="mp-player" id="musicPlayerControl">
     <div class="mp-now">
       <img src="" id="mpNowCover" alt="">
       <div class="mp-now-info">
-        <div class="mp-now-title" id="mpNowTitle">—</div>
-        <div class="mp-now-artist" id="mpNowArtist">—</div>
+        <div class="mp-now-title" id="mpNowTitle"></div>
+        <div class="mp-now-artist" id="mpNowArtist"></div>
       </div>
     </div>
     <div class="mp-progress-wrap">
       <span class="mp-time" id="mpTimeCurrent">0:00</span>
       <div class="mp-progress">
         <div class="mp-progress-fill" id="mpProgressFill"></div>
-        <input type="range" id="mpProgressInput" min="0" max="100" value="0" step="0.1">
+        <input type="range" id="mpProgressInput" min="0" max="100" value="0" step="0.1" aria-label="Posisi lagu" />
       </div>
       <span class="mp-time" id="mpTimeDuration">0:00</span>
     </div>
     <div class="mp-controls">
-      <button class="mp-btn-circle small" onclick="playPrev()" title="Previous">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+      <button class="mp-btn" id="btnPrev" type="button" aria-label="Sebelumnya">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
       </button>
-      <button class="mp-btn-circle play" id="mpPlayBtn" onclick="togglePlay()">
+      <button class="mp-btn main" id="mpPlayBtn" type="button" aria-label="Putar">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" id="mpPlayIcon"><path d="M8 5v14l11-7z"/></svg>
       </button>
-      <button class="mp-btn-circle small" onclick="playNext()" title="Next">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+      <button class="mp-btn" id="btnNext" type="button" aria-label="Berikutnya">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
       </button>
     </div>
   </div>
@@ -514,186 +486,318 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 <audio id="audioPlayer" preload="auto"></audio>
 
 <script>
-const $ = (id) => document.getElementById(id);
-let actx = null;
-function initAudio() { if (!actx) { try { actx = new (window.AudioContext || window.webkitAudioContext)(); } catch {} } if (actx && actx.state === 'suspended') actx.resume(); }
-function blip(freq, dur = 0.05, gain = 0.028, delay = 0) { if (!actx) return; const t = actx.currentTime + delay; const o = actx.createOscillator(); const g = actx.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(freq, t); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.008); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g).connect(actx.destination); o.start(t); o.stop(t + dur + 0.02); }
-const S = { tap: () => { initAudio(); blip(680); }, tab: () => { initAudio(); blip(560); blip(840, 0.045, 0.024, 0.03); }, ok: () => { initAudio(); blip(620, 0.05, 0.03); blip(880, 0.06, 0.026, 0.05); }, err: () => { initAudio(); blip(240, 0.11, 0.03); } };
-document.addEventListener('pointerdown', (e) => { const el = e.target.closest('.go, .tab, .b, .live, .refresh-btn, .music-fab, .mp-item, .mp-btn-circle, .mp-tab, .action-btn'); if (!el) return; if (el.classList.contains('tab') || el.classList.contains('mp-tab')) S.tab(); else S.tap(); }, { passive: true });
+/* ---------- UTIL ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const safeName = s => (String(s || 'media').replace(/[^a-z0-9]+/gi, '_').slice(0, 50)) || 'media';
+const fmtNum = n => { n = Number(n) || 0; const f = (v, u) => v.toFixed(1).replace(/\.0$/, '') + u; if (n >= 1e9) return f(n/1e9,'B'); if (n >= 1e6) return f(n/1e6,'M'); if (n >= 1e3) return f(n/1e3,'K'); return String(n); };
 
-const tabs = document.querySelectorAll('.tab'); const panels = document.querySelectorAll('.panel');
-tabs.forEach(t => t.addEventListener('click', () => { const tab = t.dataset.tab; tabs.forEach(x => x.classList.toggle('active', x === t)); panels.forEach(p => p.classList.toggle('active', p.id === `panel-${tab}`)); if (tab === 'status' && !statusLoaded) loadStatus(); }));
-const esc = (s) => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-const stLoad = (t = 'Memproses...') => `<div class="st"><span class="spin"></span><span>${esc(t)}</span></div>`;
-const stErr = (m) => `<div class="st err">${esc(m)}</div>`;
-async function post(url, body) { const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }); const data = await r.json().catch(() => ({})); if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`); return data; }
+async function post(url, body) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+  return d;
+}
 
-const PLATFORMS = [{ key: 'tiktok', r: /tiktok\.com|vt\.tiktok|vm\.tiktok/i, l: 'TikTok' },{ key: 'instagram', r: /instagram\.com|instagr\.am/i, l: 'Instagram' },{ key: 'youtube', r: /youtube\.com|youtu\.be/i, l: 'YouTube' },{ key: 'facebook', r: /facebook\.com|fb\.watch|fb\.com/i, l: 'Facebook' },{ key: 'twitter', r: /twitter\.com|x\.com/i, l: 'Twitter / X' },{ key: 'spotify', r: /spotify\.com|spoti\.fi/i, l: 'Spotify' },{ key: 'pinterest', r: /pinterest\.com|pin\.it/i, l: 'Pinterest' },{ key: 'soundcloud', r: /soundcloud\.com|snd\.sc/i, l: 'SoundCloud' }];
-function detect(url) { if (!url) return { key: 'link', l: 'Link' }; for (const p of PLATFORMS) if (p.r.test(url)) return p; return { key: 'link', l: 'Link' }; }
-const dlin = $('dlin'); const dlpill = $('dlpill'); const dlpilltext = $('dlpilltext'); const dlHint = document.querySelector('.inp-hint');
-let raf1 = 0;
-dlin.addEventListener('input', () => { cancelAnimationFrame(raf1); raf1 = requestAnimationFrame(() => { const v = dlin.value.trim(); if (!v) { dlpill.classList.remove('show'); if (dlHint) dlHint.classList.remove('hide'); return; } const p = detect(v); dlpill.setAttribute('data-platform', p.key); dlpill.classList.add('show'); dlpilltext.textContent = p.key === 'link' ? 'Link' : p.l + ' Detected'; if (dlHint) dlHint.classList.add('hide'); }); });
-const dlgo = $('dlgo'); const dlout = $('dlout');
-dlgo.addEventListener('click', runDownload);
-dlin.addEventListener('keydown', (e) => { if (e.key === 'Enter') runDownload(); });
+function formatTime(sec) {
+  if (!isFinite(sec) || sec <= 0) return '0:00';
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = Math.floor(sec % 60).toString().padStart(2, '0');
+  return h > 0 ? `${h}:${m.toString().padStart(2,'0')}:${s}` : `${m}:${s}`;
+}
+function parseDurationString(t) {
+  t = t.trim(); if (!t) return 0;
+  if (/^\d+(\.\d+)?$/.test(t)) return Number(t);
+  const iso = t.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?$/i);
+  if (iso) return (+iso[1]||0)*3600 + (+iso[2]||0)*60 + (+iso[3]||0);
+  if (/^\d+(:\d+){1,2}(\.\d+)?$/.test(t)) return t.split(':').reduce((a,p) => a*60 + (parseFloat(p)||0), 0);
+  const h = t.match(/(\d+)\s*(h|hr|hour|jam)/i), m = t.match(/(\d+)\s*(m|min|minute|menit)/i), s = t.match(/(\d+)\s*(s|sec|second|detik)/i);
+  if (h || m || s) return (h ? +h[1]*3600 : 0) + (m ? +m[1]*60 : 0) + (s ? +s[1] : 0);
+  return 0;
+}
+function toSeconds(v, key = '') {
+  if (v == null) return 0;
+  if (typeof v === 'number') { if (!isFinite(v)) return 0; if (/ms|milli/i.test(key) || v > 100000) return v/1000; return v; }
+  if (typeof v === 'string') return parseDurationString(v);
+  if (typeof v === 'object') return toSeconds(v.seconds ?? v.totalSeconds ?? v.text ?? v.simpleText ?? v.label ?? v.value ?? 0, key);
+  return 0;
+}
+const DURATION_KEYS = ['duration','durationSeconds','duration_seconds','durationText','duration_text','lengthSeconds','length','durationMs','duration_ms','length_ms','time'];
+function getOfficialDuration(obj) {
+  if (!obj || typeof obj !== 'object') return 0;
+  for (const k of DURATION_KEYS) {
+    if (obj[k] == null || obj[k] === '') continue;
+    const s = toSeconds(obj[k], k);
+    if (s > 10) return s;
+  }
+  return 0;
+}
 
-function pickText(v) { if (!v) return ''; if (typeof v === 'string') return v; if (typeof v === 'object') return v.name || v.title || v.text || ''; return String(v); }
-const AVATAR_KEY = /avatar|artist.*(img|image|pic|photo|thumb)|author.*(img|image|pic|photo|thumb)|profile|pfp|picture|photo/i;
-function findAvatar(obj, depth = 0) {
-  if (!obj || typeof obj !== 'object' || depth > 4) return '';
-  for (const k of Object.keys(obj)) { const v = obj[k]; if (typeof v === 'string' && /^https?:\/\//.test(v) && AVATAR_KEY.test(k)) return v; }
-  for (const k of Object.keys(obj)) { const v = obj[k]; if (v && typeof v === 'object') { const r = findAvatar(v, depth + 1); if (r) return r; } }
+/* deep search helpers */
+function deepFind(obj, test, depth = 0) {
+  if (!obj || typeof obj !== 'object' || depth > 6) return undefined;
+  for (const k of Object.keys(obj)) { const hit = test(k, obj[k]); if (hit !== undefined) return hit; }
+  for (const k of Object.keys(obj)) {
+    const v = obj[k];
+    if (v && typeof v === 'object') { const r = deepFind(v, test, depth + 1); if (r !== undefined) return r; }
+  }
+  return undefined;
+}
+function pickUrl(v, depth = 0) {
+  if (!v || depth > 4) return '';
+  if (typeof v === 'string') return /^https?:\/\//.test(v) ? v : '';
+  if (Array.isArray(v)) { for (const x of v) { const u = pickUrl(x, depth + 1); if (u) return u; } return ''; }
+  if (typeof v === 'object') {
+    for (const k of ['url','src','uri','url_list','urlList','link','value','origin','medium','thumb']) {
+      if (v[k] !== undefined) { const u = pickUrl(v[k], depth + 1); if (u) return u; }
+    }
+  }
   return '';
+}
+const AVATAR_KEY = /avatar|profile.?pic|pfp|headimg|head_img|user.?pic|author.?(pic|img|image|thumb)|artist.?(pic|img|image|thumb)|uploader.?(pic|img|image|thumb)|creator.?(pic|img|image|thumb)|owner.?(pic|img|image|thumb)/i;
+function findAvatar(obj) {
+  return deepFind(obj, (k, v) => AVATAR_KEY.test(k) ? (pickUrl(v) || undefined) : undefined) || '';
 }
 function findCover(obj) {
   if (!obj) return '';
-  if (typeof obj.thumbnail === 'string' && obj.thumbnail) return obj.thumbnail;
-  if (typeof obj.thumbnail === 'object' && obj.thumbnail) return obj.thumbnail.url || '';
-  if (typeof obj.cover === 'string') return obj.cover;
-  if (typeof obj.image === 'string') return obj.image;
-  return '';
+  const direct = pickUrl(obj.thumbnail) || pickUrl(obj.cover) || pickUrl(obj.image) || pickUrl(obj.poster);
+  if (direct) return direct;
+  return deepFind(obj, (k, v) => /^(thumbnail|thumb|cover|image|poster|origin_cover|dynamic_cover)$/i.test(k) ? (pickUrl(v) || undefined) : undefined) || '';
 }
-function fmtNum(n) { n = Number(n) || 0; if (n >= 1e9) return (n/1e9).toFixed(1) + 'B'; if (n >= 1e6) return (n/1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n/1e3).toFixed(1) + 'K'; return String(n); }
-
-const ICON_USER = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7"/></svg>';
-
+const STAT_KEYS = {
+  views: /^(views?|view_?count|play_?count|plays?)$/i,
+  likes: /^(likes?|like_?count|digg_?count|favou?rite_?count|heart_?count)$/i,
+  comments: /^(comments?|comment_?count)$/i,
+  shares: /^(shares?|share_?count)$/i
+};
+function findStat(obj, re) {
+  return deepFind(obj, (k, v) => {
+    if (!re.test(k)) return undefined;
+    if (typeof v === 'string' && v.trim() !== '' && !isNaN(v)) return Number(v);
+    if (typeof v === 'number' && isFinite(v) && v >= 0) return v;
+    return undefined;
+  });
+}
+function pickText(v) {
+  if (!v) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'object') return v.name || v.nickname || v.title || v.text || v.unique_id || '';
+  return String(v);
+}
 function dedupeMedia(list) {
-  const seenUrl = new Set(); const seenKey = new Set(); const out = [];
+  const seenUrl = new Set(), seenKey = new Set(), out = [];
   for (const m of list) {
     if (!m || !m.url || seenUrl.has(m.url)) continue;
-    const key = [(m.type || ''), (m.is_audio ? 'a' : 'v'), (m.quality || ''), (m.extension || '')].join('|');
+    const key = [m.type || '', m.is_audio ? 'a' : 'v', m.quality || '', m.extension || ''].join('|');
     if (seenKey.has(key)) continue;
     seenUrl.add(m.url); seenKey.add(key); out.push(m);
   }
   return out;
 }
 
-function downloadRow(m, i, baseName) {
-  const isA = !!m.is_audio; const isI = m.type === 'image';
+/* avatar / image fallback: kalau gambar gagal, tampilkan inisial */
+function bindImgFallback(root) {
+  root.querySelectorAll('img[data-letter]').forEach(img => {
+    img.addEventListener('error', () => {
+      const span = document.createElement('span');
+      span.textContent = img.dataset.letter || '?';
+      img.replaceWith(span);
+    }, { once: true });
+  });
+}
+
+/* ---------- TABS ---------- */
+const tabs = document.querySelectorAll('.tab'), panels = document.querySelectorAll('.panel');
+tabs.forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
+function showTab(name) {
+  tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === name));
+  panels.forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  if (name === 'status') loadStatus();
+}
+$('liveBtn').addEventListener('click', () => showTab('status'));
+
+/* ---------- DETECT ---------- */
+const PLATFORMS = [
+  { key: 'tiktok', re: /tiktok\.com|vt\.tiktok|vm\.tiktok/i, l: 'TikTok' },
+  { key: 'instagram', re: /instagram\.com|instagr\.am/i, l: 'Instagram' },
+  { key: 'youtube', re: /youtube\.com|youtu\.be/i, l: 'YouTube' },
+  { key: 'facebook', re: /facebook\.com|fb\.watch|fb\.com/i, l: 'Facebook' },
+  { key: 'twitter', re: /twitter\.com|x\.com/i, l: 'X' },
+  { key: 'spotify', re: /spotify\.com|spoti\.fi/i, l: 'Spotify' },
+  { key: 'soundcloud', re: /soundcloud\.com|snd\.sc/i, l: 'SoundCloud' },
+  { key: 'pinterest', re: /pinterest\.com|pin\.it/i, l: 'Pinterest' }
+];
+function detect(url) {
+  for (const p of PLATFORMS) if (p.re.test(url || '')) return p;
+  return { key: 'link', l: 'Tautan' };
+}
+const dlin = $('dlin'), dlpill = $('dlpill'), dlpilltext = $('dlpilltext'), dlgo = $('dlgo'), dlout = $('dlout');
+let raf = 0;
+dlin.addEventListener('input', () => {
+  cancelAnimationFrame(raf);
+  raf = requestAnimationFrame(() => {
+    const v = dlin.value.trim();
+    if (!v) { dlpill.classList.remove('show'); return; }
+    const p = detect(v);
+    dlpill.dataset.platform = p.key;
+    dlpilltext.textContent = p.l;
+    dlpill.classList.add('show');
+  });
+});
+dlgo.addEventListener('click', runDownload);
+dlin.addEventListener('keydown', e => { if (e.key === 'Enter') runDownload(); });
+
+/* ---------- RESULT ---------- */
+function downloadItem(m, i, base) {
+  const isA = !!m.is_audio, isI = m.type === 'image';
   const kind = isA ? 'audio' : (isI ? 'image' : 'video');
   const label = isA ? 'Audio' : (isI ? 'Gambar' : 'Video');
-  const quality = m.quality ? String(m.quality) : `${label} ${i + 1}`;
+  const name = m.quality ? String(m.quality).replace(/_/g, ' ') : `${label} ${i + 1}`;
   const ext = (m.extension || (isA ? 'mp3' : isI ? 'jpg' : 'mp4')).toLowerCase();
-  const fn = `${baseName}_${kind}_${i + 1}.${ext}`;
+  const fn = `${base}_${kind}_${i + 1}.${ext}`;
   return `<div class="dl-item">
-    <span class="dl-type ${kind}">${label}</span>
-    <div class="dl-info">
-      <div class="dl-name">${esc(quality)}</div>
-      <div class="dl-ext">.${esc(ext.toUpperCase())}</div>
-    </div>
-    <button class="b" data-dl="${esc(m.url)}" data-fn="${esc(fn)}">Download</button>
+    <div class="dl-top"><span class="dl-type ${kind}">${label}</span><span class="dl-ext">.${esc(ext.toUpperCase())}</span></div>
+    <div class="dl-name">${esc(name)}</div>
+    <button class="b" type="button" data-dl="${esc(m.url)}" data-fn="${esc(fn)}">Download</button>
   </div>`;
 }
 
-function buildGenericCard(data, det, src, medias) {
+function buildCard(data, det, medias) {
+  const title = data.title || 'Tanpa judul';
+  const author = pickText(data.author) || pickText(data.artist) || pickText(data.artist_name) || '';
   const cover = findCover(data);
   const avatar = findAvatar(data);
-  const author = pickText(data.author) || pickText(data.artist) || '';
-  const title = data.title || 'Tanpa Judul';
-  const baseName = (title || 'media').replace(/[^a-z0-9]+/gi, '_').slice(0, 50) || 'media';
+  const dur = getOfficialDuration(data);
+  const base = safeName(title);
+  const letter = (author || '?').trim().charAt(0).toUpperCase() || '?';
   const videos = medias.filter(m => !m.is_audio && m.type !== 'image');
   const audios = medias.filter(m => m.is_audio);
   const images = medias.filter(m => m.type === 'image');
-  const dur = getOfficialDuration(data);
 
-  let mediaHtml = '';
+  const stats = [
+    ['Views', findStat(data, STAT_KEYS.views)],
+    ['Suka', findStat(data, STAT_KEYS.likes)],
+    ['Komentar', findStat(data, STAT_KEYS.comments)],
+    ['Dibagikan', findStat(data, STAT_KEYS.shares)]
+  ].filter(s => s[1] !== undefined);
+
+  let media = '';
   if (videos.length) {
-    mediaHtml = `<div class="media"><span class="media-tag">Preview Video</span><video controls playsinline preload="metadata" ${cover ? `poster="${esc(cover)}"` : ''} src="${esc(videos[0].url)}"></video></div>`;
+    media = `<div class="media"><span class="media-tag">Pratinjau</span><video controls playsinline preload="metadata"${cover ? ` poster="${esc(cover)}"` : ''} src="${esc(videos[0].url)}"></video></div>`;
   } else if (audios.length) {
-    mediaHtml = `<div class="media media-audio"><div class="media-audio-head">${cover ? `<img src="${esc(cover)}" referrerpolicy="no-referrer" alt="">` : ''}<div class="dl-info"><div class="dl-name">${esc(title)}</div><div class="dl-ext">${esc(author)}</div></div></div><audio controls preload="metadata" src="${esc(audios[0].url)}"></audio></div>`;
+    media = `<div class="audio-box">
+      <div class="audio-head">${cover ? `<img src="${esc(cover)}" referrerpolicy="no-referrer" alt="">` : ''}<div class="creator-info"><div class="creator-name">${esc(title)}</div><div class="creator-label">${esc(author)}</div></div></div>
+      <audio controls preload="metadata" src="${esc(audios[0].url)}"></audio></div>`;
   } else if (cover) {
-    mediaHtml = `<div class="media"><img class="media-img" src="${esc(cover)}" referrerpolicy="no-referrer" alt=""></div>`;
+    media = `<div class="media"><img src="${esc(cover)}" referrerpolicy="no-referrer" alt=""></div>`;
   }
 
-  const creatorHtml = (author || avatar) ? `
-    <div class="creator">
-      <div class="creator-avatar">${avatar ? `<img src="${esc(avatar)}" referrerpolicy="no-referrer" alt="">` : ICON_USER}</div>
-      <div class="creator-info">
-        <div class="creator-name">${esc(author || 'Tanpa Nama')}</div>
-        <div class="creator-label">${esc(det.l)} Creator</div>
-      </div>
-    </div>` : '';
-
-  const chips = [
-    `<span class="chip mint">${esc(det.l)}</span>`,
-    dur ? `<span class="chip">${formatTime(dur)}</span>` : '',
-    `<span class="chip">${medias.length} file</span>`
-  ].join('');
-
+  let idx = 0;
   const groups = [
     { label: 'Video', items: videos }, { label: 'Audio', items: audios }, { label: 'Gambar', items: images }
   ].filter(g => g.items.length);
-  let idx = 0;
-  const dlHtml = groups.map(g => `
-    <div class="dl-section">
-      <div class="dl-heading">${g.label} (${g.items.length})</div>
-      <div class="dl-list">${g.items.map(m => downloadRow(m, idx++, baseName)).join('')}</div>
+  const groupsHtml = groups.map(g => `
+    <div class="dl-group">
+      <div class="dl-heading">${g.label} <b>${g.items.length}</b></div>
+      <div class="dl-grid">${g.items.map(m => { idx++; return downloadItem(m, idx, base); }).join('')}</div>
     </div>`).join('');
 
   return `
-    <div class="card">
-      <div class="card-bar"><span>Media Result</span><span class="tag">${esc(det.l)}</span></div>
-      <div class="card-body">
-        ${creatorHtml}
-        ${mediaHtml}
-        <div class="title-block">
-          <div class="title-text">${esc(title)}</div>
-          <div class="chips">${chips}</div>
+  <div class="card">
+    <div class="card-bar"><span>Hasil</span><span class="tag">${esc(det.l)}</span></div>
+    <div class="card-body">
+      <div class="creator">
+        <div class="av">${avatar ? `<img src="${esc(avatar)}" referrerpolicy="no-referrer" alt="" data-letter="${esc(letter)}">` : esc(letter)}</div>
+        <div class="creator-info">
+          <div class="creator-name">${esc(author || 'Tanpa nama')}</div>
+          <div class="creator-label">${esc(det.l)} Creator</div>
         </div>
-        ${dlHtml}
       </div>
-    </div>`;
+      ${stats.length ? `<div class="stats">${stats.map(s => `<div class="stat"><b>${fmtNum(s[1])}</b><span>${s[0]}</span></div>`).join('')}</div>` : ''}
+      ${media}
+      <div>
+        <div class="title-text">${esc(title)}</div>
+        <div class="chips">${dur ? `<span class="chip mint">${formatTime(dur)}</span>` : ''}<span class="chip">${medias.length} file</span></div>
+      </div>
+      ${groupsHtml}
+    </div>
+  </div>`;
 }
 
-function buildMusicCard(data, det, src, medias) {
-  const artist = pickText(data.author) || pickText(data.artist) || pickText(data.artist_name) || 'Unknown Artist';
-  const track = data.title || 'Tanpa Judul';
+function buildMusic(data, det, medias) {
+  const artist = pickText(data.author) || pickText(data.artist) || pickText(data.artist_name) || 'Artis tidak diketahui';
+  const track = data.title || 'Tanpa judul';
   const cover = findCover(data);
   const avatar = findAvatar(data);
   const dur = getOfficialDuration(data);
+  const base = safeName(track);
   const audios = medias.filter(m => m.is_audio && m.url);
   const prevA = audios[0] || medias.find(m => m.url);
-  const baseName = track.replace(/[^a-z0-9]+/gi, '_').slice(0, 50) || 'track';
-  const avatarImg = avatar
-    ? `<img src="${esc(avatar)}" referrerpolicy="no-referrer" alt="" data-fb="${esc(cover)}" onerror="this.onerror=null;if(this.dataset.fb){this.src=this.dataset.fb}else{this.remove()}">`
-    : (cover ? `<img src="${esc(cover)}" referrerpolicy="no-referrer" alt="">` : `<span>♪</span>`);
-  let idx = 0;
-  const rows = medias.map(m => downloadRow(m, idx++, baseName)).join('');
+  const letter = artist.charAt(0).toUpperCase() || '?';
+  const rows = medias.map((m, i) => downloadItem(m, i + 1, base)).join('');
+  const artImg = avatar || cover;
 
   return `
-    <div class="card">
-      <div class="card-bar"><span>Media Result</span><span class="tag">${esc(det.l)}</span></div>
-      <div class="sp-hero">
-        <div class="sp-avatar">${avatarImg}</div>
-        <div class="sp-hero-info">
-          <div class="sp-kicker">Artis</div>
-          <div class="sp-artist">${esc(artist)}</div>
-          <div class="sp-track">${esc(track)}</div>
+  <div class="card">
+    <div class="card-bar"><span>Hasil</span><span class="tag">${esc(det.l)}</span></div>
+    <div class="sp-hero">
+      <div class="sp-avatar">${artImg ? `<img src="${esc(artImg)}" referrerpolicy="no-referrer" alt="" data-letter="${esc(letter)}">` : esc(letter)}</div>
+      <div class="sp-hero-info">
+        <div class="sp-kicker">Artis</div>
+        <div class="sp-artist">${esc(artist)}</div>
+        <div class="sp-track">${esc(track)}</div>
+      </div>
+    </div>
+    <div class="sp-body">
+      <div class="sp-cover">${cover ? `<img src="${esc(cover)}" referrerpolicy="no-referrer" alt="">` : ''}</div>
+      <div>
+        <div class="sp-title">${esc(track)}</div>
+        <div class="chips">
+          <span class="chip mint">${esc(det.l)}</span>
+          ${dur ? `<span class="chip">${formatTime(dur)}</span>` : ''}
+          <span class="chip">${medias.length} file</span>
         </div>
       </div>
-      <div class="sp-body">
-        <div class="sp-cover">${cover ? `<img src="${esc(cover)}" referrerpolicy="no-referrer" alt="">` : ''}</div>
-        <div>
-          <div class="sp-title">${esc(track)}</div>
-          <div class="chips">
-            <span class="chip mint">${esc(det.l)}</span>
-            ${dur ? `<span class="chip">${formatTime(dur)}</span>` : ''}
-            <span class="chip">${medias.length} media</span>
-          </div>
-        </div>
-      </div>
-      <div class="sp-preview">
-        <div class="sp-preview-label">Preview</div>
-        ${prevA ? `<audio controls preload="metadata" src="${esc(prevA.url)}"></audio>` : `<div class="sp-empty">Preview tidak tersedia</div>`}
-      </div>
-      <div class="sp-dl"><div class="dl-list">${rows}</div></div>
-    </div>`;
+    </div>
+    <div class="sp-preview">
+      <div class="sp-preview-label">Pratinjau</div>
+      ${prevA ? `<audio controls preload="metadata" src="${esc(prevA.url)}"></audio>` : `<div class="sp-empty">Pratinjau tidak tersedia</div>`}
+    </div>
+    <div class="sp-dl"><div class="dl-grid">${rows}</div></div>
+  </div>`;
+}
+
+function bindDownload(root) {
+  root.querySelectorAll('[data-dl]').forEach(btn => {
+    btn.addEventListener('click', async e => {
+      e.preventDefault();
+      if (btn.disabled) return;
+      const url = btn.dataset.dl, fn = btn.dataset.fn || 'media';
+      const original = btn.textContent;
+      btn.innerHTML = '<span class="spin"></span>';
+      btn.disabled = true;
+      try {
+        const proxy = `/api/proxy?url=${encodeURIComponent(url)}&fn=${encodeURIComponent(fn)}`;
+        const check = await fetch(proxy, { method: 'HEAD' }).catch(() => null);
+        if (check && check.ok) {
+          const a = document.createElement('a');
+          a.href = proxy; a.download = fn;
+          document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        } else { throw new Error('proxy'); }
+        btn.textContent = 'Tersimpan';
+      } catch (err) {
+        window.open(url, '_blank');
+        btn.textContent = 'Dibuka';
+      } finally {
+        setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
+      }
+    });
+  });
 }
 
 async function runDownload() {
   const input = dlin.value.trim();
-  if (!input) { dlout.innerHTML = stErr('Tempel link dulu'); S.err(); return; }
-  dlout.innerHTML = stLoad('Memproses...');
+  if (!input) { dlout.innerHTML = `<div class="st err">Tempel tautan terlebih dahulu</div>`; return; }
+  dlout.innerHTML = `<div class="st"><span class="spin"></span><span>Memproses</span></div>`;
   dlgo.disabled = true;
   try {
     const data = await post('/api/download', { input });
@@ -701,27 +805,20 @@ async function runDownload() {
     const medias = dedupeMedia(data.medias || []);
     if (!medias.length) throw new Error('Tidak ada media tersedia');
     const det = detect(input);
-    const src = (data.source || '').toUpperCase();
     const isMusic = det.key === 'spotify' || det.key === 'soundcloud';
-    dlout.innerHTML = isMusic ? buildMusicCard(data, det, src, medias) : buildGenericCard(data, det, src, medias);
+    dlout.innerHTML = isMusic ? buildMusic(data, det, medias) : buildCard(data, det, medias);
+    bindImgFallback(dlout);
     bindDownload(dlout);
-    S.ok();
   } catch (err) {
-    dlout.innerHTML = stErr(err.message);
-    S.err();
+    dlout.innerHTML = `<div class="st err">${esc(err.message)}</div>`;
   } finally {
     dlgo.disabled = false;
   }
 }
 
-/* STATUS PAGE */
+/* ---------- STATUS (TIDAK DIUBAH) ---------- */
 let statusLoaded = false;
-const statusHero = $('statusHero');
-const statusGrid = $('statusGrid');
-const refreshBtn = $('refreshBtn');
-const liveBtn = $('liveBtn');
-const liveText = $('liveText');
-
+const statusHero = $('statusHero'), statusGrid = $('statusGrid'), refreshBtn = $('refreshBtn'), liveBtn = $('liveBtn'), liveText = $('liveText');
 const SVG_ATTR = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
 const SVC_ICON = {
   jerexd: `<svg ${SVG_ATTR}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
@@ -730,19 +827,16 @@ const SVC_ICON = {
   downr: `<svg ${SVG_ATTR}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>`
 };
 const SVC_ICON_FALLBACK = `<svg ${SVG_ATTR}><path d="M3 12h4l2-8 4 16 2-8h4"/></svg>`;
-
 function latencyGrade(lat, down) {
   if (down) return { cls: 'offline', text: 'Offline' };
   if (lat <= 1000) return { cls: 'fast', text: 'Cepat' };
   if (lat <= 3000) return { cls: 'mid', text: 'Sedang' };
   return { cls: 'slow', text: 'Lambat' };
 }
-
 function renderStatusSkeleton() {
   statusHero.innerHTML = `<div class="sh"><div class="sh-head"><div><div class="sh-badge checking"><span class="sh-dot"></span>Memeriksa</div><div class="sh-title">System Health</div><div class="sh-sub">Menghubungi semua server...</div></div></div></div>`;
   statusGrid.innerHTML = `<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div>`;
 }
-
 async function loadStatus(showLoader = true) {
   if (showLoader) {
     refreshBtn.disabled = true;
@@ -756,11 +850,9 @@ async function loadStatus(showLoader = true) {
     const data = await r.json();
     if (!data.status) throw new Error('Gagal cek status');
     statusLoaded = true;
-
     const overall = data.overall || 'degraded';
     const overallText = { healthy: 'Semua Sistem Normal', degraded: 'Beberapa Layanan Terganggu', critical: 'Semua Layanan Down' }[overall] || 'Status Tidak Diketahui';
     const checkedAt = data.checked_at ? new Date(data.checked_at).toLocaleTimeString('id-ID') : '-';
-
     statusHero.innerHTML = `
       <div class="sh">
         <div class="sh-head">
@@ -776,7 +868,6 @@ async function loadStatus(showLoader = true) {
         </div>
         <div class="segbar">${data.services.map(s => `<span class="seg ${s.status === 'online' ? 'online' : 'down'}" title="${esc(s.name)}"></span>`).join('')}</div>
       </div>`;
-
     statusGrid.innerHTML = data.services.map(s => {
       const down = s.status !== 'online';
       const lat = down ? 0 : Number(s.latency) || 0;
@@ -800,7 +891,6 @@ async function loadStatus(showLoader = true) {
           <div class="bar"><div class="bar-fill ${grade.cls}" style="width:${pct}%"></div></div>
         </article>`;
     }).join('');
-
     liveBtn.classList.remove('checking', 'degraded', 'critical');
     if (overall === 'healthy') liveText.textContent = 'Online';
     else if (overall === 'degraded') { liveBtn.classList.add('degraded'); liveText.textContent = 'Degraded'; }
@@ -816,246 +906,243 @@ async function loadStatus(showLoader = true) {
     liveBtn.classList.remove('checking');
   }
 }
-
 refreshBtn.addEventListener('click', () => loadStatus(true));
-liveBtn.addEventListener('click', () => {
-  tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === 'status'));
-  panels.forEach(p => p.classList.toggle('active', p.id === 'panel-status'));
-  loadStatus(true);
-});
-window.addEventListener('load', () => { setTimeout(() => loadStatus(false), 800); });
+window.addEventListener('load', () => setTimeout(() => loadStatus(false), 800));
 
-/* MUSIC & PLAYER */
-const audio = $('audioPlayer');
-const musicPanel = $('musicPanel');
-const musicFab = $('musicFab');
-const progressInput = $('mpProgressInput');
-const progressFill = $('mpProgressFill');
-const timeCurrent = $('mpTimeCurrent');
-const timeDuration = $('mpTimeDuration');
-
-let currentSong = null;
-let currentPlaylist = [];
-let currentPlayIndex = -1;
-let searchResults = [];
-let listCache = { favorit: [], playlist: [] };
-let currentLyricsLines = [];
-let lyricsSyncInterval = null;
-let officialDuration = 0;
-
+/* ---------- MUSIC ---------- */
+const audio = $('audioPlayer'), musicPanel = $('musicPanel'), musicFab = $('musicFab');
+const progressInput = $('mpProgressInput'), progressFill = $('mpProgressFill'), timeCurrent = $('mpTimeCurrent'), timeDuration = $('mpTimeDuration');
 const ICON_PLAY = '<path d="M8 5v14l11-7z"/>';
 const ICON_PAUSE = '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>';
-const ICON_LOADING = '<path d="M12 3a9 9 0 1 0 9 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>';
+const ICON_LOAD = '<path d="M12 3a9 9 0 1 0 9 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>';
+const ICON_HEART = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>';
+const ICON_PLUS = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>';
+const ICON_TRASH = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
 
-function setPlayIcon(html) { const el = $('mpPlayIcon'); if (el) el.innerHTML = html; }
-function toggleMusicPanel() { musicPanel.classList.toggle('show'); }
+let queue = [], qIdx = -1, results = [], lyricLines = [], lastLine = -1, officialDur = 0;
+const LS = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)) || []; } catch (e) { return []; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
 
-function switchTab(tabName) {
-  document.querySelectorAll('.mp-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.mp-tab-content').forEach(c => c.classList.remove('active'));
-  const tabIdx = { search: 0, lirik: 1, favorit: 2, playlist: 3 };
-  document.querySelectorAll('.mp-tab')[tabIdx[tabName]].classList.add('active');
-  $('tab-' + tabName).classList.add('active');
-  if (tabName === 'favorit') renderList('favorit');
-  if (tabName === 'playlist') renderList('playlist');
+$('musicFab').addEventListener('click', () => musicPanel.classList.toggle('show'));
+$('mpClose').addEventListener('click', () => musicPanel.classList.remove('show'));
+document.querySelectorAll('.mp-tab').forEach(t => t.addEventListener('click', () => mpTab(t.dataset.mp)));
+function mpTab(name) {
+  document.querySelectorAll('.mp-tab').forEach(t => t.classList.toggle('active', t.dataset.mp === name));
+  document.querySelectorAll('.mp-tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + name));
+  if (name === 'favorit') renderStore('fav_music', 'favoritResults');
+  if (name === 'playlist') renderStore('playlist_music', 'playlistResults');
 }
+function setPlayIcon(html) { $('mpPlayIcon').innerHTML = html; }
 
-function formatTime(sec) { if (!isFinite(sec) || sec <= 0) return '0:00'; const h = Math.floor(sec / 3600); const m = Math.floor((sec % 3600) / 60); const s = Math.floor(sec % 60).toString().padStart(2, '0'); return h > 0 ? `${h}:${m.toString().padStart(2, '0')}:${s}` : `${m}:${s}`; }
-function parseDurationString(t) { t = t.trim(); if (!t) return 0; if (/^\d+(\.\d+)?$/.test(t)) return Number(t); const iso = t.match(/^PT(?:(\d+(?:\.\d+)?)H)?(?:(\d+(?:\.\d+)?)M)?(?:(\d+(?:\.\d+)?)S)?$/i); if (iso) return (+iso[1] || 0) * 3600 + (+iso[2] || 0) * 60 + (+iso[3] || 0); if (/^\d+(:\d+){1,2}(\.\d+)?$/.test(t)) return t.split(':').reduce((acc, p) => acc * 60 + (parseFloat(p) || 0), 0); const h = t.match(/(\d+)\s*(h|hr|hour|jam)/i); const m = t.match(/(\d+)\s*(m|min|minute|menit)/i); const s = t.match(/(\d+)\s*(s|sec|second|detik)/i); if (h || m || s) return (h ? +h[1] * 3600 : 0) + (m ? +m[1] * 60 : 0) + (s ? +s[1] : 0); return 0; }
-function toSeconds(v, keyName = '') { if (v == null) return 0; if (typeof v === 'number') { if (!isFinite(v)) return 0; if (/ms|milli/i.test(keyName) || v > 100000) return v / 1000; return v; } if (typeof v === 'string') return parseDurationString(v); if (typeof v === 'object') { return toSeconds(v.seconds ?? v.totalSeconds ?? v.text ?? v.simpleText ?? v.label ?? v.value ?? 0, keyName); } return 0; }
-const DURATION_KEYS = ['duration', 'durationSeconds', 'duration_seconds', 'durationText', 'duration_text', 'lengthSeconds', 'length', 'durationMs', 'duration_ms', 'length_ms', 'time'];
-function getOfficialDuration(obj) { if (!obj || typeof obj !== 'object') return 0; for (const k of DURATION_KEYS) { if (obj[k] == null || obj[k] === '') continue; const sec = toSeconds(obj[k], k); if (sec > 10) return sec; } return 0; }
-function getDuration() { if (officialDuration > 10) return officialDuration; return isFinite(audio.duration) && audio.duration > 10 ? audio.duration : 0; }
-function updateProgress() { const dur = getDuration(); let cur = audio.currentTime || 0; if (dur > 0 && cur > dur) cur = dur; const pct = dur > 0 ? Math.min(100, (cur / dur) * 100) : 0; progressFill.style.width = pct + '%'; progressInput.value = pct; timeCurrent.textContent = formatTime(cur); timeDuration.textContent = dur > 0 ? formatTime(dur) : '0:00'; }
-
-function getStore(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch { return []; } }
-function setStore(key, val) { try { localStorage.setItem(key, JSON.stringify(val)); } catch {} }
-
-function togglePlaylistItem(e, index) { e.stopPropagation(); const song = searchResults[index]; if (!song) return; const btn = e.currentTarget; let pls = getStore('playlist_music'); const idx = pls.findIndex(s => s.videoId === song.videoId); if (idx > -1) { pls.splice(idx, 1); btn.classList.remove('active'); } else { pls.push(song); btn.classList.add('active'); } setStore('playlist_music', pls); if ($('tab-playlist').classList.contains('active')) renderList('playlist'); }
-
-function toggleFavoriteItem(e, index) {
-  e.stopPropagation();
-  const song = searchResults[index]; if (!song) return;
-  const btn = e.currentTarget;
-  let favs = getStore('fav_music');
-  const idx = favs.findIndex(s => s.videoId === song.videoId);
-  if (idx > -1) { favs.splice(idx, 1); btn.classList.remove('active'); btn.querySelector('svg').setAttribute('fill', 'none'); }
-  else { favs.push(song); btn.classList.add('active'); btn.querySelector('svg').setAttribute('fill', 'currentColor'); }
-  setStore('fav_music', favs);
-  if ($('tab-favorit').classList.contains('active')) renderList('favorit');
+function songRow(s, onclick, extra) {
+  const d = getOfficialDuration(s);
+  return `<div class="mp-item" onclick="${onclick}">
+    <img src="${esc(s.thumbnail || '')}" alt="" loading="lazy">
+    <div class="mp-item-info"><div class="mp-item-title">${esc(s.title || '')}</div><div class="mp-item-artist">${esc(s.artist || '')}</div></div>
+    <span class="duration">${d ? formatTime(d) : ''}</span>
+    ${extra || ''}
+  </div>`;
 }
-
-function renderList(type) {
-  const storeKey = type === 'favorit' ? 'fav_music' : 'playlist_music';
-  const containerId = type === 'favorit' ? 'favoritResults' : 'playlistResults';
-  const items = getStore(storeKey);
-  listCache[type] = items;
-  if (!items.length) { $(containerId).innerHTML = `<div class="tab-empty">Belum ada lagu di ${type}.</div>`; return; }
-  $(containerId).innerHTML = items.map((song, i) => { const d = getOfficialDuration(song); return `<div class="mp-item" onclick="playMusicFromList('${type}', ${i})"><img src="${esc(song.thumbnail)}" alt=""><div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div><span class="duration">${d ? formatTime(d) : ''}</span><button class="action-btn" onclick="removeFromList(event, '${type}', '${esc(song.videoId)}')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div>`; }).join('');
+function renderStore(key, paneId) {
+  const items = LS.get(key), el = $(paneId);
+  if (!items.length) { el.innerHTML = '<div class="empty">Belum ada lagu di sini.</div>'; return; }
+  el.innerHTML = items.map((s, i) => songRow(s, `playStore('${key}',${i})`,
+    `<button class="action-btn" type="button" onclick="event.stopPropagation();removeStore('${key}',${i})">${ICON_TRASH}</button>`)).join('');
 }
-
-function removeFromList(e, type, videoId) { e.stopPropagation(); const storeKey = type === 'favorit' ? 'fav_music' : 'playlist_music'; setStore(storeKey, getStore(storeKey).filter(s => s.videoId !== videoId)); renderList(type); }
-
-function sharePlaylist() { const pls = getStore('playlist_music'); if (!pls.length) return alert('Playlist masih kosong, tambahin lagu dulu!'); const dataStr = btoa(unescape(encodeURIComponent(JSON.stringify(pls)))); const shareUrl = `${window.location.origin}${window.location.pathname}?playlist=${dataStr}`; if (navigator.share) { navigator.share({ title: 'Playlist Saya', text: 'Dengerin playlist lagu favorit gw di Downloader AIO!', url: shareUrl }).catch(() => {}); } else { navigator.clipboard.writeText(shareUrl).then(() => { alert('Link Playlist berhasil dicopy! (Browser lu belum support share langsung)'); }).catch(() => prompt('Copy link ini secara manual:', shareUrl)); } }
-
-function checkImportedPlaylist() { const plData = new URLSearchParams(window.location.search).get('playlist'); if (!plData) return; try { const decoded = JSON.parse(decodeURIComponent(escape(atob(plData)))); if (Array.isArray(decoded) && decoded.length > 0) { if (confirm(`Mau import ${decoded.length} lagu dari playlist temen lu?`)) { setStore('playlist_music', decoded); window.history.replaceState({}, document.title, window.location.pathname); alert('Playlist berhasil di-import! Buka tab Playlist.'); } } } catch (e) { console.log('Gagal import playlist', e); } }
-window.addEventListener('load', checkImportedPlaylist);
+function removeStore(key, i) {
+  const items = LS.get(key); items.splice(i, 1); LS.set(key, items);
+  renderStore(key, key === 'fav_music' ? 'favoritResults' : 'playlistResults');
+}
+function playStore(key, i) { playSong(LS.get(key), i); }
 
 async function searchMusic() {
   const q = $('musicSearch').value.trim(); if (!q) return;
-  const resDiv = $('musicResults');
-  resDiv.innerHTML = `<div style="text-align:center;padding:10px"><span class="spin" style="width:14px;height:14px"></span></div>`;
+  const el = $('musicResults');
+  el.innerHTML = '<div class="empty"><span class="spin"></span></div>';
   try {
-    const r = await fetch(`/api/ytmusic?action=search&query=${encodeURIComponent(q)}`);
+    const r = await fetch('/api/ytmusic?action=search&query=' + encodeURIComponent(q));
     const d = await r.json();
     if (!d.status) throw new Error(d.message || 'Gagal mencari');
-    if (!d.result || !d.result.songs || !d.result.songs.length) throw new Error('Lagu tidak ditemukan');
-    searchResults = d.result.songs;
-    const plsStore = getStore('playlist_music');
-    const favStore = getStore('fav_music');
-    resDiv.innerHTML = searchResults.map((song, i) => {
-      const isPl = plsStore.some(s => s.videoId === song.videoId);
-      const isFav = favStore.some(s => s.videoId === song.videoId);
-      const d2 = getOfficialDuration(song);
-      return `<div class="mp-item" onclick="playMusicFromSearch(${i})">
-        <img src="${esc(song.thumbnail)}" loading="lazy" alt="">
-        <div class="mp-item-info"><div class="mp-item-title">${esc(song.title)}</div><div class="mp-item-artist">${esc(song.artist)}</div></div>
-        <span class="duration">${d2 ? formatTime(d2) : ''}</span>
-        <button class="action-btn ${isFav ? 'active' : ''}" onclick="toggleFavoriteItem(event, ${i})" title="Tambah ke Favorit">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="${isFav ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </button>
-        <button class="action-btn ${isPl ? 'active' : ''}" onclick="togglePlaylistItem(event, ${i})" title="Tambah ke Playlist">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        </button>
-      </div>`;
-    }).join('');
+    const songs = (d.result && d.result.songs) || [];
+    if (!songs.length) throw new Error('Lagu tidak ditemukan');
+    results = songs;
+    renderResults();
   } catch (e) {
-    resDiv.innerHTML = `<div style="text-align:center;color:var(--danger);font-size:12px;padding:10px">${esc(e.message)}</div>`;
+    el.innerHTML = `<div class="empty" style="color:var(--danger)">${esc(e.message)}</div>`;
   }
 }
+function renderResults() {
+  const fav = LS.get('fav_music'), pl = LS.get('playlist_music');
+  $('musicResults').innerHTML = results.map((s, i) => {
+    const isFav = fav.some(x => x.videoId === s.videoId);
+    const isPl = pl.some(x => x.videoId === s.videoId);
+    const extra = `<button class="action-btn ${isFav ? 'active' : ''}" type="button" title="Favorit" onclick="event.stopPropagation();toggleFav(${i})">${ICON_HEART}</button>
+      <button class="action-btn ${isPl ? 'active' : ''}" type="button" title="Playlist" onclick="event.stopPropagation();togglePl(${i})">${ICON_PLUS}</button>`;
+    return songRow(s, `playResult(${i})`, extra);
+  }).join('');
+}
+function toggleFav(i) {
+  const s = results[i]; if (!s) return;
+  let f = LS.get('fav_music');
+  const idx = f.findIndex(x => x.videoId === s.videoId);
+  if (idx > -1) f.splice(idx, 1); else f.push(s);
+  LS.set('fav_music', f); renderResults();
+}
+function togglePl(i) {
+  const s = results[i]; if (!s) return;
+  let p = LS.get('playlist_music');
+  const idx = p.findIndex(x => x.videoId === s.videoId);
+  if (idx > -1) p.splice(idx, 1); else p.push(s);
+  LS.set('playlist_music', p); renderResults();
+}
+function playResult(i) { playSong(results, i); }
 
-function playMusicFromSearch(i) { playMusicSong(searchResults[i], searchResults, i); }
-function playMusicFromList(type, i) { const list = listCache[type] || []; playMusicSong(list[i], list, i); }
+$('musicSearchBtn').addEventListener('click', searchMusic);
+$('musicSearch').addEventListener('keydown', e => { if (e.key === 'Enter') searchMusic(); });
+$('shareBtn').addEventListener('click', () => {
+  const pls = LS.get('playlist_music');
+  if (!pls.length) return alert('Playlist masih kosong');
+  const data = btoa(unescape(encodeURIComponent(JSON.stringify(pls))));
+  const url = `${location.origin}${location.pathname}?playlist=${data}`;
+  if (navigator.share) navigator.share({ title: 'Playlist', url }).catch(() => {});
+  else navigator.clipboard.writeText(url).then(() => alert('Link playlist disalin')).catch(() => prompt('Salin link ini:', url));
+});
+(function importPlaylist() {
+  const p = new URLSearchParams(location.search).get('playlist');
+  if (!p) return;
+  try {
+    const arr = JSON.parse(decodeURIComponent(escape(atob(p))));
+    if (Array.isArray(arr) && arr.length && confirm(`Impor ${arr.length} lagu ke playlist?`)) {
+      LS.set('playlist_music', arr);
+      history.replaceState({}, document.title, location.pathname);
+    }
+  } catch (e) {}
+})();
 
-async function playMusicSong(song, list, index) {
-  if (!song) return;
-  currentSong = song;
-  currentPlaylist = list && list.length ? list : [song];
-  currentPlayIndex = index != null ? index : currentPlaylist.indexOf(song);
-  officialDuration = getOfficialDuration(song);
-  $('mpNowTitle').textContent = song.title;
-  $('mpNowArtist').textContent = song.artist;
-  $('mpNowCover').src = song.thumbnail || '';
+function getDuration() {
+  if (officialDur > 10) return officialDur;
+  return (isFinite(audio.duration) && audio.duration > 10) ? audio.duration : 0;
+}
+function updateProgress() {
+  const dur = getDuration();
+  let cur = audio.currentTime || 0;
+  if (dur > 0 && cur > dur) cur = dur;
+  const pct = dur > 0 ? Math.min(100, cur / dur * 100) : 0;
+  progressFill.style.width = pct + '%';
+  progressInput.value = pct;
+  timeCurrent.textContent = formatTime(cur);
+  if (dur > 0) timeDuration.textContent = formatTime(dur);
+}
+progressInput.addEventListener('input', e => {
+  const dur = getDuration(); if (!dur) return;
+  const t = parseFloat(e.target.value) / 100 * dur;
+  progressFill.style.width = e.target.value + '%';
+  timeCurrent.textContent = formatTime(t);
+  try { audio.currentTime = Math.min(t, audio.duration || t); } catch (err) {}
+});
+
+async function playSong(list, idx) {
+  const s = list && list[idx];
+  if (!s) return;
+  queue = list; qIdx = idx;
+  officialDur = getOfficialDuration(s);
+  $('mpNowCover').src = s.thumbnail || '';
+  $('mpNowTitle').textContent = s.title || '';
+  $('mpNowArtist').textContent = s.artist || '';
   $('musicPlayerControl').classList.add('show');
-  audio.pause();
-  musicFab.classList.remove('playing');
-  musicPanel.classList.remove('playing');
-  setPlayIcon(ICON_LOADING);
   progressFill.style.width = '0%';
   progressInput.value = 0;
   timeCurrent.textContent = '0:00';
-  timeDuration.textContent = officialDuration ? formatTime(officialDuration) : '0:00';
-  switchTab('lirik');
-  fetchLyrics(song);
+  timeDuration.textContent = officialDur ? formatTime(officialDur) : '0:00';
+  setPlayIcon(ICON_LOAD);
+  mpTab('lirik');
+  fetchLyrics(s);
   try {
-    const r = await fetch('/api/ytmusic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'play', videoId: song.videoId }) });
+    const r = await fetch('/api/ytmusic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'play', videoId: s.videoId }) });
     const d = await r.json();
-    const audioUrl = d && d.result && d.result.download && d.result.download.audio;
-    if (!d.status || !audioUrl) throw new Error('Link audio tidak ditemukan');
-    if (!officialDuration) officialDuration = getOfficialDuration(d.result);
-    audio.src = `/api/proxy?url=${encodeURIComponent(audioUrl)}&fn=audio.m4a`;
+    const url = d && d.result && d.result.download && d.result.download.audio;
+    if (!d.status || !url) throw new Error('Link audio tidak ditemukan');
+    if (!officialDur) officialDur = getOfficialDuration(d.result);
+    timeDuration.textContent = officialDur ? formatTime(officialDur) : '0:00';
+    audio.src = '/api/proxy?url=' + encodeURIComponent(url) + '&fn=audio.m4a';
     audio.load();
-    updateProgress();
-    setupMediaSession(song);
+    setupMediaSession(s);
     await audio.play();
   } catch (e) {
-    if (e.name === 'AbortError' || e.name === 'NotAllowedError') { setPlayIcon(ICON_PLAY); return; }
-    console.error(e);
     setPlayIcon(ICON_PLAY);
-    alert('Gagal: ' + e.message);
+    if (e.name !== 'AbortError' && e.name !== 'NotAllowedError') alert('Gagal memutar: ' + e.message);
   }
 }
-
-function setupMediaSession(song) { if (!('mediaSession' in navigator)) return; try { navigator.mediaSession.metadata = new MediaMetadata({ title: song.title, artist: song.artist, album: 'Downloader AIO', artwork: song.thumbnail ? [{ src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' }] : [] }); navigator.mediaSession.setActionHandler('play', () => audio.play()); navigator.mediaSession.setActionHandler('pause', () => audio.pause()); navigator.mediaSession.setActionHandler('previoustrack', playPrev); navigator.mediaSession.setActionHandler('nexttrack', playNext); } catch {} }
-
-audio.addEventListener('timeupdate', updateProgress);
+function setupMediaSession(s) {
+  if (!('mediaSession' in navigator)) return;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: s.title || '', artist: s.artist || '', album: 'Downloader AIO',
+      artwork: s.thumbnail ? [{ src: s.thumbnail, sizes: '512x512', type: 'image/jpeg' }] : []
+    });
+    navigator.mediaSession.setActionHandler('play', () => audio.play());
+    navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+    navigator.mediaSession.setActionHandler('previoustrack', prevTrack);
+    navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
+  } catch (e) {}
+}
+audio.addEventListener('timeupdate', () => { updateProgress(); syncLyrics(); });
 audio.addEventListener('loadedmetadata', updateProgress);
 audio.addEventListener('durationchange', updateProgress);
-audio.addEventListener('play', () => { musicFab.classList.add('playing'); musicPanel.classList.add('playing'); setPlayIcon(ICON_PAUSE); });
-audio.addEventListener('pause', () => { musicFab.classList.remove('playing'); musicPanel.classList.remove('playing'); setPlayIcon(ICON_PLAY); });
-audio.addEventListener('ended', playNext);
-audio.addEventListener('error', () => { if (!audio.getAttribute('src')) return; console.error('Audio error', audio.error); setPlayIcon(ICON_PLAY); });
+audio.addEventListener('play', () => { setPlayIcon(ICON_PAUSE); musicFab.classList.add('playing'); });
+audio.addEventListener('pause', () => { setPlayIcon(ICON_PLAY); musicFab.classList.remove('playing'); });
+audio.addEventListener('ended', nextTrack);
 
-function togglePlay() { if (!audio.getAttribute('src')) return; if (audio.paused) audio.play().catch(() => setPlayIcon(ICON_PLAY)); else audio.pause(); }
-function playNext() { if (currentPlayIndex < currentPlaylist.length - 1) { const i = currentPlayIndex + 1; playMusicSong(currentPlaylist[i], currentPlaylist, i); } }
-function playPrev() { if (currentPlayIndex > 0) { const i = currentPlayIndex - 1; playMusicSong(currentPlaylist[i], currentPlaylist, i); } }
+function togglePlay() {
+  if (!audio.getAttribute('src')) return;
+  if (audio.paused) audio.play().catch(() => setPlayIcon(ICON_PLAY));
+  else audio.pause();
+}
+function nextTrack() { if (qIdx < queue.length - 1) playSong(queue, qIdx + 1); }
+function prevTrack() { if (qIdx > 0) playSong(queue, qIdx - 1); }
+$('mpPlayBtn').addEventListener('click', togglePlay);
+$('btnNext').addEventListener('click', nextTrack);
+$('btnPrev').addEventListener('click', prevTrack);
 
-progressInput.addEventListener('input', (e) => { const dur = getDuration(); if (!dur) return; const pct = parseFloat(e.target.value); const newTime = (pct / 100) * dur; progressFill.style.width = pct + '%'; timeCurrent.textContent = formatTime(newTime); try { audio.currentTime = Math.min(newTime, audio.duration || newTime); } catch {} });
-
-async function fetchLyrics(song) {
-  currentLyricsLines = [];
-  const container = $('lyricsContent');
-  container.innerHTML = "<span class='spin'></span> Mencari lirik...";
+async function fetchLyrics(s) {
+  lyricLines = []; lastLine = -1;
+  const el = $('lyricsContent');
+  el.innerHTML = '<div class="empty"><span class="spin"></span></div>';
   try {
-    const r = await fetch(`/api/lirik?videoId=${encodeURIComponent(song.videoId)}&title=${encodeURIComponent(song.title)}&artist=${encodeURIComponent(song.artist)}`);
+    const r = await fetch(`/api/lirik?videoId=${encodeURIComponent(s.videoId)}&title=${encodeURIComponent(s.title || '')}&artist=${encodeURIComponent(s.artist || '')}`);
     const d = await r.json();
-    if (d.status && d.result && d.result.lyrics && d.result.lyrics.lines) currentLyricsLines = d.result.lyrics.lines;
-    else if (d.status && d.lyrics) currentLyricsLines = d.lyrics;
-  } catch (e) { console.log('Gagal ambil lirik', e); }
-  if (currentLyricsLines && currentLyricsLines.length) {
-    container.innerHTML = currentLyricsLines.map((line, i) => { const text = line.text || line; const time = line.time || 0; return `<div class="lyric-line" id="lyr-${i}" data-time="${time}">${esc(text)}</div>`; }).join('');
-    startLyricsSync();
-  } else {
-    container.innerHTML = "<div style='color:var(--danger)'>Lirik tidak ditemukan untuk lagu ini.</div>";
-  }
+    const raw = (d && d.result && d.result.lyrics && d.result.lyrics.lines) || (d && d.lyrics) || [];
+    lyricLines = raw.map(l => ({ text: typeof l === 'string' ? l : (l.text || ''), time: Number(l.time) || 0 })).filter(l => l.text);
+  } catch (e) {}
+  if (!lyricLines.length) { el.innerHTML = '<div class="empty">Lirik tidak tersedia untuk lagu ini.</div>'; return; }
+  el.innerHTML = lyricLines.map((l, i) => `<div class="lyric-line" data-i="${i}">${esc(l.text)}</div>`).join('');
+}
+function syncLyrics() {
+  if (!lyricLines.length || !lyricLines.some(l => l.time > 0)) return;
+  const t = audio.currentTime || 0;
+  let a = -1;
+  for (let i = 0; i < lyricLines.length; i++) if (lyricLines[i].time <= t + 0.3) a = i;
+  if (a < 0 || a === lastLine) return;
+  lastLine = a;
+  document.querySelectorAll('.lyric-line').forEach(n => n.classList.toggle('active', Number(n.dataset.i) === a));
+  const node = document.querySelector(`.lyric-line[data-i="${a}"]`);
+  if (node) node.scrollIntoView({ block: 'center', behavior: 'smooth' });
 }
 
-function startLyricsSync() {
-  if (lyricsSyncInterval) clearInterval(lyricsSyncInterval);
-  lyricsSyncInterval = setInterval(() => {
-    if (!audio || audio.paused) return;
-    const t = audio.currentTime;
-    const lines = document.querySelectorAll('.lyric-line');
-    let activeIndex = -1;
-    lines.forEach((line, index) => { if (parseFloat(line.dataset.time) <= t + 0.5) activeIndex = index; });
-    lines.forEach(l => l.classList.remove('active'));
-    if (activeIndex !== -1) { const activeLine = document.getElementById(`lyr-${activeIndex}`); if (activeLine) { activeLine.classList.add('active'); activeLine.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
-  }, 500);
-}
-
-function bindDownload(root) {
-  root.querySelectorAll('[data-dl]').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault(); if (btn.disabled) return;
-      const url = btn.dataset.dl; const filename = btn.dataset.fn || 'media';
-      const original = btn.innerHTML;
-      btn.innerHTML = '<span class="spin" style="width:12px;height:12px;border-width:2px;border-top-color:transparent"></span>';
-      btn.disabled = true;
-      try {
-        const proxyUrl = `/api/proxy?url=${encodeURIComponent(url)}&fn=${encodeURIComponent(filename)}`;
-        const check = await fetch(proxyUrl, { method: 'HEAD' }).catch(() => null);
-        if (check && check.ok) {
-          const a = document.createElement('a'); a.href = proxyUrl; a.download = filename;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-          btn.innerHTML = '✓';
-        } else { throw new Error('Proxy timeout'); }
-      } catch (err) { window.open(url, '_blank'); btn.innerHTML = '✓'; }
-      finally { setTimeout(() => { btn.innerHTML = original; btn.disabled = false; }, 2200); }
-    });
-  });
-}
-
-(function bootLoader() {
-  const loader = $('loader'); const fill = $('ldFill'); const hint = $('ldHint');
-  const hints = ['MEMUAT SISTEM...', 'MENYIAPKAN API...', 'HAMPIR SIAP...'];
-  let pct = 0; let hi = 0;
-  const t1 = setInterval(() => {
-    pct = Math.min(pct + 12 + Math.random() * 10, 100);
+/* ---------- LOADER ---------- */
+(function boot() {
+  const loader = $('loader'), fill = $('ldFill');
+  let pct = 0;
+  const t = setInterval(() => {
+    pct = Math.min(pct + 14 + Math.random() * 12, 100);
     fill.style.width = pct + '%';
-    if (pct >= 40 && hi === 0) { hi = 1; hint.textContent = hints[1]; }
-    if (pct >= 75 && hi === 1) { hi = 2; hint.textContent = hints[2]; }
-    if (pct >= 100) { clearInterval(t1); setTimeout(() => { loader.classList.add('hide'); setTimeout(() => loader.remove(), 600); }, 300); }
-  }, 180);
+    if (pct >= 100) {
+      clearInterval(t);
+      setTimeout(() => { loader.classList.add('hide'); setTimeout(() => loader.remove(), 450); }, 200);
+    }
+  }, 140);
 })();
 </script>
 </body>
