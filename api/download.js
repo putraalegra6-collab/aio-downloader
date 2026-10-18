@@ -1,24 +1,29 @@
 const axios = require('axios');
 
-const JEREXD_BASE = 'https://api.jerexd.my.id/api/downloader/aiov2';
-const JEREXD_KEY = 's2tQZgBEIaX4t3K7';
+const AIO_BASE = 'https://api.jerexd.my.id/api/downloader/aiov2';
 const TIKWM_BASE = 'https://www.tikwm.com/api/';
+const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
 const isTikTok = (url) => /tiktok\.com/i.test(url);
+const toNum = (v) => {
+  if (v == null || v === '') return null;
+  const n = Number(String(v).replace(/,/g, ''));
+  return isFinite(n) ? n : null;
+};
 
-async function fromJerexd(value) {
-  const r = await axios.get(JEREXD_BASE, {
+async function fromAio(value) {
+  const r = await axios.get(AIO_BASE, {
     params: { apikey: JEREXD_KEY, url: value },
     timeout: 30000,
     headers: { 'User-Agent': UA, Accept: 'application/json' },
     validateStatus: () => true
   });
   const json = r.data;
-  if (!json || json.status !== true) {
-    throw new Error(json?.message || json?.error || 'Gagal memproses link dari server Jerexd');
+  if (!json || json.status !== true || !json.result) {
+    throw new Error(json?.error || json?.message || 'Gagal dari server AIO');
   }
-  return json;
+  return json.result;
 }
 
 async function fromTikWM(value) {
@@ -29,24 +34,22 @@ async function fromTikWM(value) {
     validateStatus: () => true
   });
   const json = r.data;
-  if (!json || json.code !== 0 || !json.data) {
-    throw new Error(json?.msg || 'Gagal dari TikWM');
-  }
+  if (!json || json.code !== 0 || !json.data) throw new Error(json?.msg || 'Gagal dari TikWM');
   return json.data;
 }
 
-function jerexdMedias(json) {
-  return (json.downloads || []).map((item) => {
-    const type = (item.type || '').toLowerCase();
-    const isAudio = type.includes('audio') || type.includes('mp3');
+function normMedias(list = []) {
+  return list.map((m) => {
+    const ext = String(m.extension || '').toLowerCase();
+    const isAudio = m.type === 'audio' || ['mp3', 'm4a', 'opus', 'aac', 'wav'].includes(ext);
     return {
       type: isAudio ? 'audio' : 'video',
-      quality: item.quality || item.type || 'Default',
-      extension: isAudio ? 'mp3' : 'mp4',
+      quality: m.quality || m.label || 'Default',
+      extension: ext || (isAudio ? 'mp3' : 'mp4'),
       is_audio: isAudio,
-      url: item.url
+      url: m.url
     };
-  }).filter(m => m.url);
+  }).filter((m) => m.url);
 }
 
 function tikwmMedias(d) {
@@ -72,44 +75,38 @@ module.exports = async (req, res) => {
   const value = String(input).trim();
 
   try {
-    // Untuk TikTok, panggil Jerexd dan TikWM bersamaan. Kalau salah satu gagal, yang lain tetap dipakai.
     const tiktok = isTikTok(value);
-    const [jx, tw] = await Promise.allSettled([
-      fromJerexd(value),
+    const [aio, tw] = await Promise.allSettled([
+      fromAio(value),
       tiktok ? fromTikWM(value) : Promise.resolve(null)
     ]);
 
-    if (jx.status === 'rejected' && (tw.status !== 'fulfilled' || !tw.value)) {
-      throw new Error(jx.reason?.message || 'Gagal memproses media');
-    }
-
-    const j = jx.status === 'fulfilled' ? jx.value : null;
+    const a = aio.status === 'fulfilled' ? aio.value : null;
     const t = tw.status === 'fulfilled' ? tw.value : null;
 
-    let medias = j ? jerexdMedias(j) : [];
+    let medias = a ? normMedias(a.medias) : [];
     if (!medias.length && t) medias = tikwmMedias(t);
-    if (!medias.length) throw new Error('Tidak ada link unduhan yang ditemukan');
+    if (!medias.length) {
+      throw new Error(aio.reason?.message || 'Tidak ada link unduhan yang ditemukan');
+    }
 
-    const authorName = t?.author?.nickname || j?.owner || j?.author || null;
-    const avatar = t?.author?.avatar || null;
-    const thumbnail = t?.cover || j?.thumbnail || null;
-
-    const stats = t ? {
-      views: t.play_count ?? null,
-      likes: t.digg_count ?? null,
-      comments: t.comment_count ?? null,
-      shares: t.share_count ?? null
-    } : null;
+    const stats = {
+      views: toNum(t?.play_count) ?? toNum(a?.viewCount),
+      likes: toNum(t?.digg_count),
+      comments: toNum(t?.comment_count),
+      shares: toNum(t?.share_count)
+    };
+    const hasStats = Object.values(stats).some((v) => v !== null);
 
     res.status(200).json({
       status: true,
-      source: t && j ? 'jerexd+tikwm' : (t ? 'tikwm' : 'jerexd'),
-      title: t?.title || j?.title || 'Media',
-      author: authorName,
-      author_avatar: avatar,
-      thumbnail,
-      duration: t?.duration ?? null,
-      stats,
+      source: a && t ? 'aiov2+tikwm' : (a ? 'aiov2' : 'tikwm'),
+      title: a?.title || t?.title || 'Media',
+      author: a?.author || t?.author?.nickname || null,
+      author_avatar: t?.author?.avatar || null,
+      thumbnail: t?.cover || a?.thumbnail || null,
+      duration: a?.duration ?? t?.duration ?? null,
+      stats: hasStats ? stats : null,
       url: value,
       medias
     });
