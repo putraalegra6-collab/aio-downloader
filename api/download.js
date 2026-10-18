@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const JEREXD_BASE = 'https://api.jerexd.my.id/api/downloader/aio';
+const JEREXD_BASE = 'https://api.jerexd.my.id/api/downloader/aiov2';
 const JEREXD_KEY = 's2tQZgBEIaX4t3K7';
 const TIKWM_BASE = 'https://www.tikwm.com/api/';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
