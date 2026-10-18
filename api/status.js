@@ -11,7 +11,7 @@ const SERVICES = [
     name: 'Jerexd AIO',
     label: 'Universal Downloader',
     check: async () => {
-      const r = await axios.get('https://api.jerexd.my.id/api/downloader/aiov2?apikey=s2tQZgBEIaX4t3K7&url=https%3A%2F%2Fvt.tiktok.com%2FZSXdPKPMx%2F', {
+      const r = await axios.get('https://api.jerexd.my.id/api/downloader/aiov2?apikey=s2tQZgBEIaX4t3K7&url=', {
         timeout: 15000,
         validateStatus: () => true,
         headers: { 'User-Agent': 'Mozilla/5.0' }
