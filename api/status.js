@@ -11,7 +11,7 @@ const SERVICES = [
     name: 'Jerexd AIO',
     label: 'Universal Downloader',
     check: async () => {
-      const r = await axios.get('https://api.jerexd.my.id/api/downloader/aio?apikey=9G1pUokhp_vkVh76&url=https://open.spotify.com/track/1xdp8tXLTGbPeUSEODP9N7', {
+      const r = await axios.get('https://api.jerexd.my.id/api/downloader/aio?apikey=s2tQZgBEIaX4t3K7&url=https://open.spotify.com/track/1xdp8tXLTGbPeUSEODP9N7', {
         timeout: 15000,
         validateStatus: () => true,
         headers: { 'User-Agent': 'Mozilla/5.0' }
