@@ -6,6 +6,7 @@
 const axios = require('axios');
 
 const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
+const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
 const SERVICES = [
   {
@@ -14,10 +15,10 @@ const SERVICES = [
     label: 'Universal Downloader',
     check: async () => {
       const r = await axios.get('https://api.jerexd.my.id/api/downloader/aiov2', {
-        params: { apikey: JEREXD_KEY, url: 'https://vt.tiktok.com/ZSXdPKPMx/' },
-        timeout: 15000,
+        params: { apikey: JEREXD_KEY, url: 'https://youtu.be/H2jX_cch8Ak' },
+        timeout: 20000,
         validateStatus: () => true,
-        headers: { 'User-Agent': 'Mozilla/5.0' }
+        headers: { 'User-Agent': UA }
       });
       return r.status === 200 && r.data && r.data.status === true;
     }
