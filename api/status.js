@@ -1,18 +1,17 @@
 /* ============================================================
    STATUS API — By Egaa
-   Cek kesehatan service dengan kategori
+   Cek: Jerexd, Tikwm, IZZ Music, Downr
    ============================================================ */
 
 const axios = require('axios');
 
 const SERVICES = [
   {
-    id: 'nexa',
-    name: 'Nexa AIO',
+    id: 'jerexd',
+    name: 'Jerexd AIO',
     label: 'Universal Downloader',
-    category: 'downloader',
     check: async () => {
-      const r = await axios.get('https://api.nexadev.my.id/api/aio?url=https://www.instagram.com/reel/DeB_9SaJ1Cs/', {
+      const r = await axios.get('https://api.jerexd.my.id/api/downloader/aio?apikey=9G1pUokhp_vkVh76&url=https://open.spotify.com/track/1xdp8tXLTGbPeUSEODP9N7', {
         timeout: 15000,
         validateStatus: () => true,
         headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -24,7 +23,6 @@ const SERVICES = [
     id: 'tikwm',
     name: 'TikWM',
     label: 'TikTok Backup',
-    category: 'downloader',
     check: async () => {
       const r = await axios.get('https://www.tikwm.com/api/?url=https://vt.tiktok.com/ZSXdPKPMx/', {
         timeout: 15000,
@@ -35,31 +33,30 @@ const SERVICES = [
     }
   },
   {
-    id: 'youtube-oembed',
-    name: 'YouTube',
-    label: 'Metadata Service',
-    category: 'search',
+    id: 'izz',
+    name: 'IZZ Music',
+    label: 'Music & Lyrics',
     check: async () => {
-      const r = await axios.get('https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&format=json', {
-        timeout: 10000,
-        validateStatus: () => true
+      const r = await axios.get('https://musicaly.maspaizz.web.id/api/search?query=test', {
+        timeout: 15000,
+        validateStatus: () => true,
+        headers: { 'User-Agent': 'Mozilla/5.0' }
       });
-      return r.status === 200;
+      return r.status === 200 && r.data && r.data.status === true;
     }
   },
   {
-    id: 'cnv',
-    name: 'YouTube Converter',
-    label: 'Download Service',
-    category: 'downloader',
+    id: 'downr',
+    name: 'Downr.org',
+    label: 'Backup Downloader',
     check: async () => {
       try {
-        const r = await axios.get('https://cnv.cx/v2/sanity/key?id=dQw4w9WgXcQ', {
+        const r = await axios.get('https://downr.org', {
           timeout: 10000,
           validateStatus: () => true,
           headers: { 'User-Agent': 'Mozilla/5.0' }
         });
-        return r.status === 200 && r.data && r.data.key;
+        return r.status >= 200 && r.status < 400;
       } catch { return false; }
     }
   }
@@ -79,7 +76,6 @@ module.exports = async (req, res) => {
         id: svc.id,
         name: svc.name,
         label: svc.label,
-        category: svc.category,
         status: ok ? 'online' : 'down',
         latency: Date.now() - start
       };
@@ -88,7 +84,6 @@ module.exports = async (req, res) => {
         id: svc.id,
         name: svc.name,
         label: svc.label,
-        category: svc.category,
         status: 'down',
         latency: Date.now() - start,
         error: err.message
@@ -99,8 +94,6 @@ module.exports = async (req, res) => {
   const online = results.filter(r => r.status === 'online').length;
   const total = results.length;
   const overall = online === total ? 'healthy' : online > 0 ? 'degraded' : 'critical';
-
-  // Average latency
   const avgLatency = Math.round(
     results.filter(r => r.status === 'online').reduce((s, r) => s + r.latency, 0) / Math.max(online, 1)
   );
