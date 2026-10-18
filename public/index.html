@@ -495,6 +495,9 @@ const esc = s => s == null ? '' : String(s).replace(/&/g,'&amp;').replace(/</g,'
 const safeName = s => (String(s || 'media').replace(/[^a-z0-9]+/gi, '_').slice(0, 50)) || 'media';
 const fmtNum = n => { n = Number(n) || 0; const f = (v, u) => v.toFixed(1).replace(/\.0$/, '') + u; if (n >= 1e9) return f(n/1e9,'B'); if (n >= 1e6) return f(n/1e6,'M'); if (n >= 1e3) return f(n/1e3,'K'); return String(n); };
 
+/* semua media (preview & download) lewat proxy supaya link SSE / CDN bisa diputar */
+const proxied = (url, fn) => `/api/proxy?url=${encodeURIComponent(url)}&fn=${encodeURIComponent(fn || 'media')}`;
+
 async function post(url, body) {
   const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const d = await r.json().catch(() => ({}));
@@ -703,11 +706,11 @@ function buildCard(data, det, medias) {
 
   let media = '';
   if (videos.length) {
-    media = `<div class="media"><span class="media-tag">Pratinjau</span><video controls playsinline preload="metadata"${cover ? ` poster="${esc(cover)}"` : ''} src="${esc(videos[0].url)}"></video></div>`;
+    media = `<div class="media"><span class="media-tag">Pratinjau</span><video controls playsinline preload="metadata"${cover ? ` poster="${esc(cover)}"` : ''} src="${esc(proxied(videos[0].url, 'preview.mp4'))}"></video></div>`;
   } else if (audios.length) {
     media = `<div class="audio-box">
       <div class="audio-head">${cover ? `<img src="${esc(cover)}" referrerpolicy="no-referrer" alt="">` : ''}<div class="creator-info"><div class="creator-name">${esc(title)}</div><div class="creator-label">${esc(author)}</div></div></div>
-      <audio controls preload="metadata" src="${esc(audios[0].url)}"></audio></div>`;
+      <audio controls preload="metadata" src="${esc(proxied(audios[0].url, 'preview.mp3'))}"></audio></div>`;
   } else if (cover) {
     media = `<div class="media"><img src="${esc(cover)}" referrerpolicy="no-referrer" alt=""></div>`;
   }
@@ -781,7 +784,7 @@ function buildMusic(data, det, medias) {
     </div>
     <div class="sp-preview">
       <div class="sp-preview-label">Pratinjau</div>
-      ${prevA ? `<audio controls preload="metadata" src="${esc(prevA.url)}"></audio>` : `<div class="sp-empty">Pratinjau tidak tersedia</div>`}
+      ${prevA ? `<audio controls preload="metadata" src="${esc(proxied(prevA.url, 'preview.mp3'))}"></audio>` : `<div class="sp-empty">Pratinjau tidak tersedia</div>`}
     </div>
     <div class="sp-dl"><div class="dl-grid">${rows}</div></div>
   </div>`;
@@ -797,11 +800,11 @@ function bindDownload(root) {
       btn.innerHTML = '<span class="spin"></span>';
       btn.disabled = true;
       try {
-        const proxy = `/api/proxy?url=${encodeURIComponent(url)}&fn=${encodeURIComponent(fn)}`;
-        const check = await fetch(proxy, { method: 'HEAD' }).catch(() => null);
+        const p = proxied(url, fn);
+        const check = await fetch(p, { method: 'HEAD' }).catch(() => null);
         if (check && check.ok) {
           const a = document.createElement('a');
-          a.href = proxy; a.download = fn;
+          a.href = p; a.download = fn;
           document.body.appendChild(a); a.click(); document.body.removeChild(a);
         } else { throw new Error('proxy'); }
         btn.textContent = 'Tersimpan';
