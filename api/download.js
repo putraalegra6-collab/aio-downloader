@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const JEREXD_BASE = 'https://api.jerexd.my.id/api/downloader/aio';
-const API_KEY = '9G1pUokhp_vkVh76';
+const API_KEY = 's2tQZgBEIaX4t3K7';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
 module.exports = async (req, res) => {
