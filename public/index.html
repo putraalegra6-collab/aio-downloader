@@ -162,7 +162,6 @@ body::before {
 .prev video { display: block; width: 100%; max-height: 400px; background: #000; }
 .prev-tag { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 5px 11px; background: var(--c-yellow); border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
 
-/* SPOTIFY / SOUNDCLOUD RESULT */
 .sp-hero { display: flex; align-items: center; gap: 18px; padding: 22px; background: linear-gradient(135deg, var(--c-mint), var(--c-teal)); border-bottom: var(--bw-thick) solid var(--ink); }
 .sp-avatar { width: 96px; height: 96px; border-radius: 50%; border: var(--bw-thick) solid var(--ink); background: var(--surface); overflow: hidden; flex-shrink: 0; display: grid; place-items: center; box-shadow: var(--sh-sm); color: var(--muted); }
 .sp-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -201,9 +200,12 @@ body::before {
 .b.dl { background: var(--ink); color: var(--surface); }
 .b.dl:hover { background: var(--c-coral); color: var(--ink); }
 
-/* STATUS PAGE (REDESIGN) */
-.sh-hero { position: relative; overflow: hidden; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 24px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+/* =========================================
+   STATUS PAGE (REDESIGN v3, TANPA EMOJI)
+   ========================================= */
+.sh-hero { position: relative; overflow: hidden; background: var(--surface); border: var(--bw-thick) solid var(--ink); box-shadow: var(--sh-lg); border-radius: var(--r-lg); padding: 24px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 22px; }
 .sh-hero::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, var(--ok) 0 33%, var(--c-yellow) 33% 66%, var(--c-coral) 66% 100%); }
+.sh-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .sh-left { min-width: 0; flex: 1; min-width: 220px; }
 .sh-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; background: var(--c-mint); margin-bottom: 12px; }
 .sh-badge.degraded { background: var(--c-yellow); }
@@ -214,35 +216,41 @@ body::before {
 .sh-badge.critical .sh-dot { background: #fff; }
 .sh-badge.checking .sh-dot { background: var(--muted); }
 .sh-left h2 { font-weight: 800; font-size: 26px; letter-spacing: -0.8px; line-height: 1.1; margin-bottom: 6px; }
-.sh-left p { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; }
+.sh-left p { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; line-height: 1.6; }
 .sh-stats { display: flex; gap: 12px; flex-wrap: wrap; }
-.sh-stat { min-width: 110px; padding: 14px 16px; background: var(--bg); border: 2.5px solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); display: flex; flex-direction: column; gap: 4px; }
-.sh-stat b { font-size: 24px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; }
+.sh-stat { min-width: 118px; padding: 14px 16px; background: var(--bg); border: 2.5px solid var(--ink); border-radius: var(--r); box-shadow: var(--sh-sm); display: flex; flex-direction: column; gap: 6px; }
+.sh-stat b { font-size: 24px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; white-space: nowrap; }
 .sh-stat span { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); }
-.segbar { display: flex; gap: 6px; width: 100%; margin-top: 4px; }
+.segbar { display: flex; gap: 6px; width: 100%; }
 .seg { flex: 1; height: 10px; border: 2px solid var(--ink); border-radius: 99px; background: var(--bg-2); }
 .seg.online { background: var(--ok); }
 .seg.down { background: var(--danger); }
 
 .status-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-.svc { position: relative; overflow: hidden; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); padding: 18px; display: flex; flex-direction: column; gap: 16px; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
+.svc { position: relative; overflow: hidden; background: var(--surface); border: var(--bw) solid var(--ink); box-shadow: var(--sh); border-radius: var(--r-lg); padding: 18px; display: flex; flex-direction: column; gap: 18px; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease); }
 .svc:hover { transform: translate(-3px,-3px); box-shadow: var(--sh-lg); }
 .svc-top { display: flex; align-items: center; gap: 12px; }
-.svc-ic { width: 46px; height: 46px; flex-shrink: 0; border: 2.5px solid var(--ink); border-radius: var(--r); display: grid; place-items: center; font-size: 20px; background: var(--c-mint); box-shadow: var(--sh-sm); }
+.svc-ic { width: 48px; height: 48px; flex-shrink: 0; border: 2.5px solid var(--ink); border-radius: var(--r); display: grid; place-items: center; background: var(--c-mint); box-shadow: var(--sh-sm); color: var(--ink); }
+.svc-ic svg { width: 22px; height: 22px; }
 .svc.down .svc-ic { background: var(--c-coral); }
 .svc-id { min-width: 0; flex: 1; }
 .svc-name { font-weight: 800; font-size: 15px; letter-spacing: -0.3px; line-height: 1.2; }
-.svc-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; margin-top: 2px; }
-.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; }
+.svc-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 600; color: var(--muted); letter-spacing: 0.4px; text-transform: uppercase; margin-top: 3px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 2px solid var(--ink); border-radius: 99px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; background: var(--c-mint); flex-shrink: 0; }
 .pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--ink); }
-.pill.online { background: var(--c-mint); }
 .pill.down { background: var(--danger); color: #fff; }
 .pill.down i { background: #fff; }
-.svc-bottom { display: flex; align-items: center; gap: 14px; }
-.svc-lat { display: flex; align-items: baseline; gap: 4px; min-width: 90px; }
-.svc-lat b { font-size: 24px; font-weight: 800; letter-spacing: -0.8px; line-height: 1; }
-.svc-lat small { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 700; color: var(--muted); }
-.bar { flex: 1; height: 10px; background: var(--bg-2); border: 2px solid var(--ink); border-radius: 99px; overflow: hidden; }
+.svc-metrics { display: flex; flex-direction: column; gap: 10px; }
+.svc-lat-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.svc-lat { display: flex; align-items: baseline; gap: 4px; }
+.svc-lat b { font-size: 28px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+.svc-lat small { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: var(--muted); }
+.grade { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 4px 8px; border: 2px solid var(--ink); border-radius: 6px; background: var(--bg); }
+.grade.fast { background: var(--ok); color: #fff; }
+.grade.mid { background: var(--c-yellow); }
+.grade.slow { background: var(--c-orange); }
+.grade.offline { background: var(--danger); color: #fff; }
+.bar { width: 100%; height: 10px; background: var(--bg-2); border: 2px solid var(--ink); border-radius: 99px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 99px; transition: width 0.6s var(--ease); }
 .bar-fill.fast { background: var(--ok); }
 .bar-fill.mid { background: var(--c-yellow); }
@@ -341,7 +349,8 @@ body::before {
   .sp-body { grid-template-columns: 1fr; padding: 16px; gap: 16px; } .sp-cover { max-width: 220px; margin: 0 auto; width: 100%; }
   .sp-title { font-size: 17px; text-align: center; } .chips { justify-content: center; }
   .sp-preview { margin: 0 16px 16px; } .sp-dl { padding: 0 16px 16px; }
-  .sh-hero { padding: 18px; } .sh-left h2 { font-size: 22px; } .sh-stat { min-width: 90px; flex: 1; }
+  .sh-hero { padding: 18px; } .sh-left h2 { font-size: 22px; } .sh-stat { min-width: 0; flex: 1; padding: 12px; } .sh-stat b { font-size: 20px; }
+  .sh-stats { width: 100%; }
   .status-list { grid-template-columns: 1fr; }
   .svc { padding: 16px; }
   .foot { padding: 14px 16px; font-size: 10px; }
@@ -402,6 +411,7 @@ body::before {
           </div>
           <button class="go" id="dlgo"><span>Proses</span><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
+        <div class="inp-hint"><span>Link yang didukung akan terdeteksi yaa</span></div>
       </div>
       <div class="result" id="dlout"></div>
     </section>
@@ -533,25 +543,15 @@ const dlgo = $('dlgo'); const dlout = $('dlout');
 dlgo.addEventListener('click', runDownload);
 dlin.addEventListener('keydown', (e) => { if (e.key === 'Enter') runDownload(); });
 
-/* Cari teks nama dari berbagai bentuk data (string atau objek) */
 function pickText(v) { if (!v) return ''; if (typeof v === 'string') return v; if (typeof v === 'object') return v.name || v.title || v.text || ''; return String(v); }
 
-/* Cari URL foto profil artis/author di seluruh objek respons (nama key mengandung avatar/image/pic/photo/profile) */
 const AVATAR_KEY = /avatar|artist.*(img|image|pic|photo|thumb)|author.*(img|image|pic|photo|thumb)|profile|pfp|picture|photo/i;
 function findAvatar(obj, depth = 0) {
   if (!obj || typeof obj !== 'object' || depth > 4) return '';
-  for (const k of Object.keys(obj)) {
-    const v = obj[k];
-    if (typeof v === 'string' && /^https?:\/\//.test(v) && AVATAR_KEY.test(k)) return v;
-  }
-  for (const k of Object.keys(obj)) {
-    const v = obj[k];
-    if (v && typeof v === 'object') { const r = findAvatar(v, depth + 1); if (r) return r; }
-  }
+  for (const k of Object.keys(obj)) { const v = obj[k]; if (typeof v === 'string' && /^https?:\/\//.test(v) && AVATAR_KEY.test(k)) return v; }
+  for (const k of Object.keys(obj)) { const v = obj[k]; if (v && typeof v === 'object') { const r = findAvatar(v, depth + 1); if (r) return r; } }
   return '';
 }
-
-/* Cari URL cover/thumbnail lagu */
 function findCover(obj) {
   if (!obj) return '';
   if (typeof obj.thumbnail === 'string' && obj.thumbnail) return obj.thumbnail;
@@ -593,7 +593,6 @@ async function runDownload() {
       const avatar = findAvatar(data);
       const dur = getOfficialDuration(data);
       const prevA = medias.find(m => m.is_audio && m.url) || medias.find(m => m.url);
-
       const avatarImg = avatar
         ? `<img src="${esc(avatar)}" referrerpolicy="no-referrer" alt="" data-fb="${esc(cover)}" onerror="this.onerror=null;if(this.dataset.fb){this.src=this.dataset.fb}else{this.remove()}">`
         : (cover ? `<img src="${esc(cover)}" referrerpolicy="no-referrer" alt="">` : `<span>♪</span>`);
@@ -645,7 +644,6 @@ async function runDownload() {
       let preview = '';
       const prevV = medias.find(m => (!m.is_audio || m.type === 'video' || m.extension === 'mp4') && m.url && m.type !== 'image');
       if (prevV) preview = `<div class="prev"><span class="prev-tag">Preview Video</span><video controls playsinline preload="metadata" src="${esc(prevV.url)}"></video></div>`;
-
       dlout.innerHTML = `<div class="card"><div class="card-bar"><span>Media Result</span><span class="tag">${esc(det.l.replace(' Detected', ''))} / ${esc(src)}</span></div><div class="card-inner">${authorHtml}<div class="card-head">${thumb}<div class="head-info"><div class="card-title">${esc(data.title || 'Tanpa Judul')}</div><div class="card-sub">${medias.length} media available</div></div></div>${preview}<div class="mlist">${rowsHtml}</div></div></div>`;
     }
     bindDownload(dlout);
@@ -661,7 +659,7 @@ async function runDownload() {
 function fmtNum(n) { n = Number(n) || 0; if (n >= 1e9) return (n/1e9).toFixed(1) + 'B'; if (n >= 1e6) return (n/1e6).toFixed(1) + 'M'; if (n >= 1e3) return (n/1e3).toFixed(1) + 'K'; return String(n); }
 
 /* =========================================
-   STATUS PAGE (REDESIGN)
+   STATUS PAGE (TANPA EMOJI, IKON SVG)
    ========================================= */
 let statusLoaded = false;
 const statusHero = $('statusHero');
@@ -669,7 +667,22 @@ const statusGrid = $('statusGrid');
 const refreshBtn = $('refreshBtn');
 const liveBtn = $('liveBtn');
 const liveText = $('liveText');
-const SERVICE_ICONS = { jerexd: '⚡', tikwm: '🎵', izz: '🎧', downr: '⬇️' };
+
+const SVG_ATTR = 'viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+const SVC_ICON = {
+  jerexd: `<svg ${SVG_ATTR}><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>`,
+  tikwm: `<svg ${SVG_ATTR}><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>`,
+  izz: `<svg ${SVG_ATTR}><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1v-6h3zM3 19a2 2 0 0 0 2 2h1v-6H3z"/></svg>`,
+  downr: `<svg ${SVG_ATTR}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>`
+};
+const SVC_ICON_FALLBACK = `<svg ${SVG_ATTR}><path d="M3 12h4l2-8 4 16 2-8h4"/></svg>`;
+
+function latencyGrade(lat, down) {
+  if (down) return { cls: 'offline', text: 'Offline' };
+  if (lat <= 1000) return { cls: 'fast', text: 'Cepat' };
+  if (lat <= 3000) return { cls: 'mid', text: 'Sedang' };
+  return { cls: 'slow', text: 'Lambat' };
+}
 
 function renderStatusSkeleton() {
   statusHero.innerHTML = `<div class="sh-hero"><div class="sh-left"><div class="sh-badge checking"><span class="sh-dot"></span>Memeriksa</div><h2>System Health</h2><p>Menghubungi semua server...</p></div></div>`;
@@ -696,14 +709,16 @@ async function loadStatus(showLoader = true) {
 
     statusHero.innerHTML = `
       <div class="sh-hero">
-        <div class="sh-left">
-          <div class="sh-badge ${overall}"><span class="sh-dot"></span>${overallText}</div>
-          <h2>System Health</h2>
-          <p>Dicek pukul ${checkedAt} • ${data.online}/${data.total} layanan aktif</p>
-        </div>
-        <div class="sh-stats">
-          <div class="sh-stat"><b>${data.online}/${data.total}</b><span>Online</span></div>
-          <div class="sh-stat"><b>${data.avg_latency}ms</b><span>Rata-rata</span></div>
+        <div class="sh-top">
+          <div class="sh-left">
+            <div class="sh-badge ${overall}"><span class="sh-dot"></span>${overallText}</div>
+            <h2>System Health</h2>
+            <p>Dicek pukul ${checkedAt}<br>${data.online}/${data.total} layanan aktif</p>
+          </div>
+          <div class="sh-stats">
+            <div class="sh-stat"><b>${data.online}/${data.total}</b><span>Online</span></div>
+            <div class="sh-stat"><b>${data.avg_latency}ms</b><span>Rata-rata</span></div>
+          </div>
         </div>
         <div class="segbar">${data.services.map(s => `<span class="seg ${s.status === 'online' ? 'online' : 'down'}" title="${esc(s.name)}"></span>`).join('')}</div>
       </div>`;
@@ -711,9 +726,9 @@ async function loadStatus(showLoader = true) {
     statusGrid.innerHTML = data.services.map(s => {
       const down = s.status !== 'online';
       const lat = down ? 0 : Number(s.latency) || 0;
-      const tone = down ? 'offline' : (lat > 3000 ? 'slow' : (lat > 1000 ? 'mid' : 'fast'));
+      const grade = latencyGrade(lat, down);
       const pct = down ? 100 : Math.min(100, (lat / 3000) * 100);
-      const icon = SERVICE_ICONS[s.id] || '•';
+      const icon = SVC_ICON[s.id] || SVC_ICON_FALLBACK;
       return `
         <article class="svc ${down ? 'down' : 'online'}">
           <div class="svc-top">
@@ -724,9 +739,12 @@ async function loadStatus(showLoader = true) {
             </div>
             <span class="pill ${down ? 'down' : 'online'}"><i></i>${down ? 'Down' : 'Online'}</span>
           </div>
-          <div class="svc-bottom">
-            <div class="svc-lat"><b>${down ? '—' : lat}</b><small>${down ? '' : 'ms'}</small></div>
-            <div class="bar"><div class="bar-fill ${tone}" style="width:${pct}%"></div></div>
+          <div class="svc-metrics">
+            <div class="svc-lat-row">
+              <div class="svc-lat"><b>${down ? '—' : lat}</b><small>${down ? '' : 'ms'}</small></div>
+              <span class="grade ${grade.cls}">${grade.text}</span>
+            </div>
+            <div class="bar"><div class="bar-fill ${grade.cls}" style="width:${pct}%"></div></div>
           </div>
         </article>`;
     }).join('');
