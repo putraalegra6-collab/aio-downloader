@@ -1,9 +1,11 @@
 /* ============================================================
    STATUS API — By Egaa
-   Cek: Jerexd, Tikwm, IZZ Music, Downr
+   Cek: Jerexd AIO v2, TikWM, IZZ Music, Downr
    ============================================================ */
 
 const axios = require('axios');
+
+const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
 
 const SERVICES = [
   {
@@ -11,7 +13,8 @@ const SERVICES = [
     name: 'Jerexd AIO',
     label: 'Universal Downloader',
     check: async () => {
-      const r = await axios.get('https://api.jerexd.my.id/api/downloader/aiov2?apikey=s2tQZgBEIaX4t3K7&url=https://youtu.be/H2jX_cch8Ak?si=BNR2sIqJRPCIVVGq', {
+      const r = await axios.get('https://api.jerexd.my.id/api/downloader/aiov2', {
+        params: { apikey: JEREXD_KEY, url: 'https://vt.tiktok.com/ZSXdPKPMx/' },
         timeout: 15000,
         validateStatus: () => true,
         headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -24,7 +27,8 @@ const SERVICES = [
     name: 'TikWM',
     label: 'TikTok Backup',
     check: async () => {
-      const r = await axios.get('https://www.tikwm.com/api/?url=https://vt.tiktok.com/ZSXdPKPMx/', {
+      const r = await axios.get('https://www.tikwm.com/api/', {
+        params: { url: 'https://vt.tiktok.com/ZSXdPKPMx/' },
         timeout: 15000,
         validateStatus: () => true,
         headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -37,7 +41,8 @@ const SERVICES = [
     name: 'IZZ Music',
     label: 'Music & Lyrics',
     check: async () => {
-      const r = await axios.get('https://musicaly.maspaizz.web.id/api/search?query=test', {
+      const r = await axios.get('https://musicaly.maspaizz.web.id/api/search', {
+        params: { query: 'test' },
         timeout: 15000,
         validateStatus: () => true,
         headers: { 'User-Agent': 'Mozilla/5.0' }
@@ -57,7 +62,9 @@ const SERVICES = [
           headers: { 'User-Agent': 'Mozilla/5.0' }
         });
         return r.status >= 200 && r.status < 400;
-      } catch { return false; }
+      } catch {
+        return false;
+      }
     }
   }
 ];
@@ -91,11 +98,11 @@ module.exports = async (req, res) => {
     }
   }));
 
-  const online = results.filter(r => r.status === 'online').length;
+  const online = results.filter((r) => r.status === 'online').length;
   const total = results.length;
   const overall = online === total ? 'healthy' : online > 0 ? 'degraded' : 'critical';
   const avgLatency = Math.round(
-    results.filter(r => r.status === 'online').reduce((s, r) => s + r.latency, 0) / Math.max(online, 1)
+    results.filter((r) => r.status === 'online').reduce((s, r) => s + r.latency, 0) / Math.max(online, 1)
   );
 
   res.status(200).json({
