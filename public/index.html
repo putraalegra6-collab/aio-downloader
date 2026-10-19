@@ -797,20 +797,23 @@ function bindDownload(root) {
       if (btn.disabled) return;
       const url = btn.dataset.dl, fn = btn.dataset.fn || 'media';
       const original = btn.textContent;
-      btn.innerHTML = '<span class="spin"></span>';
       btn.disabled = true;
+      btn.innerHTML = '<span class="spin"></span>';
       try {
-        const p = proxied(url, fn);
-        const check = await fetch(p, { method: 'HEAD' }).catch(() => null);
-        if (check && check.ok) {
-          const a = document.createElement('a');
-          a.href = p; a.download = fn;
-          document.body.appendChild(a); a.click(); document.body.removeChild(a);
-        } else { throw new Error('proxy'); }
-        btn.textContent = 'Tersimpan';
+        const r = await fetch(`/api/resolve?url=${encodeURIComponent(url)}`);
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok || !d.status || !d.url) throw new Error(d.error || 'Gagal menyiapkan file');
+        const a = document.createElement('a');
+        a.href = proxied(d.url, fn);
+        a.download = fn;
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        btn.textContent = 'Mengunduh';
       } catch (err) {
-        window.open(url, '_blank');
-        btn.textContent = 'Dibuka';
+        btn.textContent = 'Gagal';
+        alert('Gagal download: ' + err.message);
       } finally {
         setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 2000);
       }
