@@ -790,6 +790,7 @@ function buildMusic(data, det, medias) {
   </div>`;
 }
 
+/* Tombol download: selesaikan link dulu lewat /api/resolve, lalu langsung mulai unduhan */
 function bindDownload(root) {
   root.querySelectorAll('[data-dl]').forEach(btn => {
     btn.addEventListener('click', async e => {
