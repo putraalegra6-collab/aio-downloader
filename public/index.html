@@ -1094,7 +1094,13 @@ async function playSong(list, idx) {
     if (!d.status || !url) throw new Error('Link audio tidak ditemukan');
     if (!officialDur) officialDur = getOfficialDuration(d.result);
     timeDuration.textContent = officialDur ? formatTime(officialDur) : '0:00';
-    audio.src = '/api/proxy?url=' + encodeURIComponent(url) + '&fn=audio.m4a';
+    const probeUrl = '/api/proxy?url=' + encodeURIComponent(url) + '&fn=audio.m4a';
+    const probe = await fetch(probeUrl, { headers: { Range: 'bytes=0-1' } });
+    const ptype = probe.headers.get('content-type') || '';
+    if (!probe.ok || /json|html/i.test(ptype)) {
+      throw new Error('proxy ' + probe.status + ' ' + ptype + ' ' + (await probe.text()).slice(0, 150));
+    }
+    audio.src = probeUrl;
     audio.load();
     setupMediaSession(s);
     await audio.play();
