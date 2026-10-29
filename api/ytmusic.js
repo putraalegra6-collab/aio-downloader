@@ -33,7 +33,7 @@ async function isPlayableAudio(url) {
   }
 }
 
-// Kumpulkan kandidat link audio dari beberapa sumber (paralel)
+// Kumpulkan kandidat link audio dari dua sumber (paralel)
 async function getCandidates(videoId) {
   const musicaly = axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
     headers: browserHeaders, timeout: 10000, validateStatus: () => true
@@ -80,32 +80,18 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'play') {
-      // 1) musicaly dulu (paling cepat, seperti versi awal)
-      let audio = null;
-      let duration = null;
-      try {
-        const r = await axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
-          headers: browserHeaders, timeout: 10000, validateStatus: () => true
-        });
-        audio = r.data?.result?.download?.audio || null;
-        duration = r.data?.result?.duration || null;
-      } catch (e) {
-        console.log('[ytmusic] musicaly error:', e.message);
-      }
-
-      // 2) kalau musicaly nggak ngasih link, baru pakai Jerexd
-      if (!audio) {
-        const { urls, duration: d2 } = await getCandidates(videoId);
-        audio = urls[0] || null;
-        duration = duration || d2;
-      }
-
-      if (!audio) {
+      const { urls, duration } = await getCandidates(videoId);
+      if (!urls.length) {
         return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
       }
+      const checks = await Promise.all(urls.map((u) => isPlayableAudio(u)));
+      const idx = checks.indexOf(true);
+      console.log('[ytmusic]', videoId, 'kandidat:', urls.length, 'lolos cek:', checks.filter(Boolean).length);
+      // Kalau pengecekan gagal semua, tetap kirim kandidat pertama.
+      const pick = idx !== -1 ? idx : 0;
       return res.status(200).json({
         status: true,
-        result: { duration, download: { audio } }
+        result: { duration, download: { audio: urls[pick] } }
       });
     }
 
