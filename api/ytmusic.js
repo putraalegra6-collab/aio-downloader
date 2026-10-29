@@ -18,7 +18,7 @@ async function isPlayableAudio(url) {
     const r = await axios.get(url, {
       headers: { 'User-Agent': UA, 'Range': 'bytes=0-1023', 'Accept': '*/*' },
       responseType: 'arraybuffer',
-      timeout: 15000,
+      timeout: 8000,
       maxRedirects: 5,
       validateStatus: () => true
     });
@@ -33,42 +33,34 @@ async function isPlayableAudio(url) {
   }
 }
 
-// Kumpulkan kandidat link audio dari beberapa sumber
+// Kumpulkan kandidat link audio dari beberapa sumber (paralel)
 async function getCandidates(videoId) {
-  const urls = [];
-  let duration = null;
+  const musicaly = axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
+    headers: browserHeaders, timeout: 10000, validateStatus: () => true
+  }).then((r) => ({
+    urls: r.data?.result?.download?.audio ? [r.data.result.download.audio] : [],
+    duration: r.data?.result?.duration || null
+  })).catch(() => ({ urls: [], duration: null }));
 
-  try {
-    const r = await axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
-      headers: browserHeaders, timeout: 20000, validateStatus: () => true
-    });
-    const u = r.data?.result?.download?.audio;
-    if (u) urls.push(u);
-    duration = r.data?.result?.duration || null;
-  } catch (e) {
-    console.log('[ytmusic] musicaly error:', e.message);
-  }
-
-  try {
-    const r = await axios.get('https://api.jerexd.my.id/api/downloader/aiov2', {
-      params: { apikey: JEREXD_KEY, url: 'https://www.youtube.com/watch?v=' + videoId },
-      timeout: 30000,
-      headers: { 'User-Agent': UA, Accept: 'application/json' },
-      validateStatus: () => true
-    });
+  const jerexd = axios.get('https://api.jerexd.my.id/api/downloader/aiov2', {
+    params: { apikey: JEREXD_KEY, url: 'https://www.youtube.com/watch?v=' + videoId },
+    timeout: 12000,
+    headers: { 'User-Agent': UA, Accept: 'application/json' },
+    validateStatus: () => true
+  }).then((r) => {
     const j = r.data;
-    if (j && j.status === true && j.result) {
-      for (const m of (j.result.medias || [])) {
-        const isAudio = m.type === 'audio' || /^(mp3|m4a|opus|aac|wav)$/i.test(m.extension || '');
-        if (isAudio && m.url) urls.push(m.url);
-      }
-      if (!duration) duration = j.result.duration || null;
-    }
-  } catch (e) {
-    console.log('[ytmusic] jerexd error:', e.message);
-  }
+    if (!j || j.status !== true || !j.result) return { urls: [], duration: null };
+    const urls = (j.result.medias || [])
+      .filter((m) => (m.type === 'audio' || /^(mp3|m4a|opus|aac|wav)$/i.test(m.extension || '')) && m.url)
+      .map((m) => m.url);
+    return { urls, duration: j.result.duration || null };
+  }).catch(() => ({ urls: [], duration: null }));
 
-  return { urls: [...new Set(urls)], duration };
+  const [a, b] = await Promise.all([musicaly, jerexd]);
+  return {
+    urls: [...new Set([...a.urls, ...b.urls])],
+    duration: a.duration || b.duration || null
+  };
 }
 
 module.exports = async (req, res) => {
@@ -89,13 +81,13 @@ module.exports = async (req, res) => {
 
     if (action === 'play') {
       const { urls, duration } = await getCandidates(videoId);
-      for (const u of urls) {
-        if (await isPlayableAudio(u)) {
-          return res.status(200).json({
-            status: true,
-            result: { duration, download: { audio: u } }
-          });
-        }
+      const checks = await Promise.all(urls.map((u) => isPlayableAudio(u)));
+      const idx = checks.indexOf(true);
+      if (idx !== -1) {
+        return res.status(200).json({
+          status: true,
+          result: { duration, download: { audio: urls[idx] } }
+        });
       }
       return res.status(200).json({
         status: false,
