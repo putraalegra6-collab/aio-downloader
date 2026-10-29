@@ -480,6 +480,20 @@ html { scroll-behavior: smooth; }
 
 #cgRoot .cg-row-msg.mine { flex-direction: row-reverse; }
 #cgRoot .cg-row-msg.mine .cg-name { text-align: right; }
+
+.cg-pop { position: fixed; inset: 0; z-index: 10000; background: rgba(27,27,27,.45); display: flex; align-items: center; justify-content: center; padding: 20px; animation: cgFadeIn .2s ease both; }
+.cg-pop[hidden] { display: none !important; }
+.cg-pop-card { width: min(340px, 100%); background: #fffdf8; border: 2px solid #1b1b1b; border-radius: 18px; padding: 22px; box-shadow: 4px 4px 0 #1b1b1b; display: flex; flex-direction: column; gap: 12px; animation: cgIn .25s cubic-bezier(.2,.8,.2,1) both; font: 15px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif; color: #1b1b1b; }
+.cg-pop-title { font-weight: 800; font-size: 18px; }
+.cg-pop-body { font-size: 14px; opacity: .85; white-space: pre-wrap; word-break: break-word; }
+.cg-pop-card button { font: inherit; font-weight: 700; color: #1b1b1b; background: #f6b8b3; border: 2px solid #1b1b1b; border-radius: 12px; padding: 10px 14px; box-shadow: 2px 2px 0 #1b1b1b; cursor: pointer; }
+@keyframes cgFadeIn { from { opacity: 0; } to { opacity: 1; } }
+#cgRoot .cg-settings { width: min(380px, 100%); display: flex; flex-direction: column; gap: 14px; }
+#cgRoot .cg-settings .cg-card { width: 100%; }
+#cgRoot .cg-set-title { font-weight: 800; font-size: 15px; }
+#cgRoot .cg-danger { border-color: #c62828; box-shadow: 4px 4px 0 #c62828; }
+#cgRoot .cg-danger-btn { background: #c62828; color: #fff; font-weight: 700; }
+#cgRoot .cg-ok { color: #2e7d32; font-size: 13px; min-height: 1.2em; }
 </style>
 </head>
 <body>
@@ -1325,6 +1339,9 @@ function syncLyrics() {
       <div id="cgTitle" class="cg-title">Chat</div>
       <div id="cgSub" class="cg-sub"></div>
     </div>
+    <button id="cgMenu" class="cg-icon" type="button" aria-label="Menu" hidden>
+      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>
+    </button>
     <button id="cgMe" class="cg-me" type="button" aria-label="Profil saya" hidden></button>
     <button id="cgClose" class="cg-icon" type="button" aria-label="Tutup">
       <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
@@ -1390,6 +1407,13 @@ function syncLyrics() {
   </section>
 </div>
 
+<div id="cgPop" class="cg-pop" hidden>
+  <div class="cg-pop-card" role="dialog" aria-modal="true">
+    <div id="cgPopTitle" class="cg-pop-title"></div>
+    <div id="cgPopBody" class="cg-pop-body"></div>
+    <button id="cgPopOk" type="button">Oke</button>
+  </div>
+</div>
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
@@ -1475,6 +1499,7 @@ function syncLyrics() {
     $('cgBack').hidden = !o.back;
     $('cgSeg').hidden = !o.seg;
     $('cgMe').hidden = !o.me;
+    $('cgMenu').hidden = !o.menu;
   }
 
   function setSeg(name) {
@@ -1512,7 +1537,7 @@ function syncLyrics() {
     thread = u; clearReply(); lastSig = null;
     $('cgList').innerHTML = '';
     showView('chat');
-    setTop(u.username, 'Pesan pribadi', { back: true, me: true });
+    setTop(u.username, 'Pesan pribadi', { back: true, me: true, menu: true });
     backFn = openPrivate;
     $('cgText').placeholder = 'Pesan untuk ' + u.username;
     $('cgTarget').textContent = u.username;
@@ -1547,7 +1572,7 @@ function syncLyrics() {
   function renderProfile() {
     const u = profileUser, mine = me && u.id === me.id;
     const actions = mine
-      ? '<button type="button" class="cg-primary" data-act="edit">Edit profil</button><button type="button" data-act="logout">Keluar</button>'
+      ? '<button type="button" class="cg-primary" data-act="edit">Edit profil</button><button type="button" data-act="settings">Pengaturan</button>'
       : (me && me.is_owner ? '<button type="button" data-act="verify" data-on="' + (u.verified ? '0' : '1') + '">' + (u.verified ? 'Cabut centang' : 'Beri centang biru') + '</button>' : '') +
         '<button type="button" class="cg-primary" data-act="dm">Kirim pesan</button>';
     $('cgProfileBody').innerHTML = '<div class="cg-profile">' + avatar(u, 'cg-av-xl') +
@@ -1685,18 +1710,24 @@ function syncLyrics() {
     } catch (e) {
       me = null;
       stopPolling();
+      stopNotify();
       $('cgMe').hidden = true;
       showView('auth');
       setTop('Masuk', 'Buat akun atau masuk untuk chat', {});
       return;
     }
     try { await refreshMe(); } catch (e) {}
+    startNotify();
     openGlobal();
   }
 
   // ---------- event ----------
   $('cgOpen').onclick = () => {
     $('cgRoot').classList.add('cg-open');
+    if (!welcomeShown) {
+      welcomeShown = true;
+      notify('Selamat datang di Global Chat', 'Jaga sopan santun dan saling menghormati. Tekan Oke untuk lanjut.');
+    }
     boot();
   };
   $('cgClose').onclick = () => {
@@ -1745,6 +1776,7 @@ function syncLyrics() {
     if (act === 'edit') renderEdit();
     if (act === 'dm') openThread(profileUser);
     if (act === 'cancel') renderProfile();
+    if (act === 'settings') renderSettings();
     if (act === 'verify') {
       api('/api/users?action=verify', { method: 'POST', body: JSON.stringify({ id: profileUser.id, value: b.dataset.on === '1' }) })
         .then(() => openProfile(profileUser.id, backFn))
@@ -1758,6 +1790,7 @@ function syncLyrics() {
   };
   $('cgProfileBody').onsubmit = (e) => {
     if (e.target.id === 'cgEditForm') { e.preventDefault(); saveProfile(); }
+    handleSettingsSubmit(e);
   };
   $('cgProfileBody').onchange = async (e) => {
     if (e.target.id !== 'cgAvFile' || !e.target.files[0]) return;
@@ -1881,7 +1914,156 @@ function syncLyrics() {
     recTimer = setTimeout(() => { if (rec) rec.stop(); }, 60000);
   };
 
+
+  // ---------- popup notifikasi (harus ditekan Oke) ----------
+  let welcomeShown = false;
+  let notifyTimer = null;
+  let lastNotifyId = null;
+  const popQueue = [];
+  let popOpen = false;
+
+  function showNextPop() {
+    if (popOpen || !popQueue.length) return;
+    const p = popQueue.shift();
+    popOpen = true;
+    $('cgPopTitle').textContent = p.title;
+    $('cgPopBody').textContent = p.text;
+    $('cgPop').hidden = false;
+    $('cgPopOk').focus();
+  }
+  function notify(title, text) {
+    popQueue.push({ title: title, text: text });
+    showNextPop();
+  }
+  $('cgPopOk').onclick = () => {
+    popOpen = false;
+    $('cgPop').hidden = true;
+    showNextPop();
+  };
+
+  // ---------- cek pesan baru (berjalan selama website terbuka dan sudah login) ----------
+  const KIND_LABEL = { image: 'Mengirim foto', video: 'Mengirim video', audio: 'Mengirim audio', voice: 'Mengirim VN', file: 'Mengirim file' };
+  async function notifyTick() {
+    if (!me || lastNotifyId === null) return;
+    const r = await api('/api/chat?since=' + lastNotifyId);
+    for (const m of r.messages) {
+      lastNotifyId = Math.max(lastNotifyId, m.id);
+      const openNow = $('cgRoot').classList.contains('cg-open');
+      const visible = openNow && view === 'chat' && (m.to_user ? (thread && thread.id === m.user_id) : !thread);
+      if (visible) continue;
+      const preview = (m.body ? String(m.body) : (KIND_LABEL[m.kind] || 'Pesan baru')).slice(0, 140);
+      notify(m.to_user ? 'Pesan pribadi dari ' + m.username : 'Global: ' + m.username, preview);
+    }
+  }
+  async function startNotify() {
+    stopNotify();
+    try {
+      const r = await api('/api/chat?latest=1');
+      lastNotifyId = r.id;
+    } catch (e) {
+      lastNotifyId = null;
+      return;
+    }
+    notifyTimer = setInterval(() => notifyTick().catch(() => {}), 4000);
+  }
+  function stopNotify() {
+    clearInterval(notifyTimer);
+    notifyTimer = null;
+    lastNotifyId = null;
+  }
+
+  // ---------- hapus obrolan pribadi (hanya di akun ini) ----------
+  $('cgMenu').onclick = async () => {
+    if (!thread) return;
+    if (!confirm('Hapus obrolan dengan ' + thread.username + '? Hanya dihapus dari akunmu.')) return;
+    try {
+      await api('/api/chat?action=clear&with=' + thread.id, { method: 'POST' });
+      lastSig = null;
+      $('cgList').innerHTML = '';
+      await loadThread();
+    } catch (err) {
+      setStatus(err.message);
+    }
+  };
+
+  // ---------- pengaturan akun ----------
+  function setMsg(id, text, ok) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = text;
+    el.className = ok ? 'cg-ok' : 'cg-err';
+  }
+
+  function renderSettings() {
+    setTop('Pengaturan', '', { back: true });
+    backFn = () => openProfile(me.id, openGlobal);
+    $('cgProfileBody').innerHTML = '<div class="cg-settings">' +
+      '<div class="cg-card"><div class="cg-set-title">Profil</div>' +
+        '<div class="cg-row-wrap"><button type="button" data-act="edit">Edit foto dan bio</button></div></div>' +
+      '<form id="cgSetUserForm" class="cg-card"><div class="cg-set-title">Ganti username</div>' +
+        '<label class="cg-field">Username baru<input id="cgSetUser" type="text" autocomplete="username" required></label>' +
+        '<label class="cg-field">Password sekarang<input id="cgSetUserPw" type="password" autocomplete="current-password" required></label>' +
+        '<button type="submit" class="cg-primary">Simpan username</button><div id="cgSetUserMsg" class="cg-err"></div></form>' +
+      '<form id="cgSetPassForm" class="cg-card"><div class="cg-set-title">Ganti password</div>' +
+        '<label class="cg-field">Password lama<input id="cgSetOld" type="password" autocomplete="current-password" required></label>' +
+        '<label class="cg-field">Password baru (min 4)<input id="cgSetNew" type="password" autocomplete="new-password" required></label>' +
+        '<button type="submit" class="cg-primary">Simpan password</button><div id="cgSetPassMsg" class="cg-err"></div></form>' +
+      '<form id="cgSetDelForm" class="cg-card cg-danger"><div class="cg-set-title">Hapus akun</div>' +
+        '<p class="cg-hint">Akun, pesan, dan foto profilmu akan dihapus permanen.</p>' +
+        '<label class="cg-field">Password<input id="cgSetDelPw" type="password" autocomplete="current-password" required></label>' +
+        '<button type="submit" class="cg-danger-btn">Hapus akun</button><div id="cgSetDelMsg" class="cg-err"></div></form>' +
+      '<div class="cg-row-wrap"><button type="button" data-act="logout">Keluar dari akun</button></div>' +
+      '</div>';
+  }
+
+  async function refreshSelf() {
+    me = await api('/api/auth?action=me');
+    await refreshMe();
+  }
+
+  async function handleSettingsSubmit(e) {
+    const id = e.target.id;
+    if (id === 'cgSetUserForm') {
+      e.preventDefault();
+      try {
+        await api('/api/users?action=username', { method: 'POST', body: JSON.stringify({ username: $('cgSetUser').value.trim(), password: $('cgSetUserPw').value }) });
+        await refreshSelf();
+        $('cgSetUserPw').value = '';
+        setMsg('cgSetUserMsg', 'Username sudah diganti menjadi ' + me.username, true);
+      } catch (err) { setMsg('cgSetUserMsg', err.message, false); }
+    }
+    if (id === 'cgSetPassForm') {
+      e.preventDefault();
+      try {
+        await api('/api/users?action=password', { method: 'POST', body: JSON.stringify({ old_password: $('cgSetOld').value, new_password: $('cgSetNew').value }) });
+        $('cgSetOld').value = '';
+        $('cgSetNew').value = '';
+        setMsg('cgSetPassMsg', 'Password sudah diganti. Sesi di perangkat lain sudah keluar.', true);
+      } catch (err) { setMsg('cgSetPassMsg', err.message, false); }
+    }
+    if (id === 'cgSetDelForm') {
+      e.preventDefault();
+      if (!confirm('Yakin hapus akun? Tindakan ini tidak bisa dibatalkan.')) return;
+      try {
+        await api('/api/users?action=delete', { method: 'POST', body: JSON.stringify({ password: $('cgSetDelPw').value }) });
+        me = null;
+        stopNotify();
+        await boot();
+      } catch (err) { setMsg('cgSetDelMsg', err.message, false); }
+    }
+  }
+
   setMode('login');
+  // mulai cek pesan baru walaupun chat belum dibuka, selama sudah login
+  (async () => {
+    try {
+      me = await api('/api/auth?action=me');
+      try { await refreshMe(); } catch (e) {}
+      startNotify();
+    } catch (e) {
+      me = null;
+    }
+  })();
 })();
 </script>
 </body>
