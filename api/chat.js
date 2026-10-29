@@ -12,7 +12,6 @@ module.exports = async (req, res) => {
     if (!me) return res.status(401).json({ error: 'Belum login' });
     const q = req.query || {};
 
-    // Ambil isi file (foto, video, audio, VN, file)
     if (req.method === 'GET' && q.file) {
       const rows = await sql`SELECT user_id, to_user, file_name, mime, data FROM messages WHERE id = ${Number(q.file)} AND data IS NOT NULL`;
       if (!rows[0]) return res.status(404).end();
@@ -27,25 +26,54 @@ module.exports = async (req, res) => {
       return res.status(200).end(Buffer.from(r.data, 'base64'));
     }
 
-    // Daftar pesan: global (tanpa with) atau chat pribadi (with=ID)
+    if (req.method === 'GET' && q.latest !== undefined) {
+      const rows = await sql`SELECT COALESCE(MAX(id), 0) AS id FROM messages`;
+      return res.status(200).json({ id: rows[0].id });
+    }
+
+    if (req.method === 'GET' && q.since !== undefined) {
+      const since = Number.isInteger(Number(q.since)) ? Number(q.since) : 0;
+      const rows = await sql`SELECT m.id, m.user_id, m.username, m.kind, m.body, m.reply_to, m.file_name, m.mime, m.to_user,
+          (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av,
+          (u.verified OR LOWER(u.username) = ${OWNER}) AS verified
+        FROM messages m JOIN users u ON u.id = m.user_id
+        WHERE m.id > ${since} AND m.user_id <> ${me.id} AND (m.to_user IS NULL OR m.to_user = ${me.id})
+        ORDER BY m.id ASC LIMIT 50`;
+      return res.status(200).json({ messages: rows });
+    }
+
     if (req.method === 'GET') {
       let rows;
       if (q.with !== undefined) {
         const w = Number(q.with);
         if (!Number.isInteger(w)) return res.status(400).json({ error: 'User tidak valid' });
         rows = await sql`SELECT m.id, m.user_id, m.username, m.kind, m.body, m.reply_to, m.file_name, m.mime, m.to_user,
-            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av, (u.verified OR LOWER(u.username) = ${OWNER}) AS verified
+            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av,
+            (u.verified OR LOWER(u.username) = ${OWNER}) AS verified
           FROM messages m JOIN users u ON u.id = m.user_id
-          WHERE (m.user_id = ${me.id} AND m.to_user = ${w}) OR (m.user_id = ${w} AND m.to_user = ${me.id})
+          WHERE ((m.user_id = ${me.id} AND m.to_user = ${w}) OR (m.user_id = ${w} AND m.to_user = ${me.id}))
+            AND m.id > COALESCE((SELECT last_id FROM chat_clear WHERE user_id = ${me.id} AND peer_id = ${w}), 0)
           ORDER BY m.id DESC LIMIT 100`;
       } else {
         rows = await sql`SELECT m.id, m.user_id, m.username, m.kind, m.body, m.reply_to, m.file_name, m.mime, m.to_user,
-            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av, (u.verified OR LOWER(u.username) = ${OWNER}) AS verified
+            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av,
+            (u.verified OR LOWER(u.username) = ${OWNER}) AS verified
           FROM messages m JOIN users u ON u.id = m.user_id
           WHERE m.to_user IS NULL
           ORDER BY m.id DESC LIMIT 100`;
       }
       return res.status(200).json({ messages: rows.reverse() });
+    }
+
+    // Hapus obrolan pribadi, hanya untuk akun ini
+    if (req.method === 'POST' && q.action === 'clear') {
+      const w = Number(q.with);
+      if (!Number.isInteger(w)) return res.status(400).json({ error: 'User tidak valid' });
+      await sql`INSERT INTO chat_clear (user_id, peer_id, last_id)
+        VALUES (${me.id}, ${w}, (SELECT COALESCE(MAX(id), 0) FROM messages
+          WHERE (user_id = ${me.id} AND to_user = ${w}) OR (user_id = ${w} AND to_user = ${me.id})))
+        ON CONFLICT (user_id, peer_id) DO UPDATE SET last_id = EXCLUDED.last_id`;
+      return res.status(200).json({ ok: true });
     }
 
     if (req.method === 'POST') {
