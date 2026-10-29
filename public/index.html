@@ -451,6 +451,32 @@ html { scroll-behavior: smooth; }
 #cgRoot .cg-row-wrap { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
 #cgRoot .cg-avatar-edit { display: flex; flex-direction: column; align-items: center; gap: 10px; }
 #cgRoot .cg-file-input { font-size: 13px; max-width: 100%; }
+
+#cgRoot .cg-composer { padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px)); background: #f4efe4; border-top: 2px solid #1b1b1b; display: flex; flex-direction: column; gap: 6px; }
+#cgRoot .cg-box { background: #fffdf8; border: 2px solid #1b1b1b; border-radius: 24px; padding: 12px 12px 10px; box-shadow: 3px 3px 0 #1b1b1b; display: flex; flex-direction: column; gap: 8px; transition: box-shadow .2s ease; }
+#cgRoot .cg-box:focus-within { box-shadow: 3px 3px 0 #1b1b1b, 0 0 0 4px #f6b8b3; }
+#cgRoot .cg-textin { width: 100%; border: none; background: none; outline: none; padding: 4px 6px; font-size: 16px; box-shadow: none; }
+#cgRoot .cg-textin::placeholder { opacity: .45; }
+#cgRoot .cg-box-bar { display: flex; align-items: center; gap: 8px; }
+#cgRoot .cg-round { width: 38px; height: 38px; padding: 0; border-radius: 50%; display: grid; place-items: center; flex-shrink: 0; box-shadow: none; border: 2px solid #1b1b1b; background: #fffdf8; }
+#cgRoot .cg-round:hover { background: #fff6d8; }
+#cgRoot .cg-round:active { transform: scale(.94); }
+#cgRoot .cg-round svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+#cgRoot .cg-round .i-stop { display: none; fill: currentColor; stroke: none; }
+#cgRoot .cg-round.rec { background: #ff8a80; }
+#cgRoot .cg-round.rec .i-stop { display: block; }
+#cgRoot .cg-round.rec .i-mic { display: none; }
+#cgRoot .cg-round-solid { background: #1b1b1b; color: #fffdf8; }
+#cgRoot .cg-round-solid:hover { background: #333; }
+#cgRoot .cg-round-solid:disabled { opacity: .45; }
+#cgRoot .cg-pill { font-size: 13px; font-weight: 700; padding: 5px 12px; border: 2px solid #1b1b1b; border-radius: 999px; background: #f4efe4; white-space: nowrap; max-width: 55%; overflow: hidden; text-overflow: ellipsis; }
+#cgRoot .cg-grow { flex: 1; }
+#cgRoot .cg-status { font-size: 12px; opacity: .7; min-height: 1em; padding-left: 4px; }
+
+#cgRoot .cg-verified { display: inline-grid; place-items: center; width: 15px; height: 15px; margin-left: 4px; vertical-align: -2px; border-radius: 50%; background: #1d9bf0; flex-shrink: 0; }
+#cgRoot .cg-verified svg { width: 10px; height: 10px; fill: none; stroke: #fff; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+#cgRoot .cg-pname .cg-verified { width: 18px; height: 18px; margin-left: 6px; }
+#cgRoot .cg-pname .cg-verified svg { width: 12px; height: 12px; }
 </style>
 </head>
 <body>
@@ -1329,17 +1355,23 @@ function syncLyrics() {
         <span id="cgReplyTxt"></span>
         <button id="cgCancelReply" class="cg-link" type="button">Batal</button>
       </div>
-      <div class="cg-inputrow">
-        <button id="cgAttach" class="cg-icon-btn" type="button" aria-label="Lampirkan file">
-          <svg viewBox="0 0 24 24"><path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3L16 6.5"/></svg>
-        </button>
-        <input id="cgFileIn" type="file" accept="image/*,video/*,audio/*,*/*" hidden>
-        <input id="cgText" class="cg-input" type="text" placeholder="Tulis pesan" maxlength="2000" autocomplete="off">
-        <button id="cgVn" class="cg-icon-btn" type="button" aria-label="Rekam VN">
-          <svg class="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
-          <svg class="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
-        </button>
-        <button id="cgSend" class="cg-primary cg-send" type="button">Kirim</button>
+      <div class="cg-box">
+        <input id="cgText" class="cg-textin" type="text" placeholder="Tulis pesan" maxlength="2000" autocomplete="off">
+        <div class="cg-box-bar">
+          <button id="cgAttach" class="cg-round" type="button" aria-label="Lampirkan file">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <input id="cgFileIn" type="file" accept="image/*,video/*,audio/*,*/*" hidden>
+          <span id="cgTarget" class="cg-pill">Global</span>
+          <span class="cg-grow"></span>
+          <button id="cgVn" class="cg-round" type="button" aria-label="Rekam VN">
+            <svg class="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+            <svg class="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+          </button>
+          <button id="cgSend" class="cg-round cg-round-solid" type="button" aria-label="Kirim">
+            <svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+          </button>
+        </div>
       </div>
       <div id="cgStatus" class="cg-status"></div>
     </div>
@@ -1379,6 +1411,7 @@ function syncLyrics() {
   const avatar = (u, cls) => u.has_avatar
     ? '<img class="' + cls + '" src="' + avatarSrc(u.id, u.av) + '" alt="" loading="lazy">'
     : '<span class="' + cls + ' cg-letter">' + letter(u.username) + '</span>';
+  const badge = (u) => u.verified ? '<span class="cg-verified" title="Terverifikasi"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.2 4.2L19 7"/></svg></span>' : '';
   const timeOf = (iso) => new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   const fmt = (sec) => Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
 
@@ -1466,6 +1499,7 @@ function syncLyrics() {
     setTop('Global', 'Semua orang', { seg: true, me: true });
     setSeg('global');
     $('cgText').placeholder = 'Tulis pesan';
+    $('cgTarget').textContent = 'Global';
     loadThread().catch((e) => setStatus(e.message));
     startPolling(loadThread);
   }
@@ -1478,6 +1512,7 @@ function syncLyrics() {
     setTop(u.username, 'Pesan pribadi', { back: true, me: true });
     backFn = openPrivate;
     $('cgText').placeholder = 'Pesan untuk ' + u.username;
+    $('cgTarget').textContent = u.username;
     loadThread().catch((e) => setStatus(e.message));
     startPolling(loadThread);
   }
@@ -1510,9 +1545,10 @@ function syncLyrics() {
     const u = profileUser, mine = me && u.id === me.id;
     const actions = mine
       ? '<button type="button" class="cg-primary" data-act="edit">Edit profil</button><button type="button" data-act="logout">Keluar</button>'
-      : '<button type="button" class="cg-primary" data-act="dm">Kirim pesan</button>';
+      : (me && me.is_owner ? '<button type="button" data-act="verify" data-on="' + (u.verified ? '0' : '1') + '">' + (u.verified ? 'Cabut centang' : 'Beri centang biru') + '</button>' : '') +
+        '<button type="button" class="cg-primary" data-act="dm">Kirim pesan</button>';
     $('cgProfileBody').innerHTML = '<div class="cg-profile">' + avatar(u, 'cg-av-xl') +
-      '<div class="cg-pname">' + esc(u.username) + '</div>' +
+      '<div class="cg-pname">' + esc(u.username) + badge(u) + '</div>' +
       '<div class="cg-pbio">' + (u.bio ? esc(u.bio) : 'Belum ada bio') + '</div>' +
       '<div class="cg-row-wrap">' + actions + '</div></div>';
   }
@@ -1560,7 +1596,7 @@ function syncLyrics() {
     const list = allUsers.filter((u) => !q || u.username.toLowerCase().indexOf(q) !== -1);
     $('cgUserList').innerHTML = list.length
       ? list.map((u) => '<button type="button" class="cg-user" data-open="' + u.id + '">' + avatar(u, 'cg-av') +
-          '<span class="cg-user-txt"><span class="cg-user-name">' + esc(u.username) + '</span>' +
+          '<span class="cg-user-txt"><span class="cg-user-name">' + esc(u.username) + badge(u) + '</span>' +
           '<span class="cg-user-bio">' + esc(u.bio || 'Belum ada bio') + '</span></span></button>').join('')
       : '<div class="cg-empty">Belum ada pengguna lain</div>';
   }
@@ -1582,7 +1618,7 @@ function syncLyrics() {
     const quote = parent ? '<div class="cg-quote"><b>' + esc(parent.username) + '</b> ' + esc((parent.body || 'File').slice(0, 90)) + '</div>' : '';
     const text = m.body ? '<div class="cg-txt">' + esc(m.body) + '</div>' : '';
     const av = mine ? '' : '<button class="cg-av-btn" data-profile="' + m.user_id + '" aria-label="Profil">' + avatar(u, 'cg-av') + '</button>';
-    const name = mine ? '' : '<button class="cg-name" data-profile="' + m.user_id + '">' + esc(m.username) + '</button>';
+    const name = mine ? '' : '<button class="cg-name" data-profile="' + m.user_id + '">' + esc(m.username) + badge(m) + '</button>';
     const del = canDel ? '<button type="button" data-del="' + m.id + '">Hapus</button>' : '';
     return '<div class="cg-row-msg' + (mine ? ' mine' : '') + '" data-id="' + m.id + '">' + av +
       '<div class="cg-bubble">' + name + quote + media + text +
@@ -1706,6 +1742,11 @@ function syncLyrics() {
     if (act === 'edit') renderEdit();
     if (act === 'dm') openThread(profileUser);
     if (act === 'cancel') renderProfile();
+    if (act === 'verify') {
+      api('/api/users?action=verify', { method: 'POST', body: JSON.stringify({ id: profileUser.id, value: b.dataset.on === '1' }) })
+        .then(() => openProfile(profileUser.id, backFn))
+        .catch((err) => setStatus(err.message));
+    }
     if (act === 'logout') logout();
     if (act === 'avremove') {
       pendingAvatar = null;
