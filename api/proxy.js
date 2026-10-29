@@ -24,10 +24,8 @@ module.exports = async (req, res) => {
   }
 
   try {
-    // Fallback: kalau masih dapat link SSE, selesaikan dulu
     let target = String(url);
     if (target.includes('sse-progress')) {
-      const { resolveSse } = require('../lib/sse');
       target = await resolveSse(target);
     }
 
@@ -47,18 +45,28 @@ module.exports = async (req, res) => {
     });
 
     const upstreamType = response.headers['content-type'] || '';
+    console.log('[proxy]', response.status, upstreamType, target.slice(0, 120));
+
     if (response.status >= 400 || /json|html/i.test(upstreamType)) {
       response.data.destroy();
       return res.status(502).json({
         status: false,
-        error: 'Sumber file menolak atau mengirim halaman, bukan media'
+        error: 'Sumber file menolak atau mengirim halaman, bukan media',
+        upstream_status: response.status,
+        upstream_type: upstreamType
       });
     }
 
-    res.setHeader('Content-Type', upstreamType || contentType);
-    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(filename)}"`);
+    const finalType = (!upstreamType || /octet-stream|binary/i.test(upstreamType))
+      ? contentType
+      : upstreamType;
+
+    res.setHeader('Content-Type', finalType);
+    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(filename)}"`);
     res.setHeader('Accept-Ranges', 'bytes');
-    if (response.headers['content-length']) res.setHeader('Content-Length', response.headers['content-length']);
+    if (response.headers['content-length'] && !response.headers['content-encoding']) {
+      res.setHeader('Content-Length', response.headers['content-length']);
+    }
     if (response.headers['content-range']) res.setHeader('Content-Range', response.headers['content-range']);
 
     res.status(response.status);
