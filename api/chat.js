@@ -3,6 +3,7 @@ const { currentUser } = require('../lib/auth');
 
 const MAX_B64 = 4 * 1024 * 1024;
 const KINDS = ['text', 'image', 'video', 'audio', 'voice', 'file'];
+const OWNER = (process.env.OWNER_USERNAME || '').trim().toLowerCase();
 
 module.exports = async (req, res) => {
   try {
@@ -33,13 +34,13 @@ module.exports = async (req, res) => {
         const w = Number(q.with);
         if (!Number.isInteger(w)) return res.status(400).json({ error: 'User tidak valid' });
         rows = await sql`SELECT m.id, m.user_id, m.username, m.kind, m.body, m.reply_to, m.file_name, m.mime, m.to_user,
-            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av
+            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av, (u.verified OR LOWER(u.username) = ${OWNER}) AS verified
           FROM messages m JOIN users u ON u.id = m.user_id
           WHERE (m.user_id = ${me.id} AND m.to_user = ${w}) OR (m.user_id = ${w} AND m.to_user = ${me.id})
           ORDER BY m.id DESC LIMIT 100`;
       } else {
         rows = await sql`SELECT m.id, m.user_id, m.username, m.kind, m.body, m.reply_to, m.file_name, m.mime, m.to_user,
-            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av
+            (m.data IS NOT NULL) AS has_file, m.created_at, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av, (u.verified OR LOWER(u.username) = ${OWNER}) AS verified
           FROM messages m JOIN users u ON u.id = m.user_id
           WHERE m.to_user IS NULL
           ORDER BY m.id DESC LIMIT 100`;
