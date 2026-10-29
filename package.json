@@ -1,12 +1,13 @@
 {
   "name": "aio-downloader",
-  "version": "6.0.0",
+  "version": "7.0.0",
   "private": true,
-  "description": "All-in-one downloader — By Egaa",
+  "description": "All-in-one downloader + global chat — By Egaa",
   "engines": {
     "node": "24.x"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
     "axios": "^1.7.9"
   }
 }
