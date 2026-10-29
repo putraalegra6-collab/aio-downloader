@@ -3,6 +3,7 @@ const { currentUser } = require('../lib/auth');
 
 const AVATAR_RE = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
 const MAX_AVATAR_CHARS = 400000;
+const OWNER = (process.env.OWNER_USERNAME || '').trim().toLowerCase();
 
 module.exports = async (req, res) => {
   try {
@@ -25,16 +26,26 @@ module.exports = async (req, res) => {
 
     // Profil satu user
     if (req.method === 'GET' && q.id) {
-      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av FROM users WHERE id = ${Number(q.id)}`;
+      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av, (verified OR LOWER(username) = ${OWNER}) AS verified FROM users WHERE id = ${Number(q.id)}`;
       if (!rows[0]) return res.status(404).json({ error: 'User tidak ditemukan' });
       return res.status(200).json(rows[0]);
     }
 
     // Daftar user lain
     if (req.method === 'GET') {
-      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av
+      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av, (verified OR LOWER(username) = ${OWNER}) AS verified
         FROM users WHERE id <> ${me.id} ORDER BY LOWER(username) LIMIT 500`;
       return res.status(200).json({ users: rows });
+    }
+
+    // Centang biru: hanya owner yang boleh
+    if (req.method === 'POST' && q.action === 'verify') {
+      if (!me.is_owner) return res.status(403).json({ error: 'Hanya owner yang bisa memberi centang' });
+      const { id, value } = req.body || {};
+      const uid = Number(id);
+      if (!Number.isInteger(uid)) return res.status(400).json({ error: 'User tidak valid' });
+      await sql`UPDATE users SET verified = ${value === true} WHERE id = ${uid}`;
+      return res.status(200).json({ ok: true });
     }
 
     // Edit profil sendiri: bio dan/atau foto
