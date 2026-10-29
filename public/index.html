@@ -1556,9 +1556,7 @@ function syncLyrics() {
     setTop('Pribadi', 'Pilih seseorang untuk chat', { seg: true, me: true });
     setSeg('private');
     try {
-      const r = await api('/api/users');
-      allUsers = r.users;
-      renderUsers();
+      await loadUsers();
     } catch (e) { setStatus(e.message); }
   }
 
@@ -1617,6 +1615,7 @@ function syncLyrics() {
   }
 
   async function logout() {
+    await removePush();
     await fetch('/api/auth?action=logout', { method: 'POST', credentials: 'same-origin' });
     me = null;
     await boot();
@@ -1630,7 +1629,7 @@ function syncLyrics() {
       ? list.map((u) => '<button type="button" class="cg-user" data-open="' + u.id + '">' + avatar(u, 'cg-av') +
           '<span class="cg-user-txt"><span class="cg-user-name">' + esc(u.username) + badge(u) + '</span>' +
           '<span class="cg-user-bio">' + esc(u.bio || 'Belum ada bio') + '</span></span></button>').join('')
-      : '<div class="cg-empty">Belum ada pengguna lain</div>';
+      : '<div class="cg-empty">' + (q ? 'Pengguna tidak ditemukan' : 'Belum ada obrolan. Cari username untuk mulai chat') + '</div>';
   }
 
   // ---------- pesan ----------
@@ -1723,6 +1722,7 @@ function syncLyrics() {
     }
     try { await refreshMe(); } catch (e) {}
     startNotify();
+    setupPush();
     greet(true);
     openGlobal();
   }
@@ -1764,8 +1764,13 @@ function syncLyrics() {
     }
   };
 
-  $('cgSearch').oninput = renderUsers;
+  let searchTimer = null;
+  $('cgSearch').oninput = () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadUsers().catch(() => {}), 250);
+  };
   $('cgUserList').onclick = (e) => {
+    if (longPressed) { longPressed = false; return; }
     const b = e.target.closest('[data-open]');
     if (!b) return;
     const u = allUsers.find((x) => x.id === Number(b.dataset.open));
@@ -1968,7 +1973,7 @@ function syncLyrics() {
       const preview = (m.body ? String(m.body) : (KIND_LABEL[m.kind] || 'Pesan baru')).slice(0, 140);
       const ttl = m.to_user ? 'Pesan pribadi dari ' + m.username : 'Global: ' + m.username;
       notify(ttl, preview);
-      nativeNotify(ttl, preview);
+
     }
   }
   async function startNotify() {
@@ -2088,7 +2093,7 @@ function syncLyrics() {
       title: 'Aktifkan notifikasi',
       text: 'Izinkan notifikasi supaya kamu tahu saat ada pesan baru, walaupun sedang membuka halaman lain.',
       actions: [
-        { label: 'Aktifkan', run: () => { Notification.requestPermission().catch(() => {}); } },
+        { label: 'Aktifkan', run: () => { Notification.requestPermission().then((p) => { if (p === 'granted') setupPush(); }).catch(() => {}); } },
         { label: 'Nanti' }
       ]
     });
@@ -2110,6 +2115,87 @@ function syncLyrics() {
     askNotifPermission();
   }
 
+  // ---------- daftar obrolan: tekan lama untuk hapus obrolan ----------
+  let longPressed = false;
+  let pressTimer = null;
+  function clearPress() { clearTimeout(pressTimer); pressTimer = null; }
+  $('cgUserList').addEventListener('pointerdown', (e) => {
+    const b = e.target.closest('[data-open]');
+    if (!b) return;
+    clearPress();
+    pressTimer = setTimeout(() => {
+      pressTimer = null;
+      longPressed = true;
+      const u = allUsers.find((x) => x.id === Number(b.dataset.open));
+      if (u) showChatActions(u);
+    }, 500);
+  });
+  $('cgUserList').addEventListener('pointerup', clearPress);
+  $('cgUserList').addEventListener('pointercancel', clearPress);
+  $('cgUserList').addEventListener('pointerleave', clearPress);
+  $('cgUserList').addEventListener('contextmenu', (e) => { if (e.target.closest('[data-open]')) e.preventDefault(); });
+
+  function showChatActions(u) {
+    popQueue.push({
+      title: u.username,
+      text: 'Hapus obrolan ini dari daftarmu? Pesan tidak terhapus untuk lawan bicara, dan obrolan akan muncul lagi kalau ada pesan baru.',
+      actions: [
+        { label: 'Hapus obrolan', run: () => clearChatWith(u) },
+        { label: 'Batal' }
+      ]
+    });
+    showNextPop();
+  }
+  async function clearChatWith(u) {
+    try {
+      await api('/api/chat?action=clear&with=' + u.id, { method: 'POST' });
+      await loadUsers();
+    } catch (err) {
+      setStatus(err.message);
+    }
+  }
+
+  async function loadUsers() {
+    const q = $('cgSearch').value.trim();
+    const r = await api(q ? '/api/users?q=' + encodeURIComponent(q) : '/api/users?chats=1');
+    allUsers = r.users;
+    renderUsers();
+  }
+
+  // ---------- Web Push: notifikasi tetap muncul walau browser ditutup ----------
+  function urlB64(b64) {
+    const pad = '='.repeat((4 - (b64.length % 4)) % 4);
+    const raw = atob((b64 + pad).replace(/-/g, '+').replace(/_/g, '/'));
+    return Uint8Array.from(raw, (c) => c.charCodeAt(0));
+  }
+
+  async function setupPush() {
+    try {
+      if (!me || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+      if (!('Notification' in window) || Notification.permission !== 'granted') return;
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+      const info = await api('/api/push');
+      let sub = await reg.pushManager.getSubscription();
+      if (!sub) {
+        sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64(info.key) });
+      }
+      await api('/api/push', { method: 'POST', body: JSON.stringify(sub) });
+    } catch (e) {}
+  }
+
+  async function removePush() {
+    try {
+      if (!('serviceWorker' in navigator)) return;
+      const reg = await navigator.serviceWorker.getRegistration('/');
+      if (!reg) return;
+      const sub = await reg.pushManager.getSubscription();
+      if (!sub) return;
+      await fetch('/api/push?endpoint=' + encodeURIComponent(sub.endpoint), { method: 'DELETE', credentials: 'same-origin' });
+      await sub.unsubscribe();
+    } catch (e) {}
+  }
+
   setMode('login');
   // mulai cek pesan baru walaupun chat belum dibuka, selama sudah login
   (async () => {
@@ -2117,6 +2203,7 @@ function syncLyrics() {
       me = await api('/api/auth?action=me');
       try { await refreshMe(); } catch (e) {}
       startNotify();
+      setupPush();
     } catch (e) {
       me = null;
     }
