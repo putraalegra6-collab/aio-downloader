@@ -349,48 +349,108 @@ button { font-family: inherit; }
   .music-panel { bottom: 82px; right: 14px; width: calc(100vw - 28px); }
 }
 
-#cgRoot { display:none; position:fixed; inset:0; z-index:9999; flex-direction:column; background:#f4efe4; color:#1b1b1b; font:15px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif; }
-#cgRoot *, #cgRoot *::before, #cgRoot *::after { box-sizing:border-box; }
-#cgRoot button { font:inherit; color:#1b1b1b; background:#fffdf8; border:2px solid #1b1b1b; border-radius:10px; padding:8px 14px; cursor:pointer; box-shadow:2px 2px 0 #1b1b1b; }
-#cgRoot button:active { transform:translate(2px,2px); box-shadow:none; }
-#cgRoot button:disabled { opacity:.5; cursor:default; }
-#cgRoot .cg-primary { background:#f6b8b3; font-weight:700; }
-#cgRoot .cg-link { border:none; background:none; box-shadow:none; padding:6px 4px; text-decoration:underline; text-underline-offset:3px; }
-#cgRoot .cg-link.rec { color:#c62828; font-weight:700; }
-#cgRoot .cg-top { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; padding-top:calc(12px + env(safe-area-inset-top,0px)); background:#fffdf8; border-bottom:2px solid #1b1b1b; }
-#cgRoot .cg-title { font-weight:800; font-size:17px; }
-#cgRoot .cg-sub { font-size:13px; opacity:.65; }
-#cgRoot .cg-top-actions { display:flex; gap:8px; }
-#cgRoot .cg-top-actions button { padding:6px 10px; font-size:13px; }
-#cgRoot .cg-auth { flex:1; display:none; align-items:center; justify-content:center; padding:20px; overflow:auto; }
-#cgRoot .cg-card { width:min(360px,100%); background:#fffdf8; border:2px solid #1b1b1b; border-radius:14px; padding:20px; box-shadow:4px 4px 0 #1b1b1b; display:flex; flex-direction:column; gap:12px; }
-#cgRoot .cg-tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-#cgRoot .cg-tab.on { background:#f6b8b3; font-weight:700; }
-#cgRoot .cg-field { display:flex; flex-direction:column; gap:4px; font-size:13px; font-weight:600; }
-#cgRoot .cg-field input { font:inherit; font-weight:400; padding:10px 12px; border:2px solid #1b1b1b; border-radius:10px; background:#fff; color:#1b1b1b; }
-#cgRoot .cg-check { display:flex; align-items:center; gap:8px; font-size:14px; }
-#cgRoot .cg-block { width:100%; }
-#cgRoot .cg-err { min-height:1.2em; color:#c62828; font-size:13px; }
-#cgRoot .cg-hint { margin:0; font-size:12px; opacity:.6; }
-#cgRoot .cg-main { flex:1; display:none; flex-direction:column; min-height:0; }
-#cgRoot .cg-list { flex:1; overflow-y:auto; padding:14px 14px 6px; display:flex; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch; }
-#cgRoot .cg-msg { max-width:82%; background:#fffdf8; border:2px solid #1b1b1b; border-radius:14px 14px 14px 4px; padding:8px 12px 6px; align-self:flex-start; }
-#cgRoot .cg-msg.cg-mine { align-self:flex-end; background:#fbe9a6; border-radius:14px 14px 4px 14px; }
-#cgRoot .cg-who { font-size:12px; font-weight:700; opacity:.7; margin-bottom:3px; }
-#cgRoot .cg-txt { white-space:pre-wrap; word-break:break-word; }
-#cgRoot .cg-quote { border-left:3px solid #e9807b; padding:2px 8px; margin-bottom:6px; font-size:13px; opacity:.8; word-break:break-word; }
-#cgRoot .cg-msg img, #cgRoot .cg-msg video { display:block; max-width:100%; border-radius:8px; margin-bottom:4px; }
-#cgRoot .cg-msg audio { width:100%; margin-bottom:4px; }
-#cgRoot .cg-msg a { word-break:break-all; color:#1b1b1b; font-weight:600; }
-#cgRoot .cg-acts { display:flex; gap:6px; margin-top:6px; }
-#cgRoot .cg-acts button { padding:2px 8px; font-size:12px; box-shadow:none; border-width:1.5px; }
-#cgRoot .cg-composer { border-top:2px solid #1b1b1b; background:#fffdf8; padding:10px 12px; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:6px; }
-#cgRoot .cg-row { display:flex; gap:8px; align-items:center; }
-#cgRoot .cg-input { flex:1; min-width:0; font:inherit; padding:10px 12px; border:2px solid #1b1b1b; border-radius:10px; background:#fff; color:#1b1b1b; }
-#cgRoot .cg-tools { justify-content:flex-start; gap:4px; flex-wrap:wrap; }
-#cgRoot .cg-status { font-size:12px; opacity:.6; margin-left:auto; }
-#cgRoot .cg-reply { display:none; align-items:center; justify-content:space-between; gap:8px; font-size:13px; background:#f4efe4; border:2px solid #1b1b1b; border-radius:10px; padding:6px 10px; }
+html { scroll-behavior: smooth; }
+.tab { transition: transform .18s ease, box-shadow .18s ease, background .2s ease; }
 .tab-chat { grid-column: 1 / -1; }
+.panel.active { animation: cgFadeUp .35s ease both; }
+@keyframes cgFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+}
+
+#cgRoot { position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: column; background: #f4efe4; color: #1b1b1b; font: 15px/1.45 system-ui, -apple-system, 'Segoe UI', sans-serif; opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity .25s ease, transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s linear .3s; }
+#cgRoot.cg-open { opacity: 1; visibility: visible; transform: none; transition: opacity .25s ease, transform .3s cubic-bezier(.2,.8,.2,1), visibility 0s; }
+#cgRoot [hidden] { display: none !important; }
+#cgRoot *, #cgRoot *::before, #cgRoot *::after { box-sizing: border-box; }
+#cgRoot button, #cgRoot input, #cgRoot textarea { font: inherit; color: inherit; }
+#cgRoot button { cursor: pointer; background: #fffdf8; border: 2px solid #1b1b1b; border-radius: 10px; padding: 8px 14px; box-shadow: 2px 2px 0 #1b1b1b; transition: transform .12s ease, box-shadow .12s ease, background .15s ease; }
+#cgRoot button:hover { background: #fff6d8; }
+#cgRoot button:active { transform: translate(2px, 2px); box-shadow: 0 0 0 #1b1b1b; }
+#cgRoot button:disabled { opacity: .5; cursor: default; }
+#cgRoot .cg-primary { background: #f6b8b3; font-weight: 700; }
+#cgRoot .cg-primary:hover { background: #f2a7a1; }
+#cgRoot .cg-link { background: none; border: none; box-shadow: none; padding: 6px 4px; text-decoration: underline; text-underline-offset: 3px; }
+#cgRoot .cg-link:hover, #cgRoot .cg-link:active { background: none; transform: none; box-shadow: none; }
+
+#cgRoot .cg-top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; padding-top: calc(12px + env(safe-area-inset-top, 0px)); background: #fffdf8; border-bottom: 2px solid #1b1b1b; }
+#cgRoot .cg-titles { flex: 1; min-width: 0; }
+#cgRoot .cg-title { font-weight: 800; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#cgRoot .cg-sub { font-size: 12px; opacity: .6; }
+#cgRoot .cg-icon { width: 40px; height: 40px; padding: 0; display: grid; place-items: center; border-radius: 12px; flex-shrink: 0; }
+#cgRoot .cg-icon svg, #cgRoot .cg-icon-btn svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+#cgRoot .cg-me { width: 40px; height: 40px; padding: 0; border: none; background: none; box-shadow: none; border-radius: 50%; flex-shrink: 0; }
+#cgRoot .cg-me:hover, #cgRoot .cg-me:active { background: none; transform: none; box-shadow: none; }
+
+#cgRoot .cg-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 14px; background: #fffdf8; border-bottom: 2px solid #1b1b1b; }
+#cgRoot .cg-seg button { box-shadow: none; background: #f4efe4; font-weight: 700; padding: 8px; }
+#cgRoot .cg-seg button.on { background: #f6b8b3; }
+
+#cgRoot .cg-view { flex: 1; min-height: 0; display: flex; flex-direction: column; animation: cgIn .3s cubic-bezier(.2,.8,.2,1) both; }
+#cgRoot .cg-center { align-items: center; justify-content: center; padding: 20px; overflow: auto; }
+@keyframes cgIn { from { opacity: 0; transform: translateY(6px) scale(.985); } to { opacity: 1; transform: none; } }
+
+#cgRoot .cg-card { width: min(360px, 100%); background: #fffdf8; border: 2px solid #1b1b1b; border-radius: 16px; padding: 20px; box-shadow: 4px 4px 0 #1b1b1b; display: flex; flex-direction: column; gap: 14px; }
+#cgRoot .cg-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+#cgRoot .cg-tabs button { box-shadow: none; background: #f4efe4; font-weight: 700; }
+#cgRoot .cg-tabs button.on { background: #f6b8b3; }
+#cgRoot .cg-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 700; }
+#cgRoot .cg-field input, #cgRoot .cg-field textarea { font-weight: 400; font-size: 15px; padding: 11px 12px; border: 2px solid #1b1b1b; border-radius: 12px; background: #fff; outline: none; resize: none; }
+#cgRoot .cg-check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+#cgRoot .cg-block { width: 100%; }
+#cgRoot .cg-err { min-height: 1.2em; color: #c62828; font-size: 13px; }
+#cgRoot .cg-hint { margin: 0; font-size: 12px; opacity: .6; }
+
+#cgRoot .cg-list { flex: 1; overflow-y: auto; padding: 16px 14px 8px; display: flex; flex-direction: column; gap: 12px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+#cgRoot .cg-row-msg { display: flex; align-items: flex-end; gap: 8px; max-width: 88%; align-self: flex-start; animation: cgIn .28s cubic-bezier(.2,.8,.2,1) both; }
+#cgRoot .cg-row-msg.mine { align-self: flex-end; }
+#cgRoot .cg-bubble { min-width: 0; background: #fffdf8; border: 2px solid #1b1b1b; border-radius: 16px 16px 16px 4px; padding: 8px 12px 6px; box-shadow: 2px 2px 0 #1b1b1b; }
+#cgRoot .cg-row-msg.mine .cg-bubble { background: #fbe9a6; border-radius: 16px 16px 4px 16px; }
+#cgRoot .cg-name { display: block; background: none; border: none; box-shadow: none; padding: 0; font-size: 12px; font-weight: 800; margin-bottom: 2px; text-align: left; }
+#cgRoot .cg-name:hover { text-decoration: underline; background: none; transform: none; }
+#cgRoot .cg-txt { white-space: pre-wrap; word-break: break-word; }
+#cgRoot .cg-media { display: block; max-width: min(260px, 100%); border-radius: 10px; border: 2px solid #1b1b1b; margin: 2px 0 4px; }
+#cgRoot .cg-audio { display: block; width: min(240px, 100%); margin: 4px 0; }
+#cgRoot .cg-file { display: inline-block; font-weight: 700; word-break: break-all; margin: 4px 0; color: #1b1b1b; }
+#cgRoot .cg-quote { border-left: 3px solid #e9807b; padding: 2px 8px; margin-bottom: 6px; font-size: 13px; opacity: .85; word-break: break-word; }
+#cgRoot .cg-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 4px; font-size: 11px; opacity: .7; }
+#cgRoot .cg-acts { display: flex; gap: 6px; }
+#cgRoot .cg-acts button { padding: 1px 8px; font-size: 11px; box-shadow: none; border-width: 1.5px; border-radius: 8px; }
+#cgRoot .cg-empty { margin: auto; opacity: .6; font-size: 14px; }
+
+#cgRoot .cg-av, #cgRoot .cg-av-xl { border-radius: 50%; object-fit: cover; border: 2px solid #1b1b1b; display: grid; place-items: center; flex-shrink: 0; background: #f6b8b3; font-weight: 800; }
+#cgRoot .cg-av { width: 36px; height: 36px; font-size: 15px; }
+#cgRoot .cg-av-xl { width: 112px; height: 112px; font-size: 44px; }
+#cgRoot .cg-av-btn { padding: 0; border: none; background: none; box-shadow: none; border-radius: 50%; align-self: flex-end; }
+#cgRoot .cg-av-btn:hover, #cgRoot .cg-av-btn:active { background: none; transform: none; box-shadow: none; }
+
+#cgRoot .cg-composer { border-top: 2px solid #1b1b1b; background: #fffdf8; padding: 10px 12px; padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 6px; }
+#cgRoot .cg-inputrow { display: flex; align-items: center; gap: 8px; }
+#cgRoot .cg-icon-btn { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; flex-shrink: 0; border-radius: 12px; }
+#cgRoot .cg-icon-btn .i-stop { display: none; fill: currentColor; stroke: none; }
+#cgRoot .cg-icon-btn.rec { background: #ff8a80; }
+#cgRoot .cg-icon-btn.rec .i-stop { display: block; }
+#cgRoot .cg-icon-btn.rec .i-mic { display: none; }
+#cgRoot .cg-input { flex: 1; min-width: 0; height: 44px; padding: 0 14px; border: 2px solid #1b1b1b; border-radius: 12px; background: #fff; outline: none; transition: box-shadow .15s ease; }
+#cgRoot .cg-input:focus { box-shadow: 0 0 0 3px #f6b8b3; }
+#cgRoot .cg-send { height: 44px; padding: 0 18px; font-weight: 800; }
+#cgRoot .cg-reply { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; background: #f4efe4; border: 2px solid #1b1b1b; border-radius: 10px; padding: 6px 10px; }
+#cgRoot .cg-status { font-size: 12px; opacity: .7; min-height: 1em; }
+
+#cgRoot .cg-searchbox { padding: 12px 14px 6px; }
+#cgRoot .cg-users { flex: 1; overflow-y: auto; padding: 6px 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+#cgRoot .cg-user { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; box-shadow: 2px 2px 0 #1b1b1b; }
+#cgRoot .cg-user .cg-av { width: 44px; height: 44px; font-size: 17px; }
+#cgRoot .cg-user-txt { display: flex; flex-direction: column; min-width: 0; }
+#cgRoot .cg-user-name { font-weight: 800; }
+#cgRoot .cg-user-bio { font-size: 12px; opacity: .65; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+#cgRoot .cg-profile-wrap { flex: 1; overflow-y: auto; display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px; }
+#cgRoot .cg-profile { width: min(380px, 100%); background: #fffdf8; border: 2px solid #1b1b1b; border-radius: 16px; padding: 24px; box-shadow: 4px 4px 0 #1b1b1b; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+#cgRoot .cg-pname { font-size: 20px; font-weight: 800; }
+#cgRoot .cg-pbio { font-size: 14px; opacity: .75; white-space: pre-wrap; word-break: break-word; }
+#cgRoot .cg-row-wrap { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; align-items: center; }
+#cgRoot .cg-avatar-edit { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+#cgRoot .cg-file-input { font-size: 13px; max-width: 100%; }
 </style>
 </head>
 <body>
@@ -1228,22 +1288,30 @@ function syncLyrics() {
 </script>
 
 <div id="cgRoot">
-  <div class="cg-top">
-    <div>
-      <div class="cg-title">Global Chat</div>
-      <div class="cg-sub" id="cgWho"></div>
+  <header class="cg-top">
+    <button id="cgBack" class="cg-icon" type="button" aria-label="Kembali" hidden>
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="cg-titles">
+      <div id="cgTitle" class="cg-title">Chat</div>
+      <div id="cgSub" class="cg-sub"></div>
     </div>
-    <div class="cg-top-actions">
-      <button id="cgLogout" type="button" hidden>Keluar</button>
-      <button id="cgClose" type="button">Tutup</button>
-    </div>
-  </div>
+    <button id="cgMe" class="cg-me" type="button" aria-label="Profil saya" hidden></button>
+    <button id="cgClose" class="cg-icon" type="button" aria-label="Tutup">
+      <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </header>
 
-  <div id="cgAuth" class="cg-auth">
+  <nav id="cgSeg" class="cg-seg" hidden>
+    <button type="button" data-seg="global" class="on">Global</button>
+    <button type="button" data-seg="private">Pribadi</button>
+  </nav>
+
+  <section id="cgViewAuth" class="cg-view cg-center" hidden>
     <form id="cgAuthForm" class="cg-card">
       <div class="cg-tabs">
-        <button type="button" id="cgTabLogin" class="cg-tab on">Masuk</button>
-        <button type="button" id="cgTabReg" class="cg-tab">Daftar</button>
+        <button type="button" id="cgTabLogin" class="on">Masuk</button>
+        <button type="button" id="cgTabReg">Daftar</button>
       </div>
       <label class="cg-field">Username<input id="cgU" type="text" autocomplete="username" required></label>
       <label class="cg-field">Password<input id="cgP" type="password" autocomplete="current-password" required></label>
@@ -1252,303 +1320,524 @@ function syncLyrics() {
       <button id="cgAuthBtn" class="cg-primary cg-block" type="submit">Masuk</button>
       <p class="cg-hint">Username 3-20 karakter (huruf, angka, _). Password minimal 4 karakter.</p>
     </form>
-  </div>
+  </section>
 
-  <div id="cgChat" class="cg-main">
+  <section id="cgViewChat" class="cg-view" hidden>
     <div id="cgList" class="cg-list"></div>
-    <div id="cgComposer" class="cg-composer">
-      <div id="cgReplyBar" class="cg-reply">
+    <div class="cg-composer">
+      <div id="cgReplyBar" class="cg-reply" hidden>
         <span id="cgReplyTxt"></span>
         <button id="cgCancelReply" class="cg-link" type="button">Batal</button>
       </div>
-      <div class="cg-row">
-        <button id="cgAttach" type="button">File</button>
+      <div class="cg-inputrow">
+        <button id="cgAttach" class="cg-icon-btn" type="button" aria-label="Lampirkan file">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5l-8.5 8.5a5 5 0 0 1-7-7L14 4.5a3.5 3.5 0 0 1 5 5L10.5 18a2 2 0 0 1-3-3L16 6.5"/></svg>
+        </button>
         <input id="cgFileIn" type="file" accept="image/*,video/*,audio/*,*/*" hidden>
-        <input id="cgText" class="cg-input" type="text" placeholder="Tulis pesan" maxlength="2000">
-        <button id="cgSend" class="cg-primary" type="button">Kirim</button>
+        <input id="cgText" class="cg-input" type="text" placeholder="Tulis pesan" maxlength="2000" autocomplete="off">
+        <button id="cgVn" class="cg-icon-btn" type="button" aria-label="Rekam VN">
+          <svg class="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          <svg class="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+        </button>
+        <button id="cgSend" class="cg-primary cg-send" type="button">Kirim</button>
       </div>
-      <div class="cg-row cg-tools">
-        <button id="cgVn" class="cg-link" type="button">Rekam VN</button>
-        <button id="cgReport" class="cg-link" type="button">Lapor bug</button>
-        <span id="cgStatus" class="cg-status"></span>
-      </div>
+      <div id="cgStatus" class="cg-status"></div>
     </div>
-  </div>
+  </section>
+
+  <section id="cgViewPrivate" class="cg-view" hidden>
+    <div class="cg-searchbox"><input id="cgSearch" class="cg-input" type="search" placeholder="Cari username" autocomplete="off"></div>
+    <div id="cgUserList" class="cg-users"></div>
+  </section>
+
+  <section id="cgViewProfile" class="cg-view" hidden>
+    <div id="cgProfileBody" class="cg-profile-wrap"></div>
+  </section>
 </div>
 
 <script>
 (function () {
+  const $ = (id) => document.getElementById(id);
+  const MAX_BYTES = 3 * 1024 * 1024;
 
-const $ = (id) => document.getElementById(id);
-const MAX_BYTES = 3 * 1024 * 1024;
-let me = null, mode = 'login', replyTo = null, pollTimer = null;
-let rec = null, recChunks = [], recTimeout = null;
+  let me = null;
+  let view = 'auth';
+  let thread = null;
+  let backFn = null;
+  let replyTo = null;
+  let pollTimer = null;
+  let lastSig = null;
+  let allUsers = [];
+  let profileUser = null;
+  let pendingAvatar = undefined;
+  let mode = 'login';
+  let rec = null, recChunks = [], recTimer = null, recTick = null, recStart = 0;
 
-const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const letter = (name) => esc(String(name || '?').charAt(0).toUpperCase());
+  const avatarSrc = (id, av) => '/api/users?avatar=' + id + '&v=' + (av || 0);
+  const avatar = (u, cls) => u.has_avatar
+    ? '<img class="' + cls + '" src="' + avatarSrc(u.id, u.av) + '" alt="" loading="lazy">'
+    : '<span class="' + cls + ' cg-letter">' + letter(u.username) + '</span>';
+  const timeOf = (iso) => new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  const fmt = (sec) => Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
 
-async function api(url, opts = {}) {
-  const r = await fetch(url, {
-    credentials: 'same-origin',
-    method: opts.method || 'GET',
-    headers: { 'Content-Type': 'application/json' },
-    body: opts.body
-  });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(j.error || 'Gagal (' + r.status + ')');
-  return j;
-}
-
-function setStatus(t) { $('cgStatus').textContent = t; }
-
-function readBase64(blob) {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(String(r.result).split(',')[1]);
-    r.onerror = () => reject(new Error('Gagal membaca file'));
-    r.readAsDataURL(blob);
-  });
-}
-
-// ---------- login / daftar ----------
-function setMode(m) {
-  mode = m;
-  $('cgTabLogin').className = m === 'login' ? 'cg-tab on' : 'cg-tab';
-  $('cgTabReg').className = m === 'register' ? 'cg-tab on' : 'cg-tab';
-  $('cgAuthBtn').textContent = m === 'login' ? 'Masuk' : 'Daftar';
-  $('cgAuthErr').textContent = '';
-}
-$('cgTabLogin').onclick = () => setMode('login');
-$('cgTabReg').onclick = () => setMode('register');
-
-$('cgAuthForm').onsubmit = async (e) => {
-  e.preventDefault();
-  $('cgAuthErr').textContent = '';
-  $('cgAuthBtn').disabled = true;
-  try {
-    await api('/api/auth?action=' + (mode === 'login' ? 'login' : 'register'), {
-      method: 'POST',
-      body: JSON.stringify({ username: $('cgU').value.trim(), password: $('cgP').value, remember: $('cgRemember').checked })
+  async function api(url, opts) {
+    opts = opts || {};
+    const r = await fetch(url, {
+      credentials: 'same-origin',
+      method: opts.method || 'GET',
+      headers: { 'Content-Type': 'application/json' },
+      body: opts.body
     });
-    $('cgP').value = '';
-    await boot();
-  } catch (err) {
-    $('cgAuthErr').textContent = err.message;
-  } finally {
-    $('cgAuthBtn').disabled = false;
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Gagal (' + r.status + ')');
+    return j;
   }
-};
 
-async function boot() {
-  try {
-    me = await api('/api/auth?action=me');
-    $('cgAuth').style.display = 'none';
-    $('cgChat').style.display = 'flex';
-    $('cgWho').textContent = me.username;
-    $('cgLogout').hidden = false;
-    await loadMessages();
-    clearInterval(pollTimer);
-    pollTimer = setInterval(() => loadMessages().catch(() => {}), 3000);
-  } catch {
-    me = null;
-    clearInterval(pollTimer);
-    $('cgAuth').style.display = 'flex';
-    $('cgChat').style.display = 'none';
-    $('cgLogout').hidden = true;
-    $('cgWho').textContent = '';
+  function readDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(String(r.result));
+      r.onerror = () => reject(new Error('Gagal membaca file'));
+      r.readAsDataURL(blob);
+    });
+  }
+
+  function resizeImage(file) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        const S = 256;
+        const side = Math.min(img.width, img.height);
+        const c = document.createElement('canvas');
+        c.width = S; c.height = S;
+        c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, S, S);
+        URL.revokeObjectURL(url);
+        resolve(c.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Gambar tidak bisa dibaca')); };
+      img.src = url;
+    });
+  }
+
+  function setStatus(t) { $('cgStatus').textContent = t || ''; }
+
+  function showView(name) {
+    view = name;
+    $('cgViewAuth').hidden = name !== 'auth';
+    $('cgViewChat').hidden = name !== 'chat';
+    $('cgViewPrivate').hidden = name !== 'private';
+    $('cgViewProfile').hidden = name !== 'profile';
+  }
+
+  function setTop(title, sub, o) {
+    o = o || {};
+    $('cgTitle').textContent = title;
+    $('cgSub').textContent = sub || '';
+    $('cgBack').hidden = !o.back;
+    $('cgSeg').hidden = !o.seg;
+    $('cgMe').hidden = !o.me;
+  }
+
+  function setSeg(name) {
+    document.querySelectorAll('#cgSeg button').forEach((b) => b.classList.toggle('on', b.dataset.seg === name));
+  }
+
+  function stopPolling() { clearInterval(pollTimer); pollTimer = null; }
+  function startPolling(fn) { stopPolling(); pollTimer = setInterval(() => fn().catch(() => {}), 3000); }
+
+  function currentBack() {
+    if (view === 'chat' && thread) { const t = thread; return () => openThread(t); }
+    if (view === 'private') return openPrivate;
+    return openGlobal;
+  }
+
+  function clearReply() { replyTo = null; $('cgReplyBar').hidden = true; }
+  function showReply() { $('cgReplyTxt').textContent = 'Membalas ' + replyTo.who; $('cgReplyBar').hidden = false; $('cgText').focus(); }
+
+  // ---------- navigasi ----------
+  function openGlobal() {
+    stopPolling();
+    thread = null; clearReply(); lastSig = null;
     $('cgList').innerHTML = '';
+    showView('chat');
+    setTop('Global', 'Semua orang', { seg: true, me: true });
+    setSeg('global');
+    $('cgText').placeholder = 'Tulis pesan';
+    loadThread().catch((e) => setStatus(e.message));
+    startPolling(loadThread);
   }
-}
 
-$('cgLogout').onclick = async () => {
-  await fetch('/api/auth?action=logout', { method: 'POST', credentials: 'same-origin' });
-  await boot();
-};
-
-// ---------- pesan ----------
-function msgHtml(m, byId) {
-  const mine = me && m.username === me.username;
-  const canDelete = mine || (me && me.is_admin);
-  const src = '/api/chat?file=' + m.id;
-  let inner = '';
-  const parent = m.reply_to && byId[m.reply_to];
-  if (parent) inner += '<div class="cg-quote">' + esc(parent.username) + ': ' + esc((parent.body || '[file]').slice(0, 80)) + '</div>';
-  if (m.has_file) {
-    if (m.kind === 'image') inner += '<img src="' + src + '" loading="lazy" alt="">';
-    else if (m.kind === 'video') inner += '<video controls preload="metadata" src="' + src + '"></video>';
-    else if (m.kind === 'audio' || m.kind === 'voice') inner += '<audio controls preload="none" src="' + src + '"></audio>';
-    else inner += '<a href="' + src + '" download="' + esc(m.file_name) + '">' + esc(m.file_name || 'file') + '</a>';
+  function openThread(u) {
+    stopPolling();
+    thread = u; clearReply(); lastSig = null;
+    $('cgList').innerHTML = '';
+    showView('chat');
+    setTop(u.username, 'Pesan pribadi', { back: true, me: true });
+    backFn = openPrivate;
+    $('cgText').placeholder = 'Pesan untuk ' + u.username;
+    loadThread().catch((e) => setStatus(e.message));
+    startPolling(loadThread);
   }
-  if (m.body) inner += '<div class="cg-txt">' + (m.kind === 'report' ? '' : '') + esc(m.body) + '</div>';
-  const time = new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-  inner += '<div class="cg-acts"><button data-reply="' + m.id + '">Balas</button>' +
-    (canDelete ? '<button data-del="' + m.id + '">Hapus</button>' : '') + '</div>';
-  return '<div class="cg-msg ' + (mine ? 'cg-mine' : '') + '" data-id="' + m.id + '"><div class="cg-who">' + esc(m.username) + ' · ' + time + '</div>' + inner + '</div>';
-}
 
-// Update incremental: pesan baru ditambah di bawah, pesan yang sudah hilang dibuang.
-// Jadi audio yang sedang diputar tidak ter-reset tiap polling.
-async function loadMessages() {
-  const { messages } = await api('/api/chat');
-  const list = $('cgList');
-  const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 120;
-  const firstLoad = list.children.length === 0;
-  const byId = Object.fromEntries(messages.map((m) => [m.id, m]));
-  const ids = new Set(messages.map((m) => m.id));
-
-  for (const el of [...list.children]) {
-    if (!ids.has(Number(el.dataset.id))) el.remove();
-  }
-  const have = new Set([...list.children].map((el) => Number(el.dataset.id)));
-  for (const m of messages) {
-    if (have.has(m.id)) continue;
-    const tmp = document.createElement('div');
-    tmp.innerHTML = msgHtml(m, byId);
-    list.appendChild(tmp.firstElementChild);
-  }
-  if (firstLoad || nearBottom) list.scrollTop = list.scrollHeight;
-}
-
-function clearReply() {
-  replyTo = null;
-  $('cgReplyBar').style.display = 'none';
-}
-
-async function sendPayload(payload) {
-  await api('/api/chat', { method: 'POST', body: JSON.stringify({ ...payload, reply_to: replyTo ? replyTo.id : null }) });
-  clearReply();
-  await loadMessages();
-}
-
-$('cgList').onclick = async (e) => {
-  const rb = e.target.closest('[data-reply]');
-  const db = e.target.closest('[data-del]');
-  if (rb) {
-    const el = rb.closest('.cg-msg');
-    replyTo = { id: Number(rb.dataset.reply), who: el.querySelector('.cg-who').textContent.split(' · ')[0] };
-    $('cgReplyTxt').textContent = 'Membalas ' + replyTo.who;
-    $('cgReplyBar').style.display = 'block';
-    $('cgText').focus();
-  }
-  if (db) {
-    if (!confirm('Hapus pesan ini?')) return;
+  async function openPrivate() {
+    stopPolling();
+    thread = null; clearReply();
+    showView('private');
+    setTop('Pribadi', 'Pilih seseorang untuk chat', { seg: true, me: true });
+    setSeg('private');
     try {
-      await api('/api/chat?id=' + db.dataset.del, { method: 'DELETE' });
-      await loadMessages();
-    } catch (err) {
-      alert(err.message);
+      const r = await api('/api/users');
+      allUsers = r.users;
+      renderUsers();
+    } catch (e) { setStatus(e.message); }
+  }
+
+  async function openProfile(id, back) {
+    stopPolling();
+    showView('profile');
+    setTop('Profil', '', { back: true, me: true });
+    backFn = back || openGlobal;
+    try {
+      profileUser = await api('/api/users?id=' + id);
+      renderProfile();
+    } catch (e) { setStatus(e.message); }
+  }
+
+  function renderProfile() {
+    const u = profileUser, mine = me && u.id === me.id;
+    const actions = mine
+      ? '<button type="button" class="cg-primary" data-act="edit">Edit profil</button><button type="button" data-act="logout">Keluar</button>'
+      : '<button type="button" class="cg-primary" data-act="dm">Kirim pesan</button>';
+    $('cgProfileBody').innerHTML = '<div class="cg-profile">' + avatar(u, 'cg-av-xl') +
+      '<div class="cg-pname">' + esc(u.username) + '</div>' +
+      '<div class="cg-pbio">' + (u.bio ? esc(u.bio) : 'Belum ada bio') + '</div>' +
+      '<div class="cg-row-wrap">' + actions + '</div></div>';
+  }
+
+  function renderEdit() {
+    const u = profileUser;
+    pendingAvatar = undefined;
+    $('cgProfileBody').innerHTML = '<form id="cgEditForm" class="cg-card">' +
+      '<div class="cg-avatar-edit"><div id="cgPreview">' + avatar(u, 'cg-av-xl') + '</div>' +
+      '<input id="cgAvFile" class="cg-file-input" type="file" accept="image/*">' +
+      '<button type="button" class="cg-link" data-act="avremove">Hapus foto</button></div>' +
+      '<label class="cg-field">Bio<textarea id="cgBio" maxlength="160" rows="3">' + esc(u.bio || '') + '</textarea></label>' +
+      '<div class="cg-err" id="cgEditErr"></div>' +
+      '<div class="cg-row-wrap"><button type="button" data-act="cancel">Batal</button>' +
+      '<button type="submit" class="cg-primary">Simpan</button></div></form>';
+  }
+
+  async function refreshMe() {
+    const p = await api('/api/users?id=' + me.id);
+    $('cgMe').innerHTML = avatar(p, 'cg-av');
+  }
+
+  async function saveProfile() {
+    const err = $('cgEditErr');
+    err.textContent = '';
+    const payload = { bio: $('cgBio').value.trim() };
+    if (pendingAvatar !== undefined) payload.avatar = pendingAvatar;
+    try {
+      await api('/api/users?action=me', { method: 'POST', body: JSON.stringify(payload) });
+      pendingAvatar = undefined;
+      await refreshMe();
+      await openProfile(me.id, backFn);
+    } catch (e) { err.textContent = e.message; }
+  }
+
+  async function logout() {
+    await fetch('/api/auth?action=logout', { method: 'POST', credentials: 'same-origin' });
+    me = null;
+    await boot();
+  }
+
+  // ---------- daftar user ----------
+  function renderUsers() {
+    const q = $('cgSearch').value.trim().toLowerCase();
+    const list = allUsers.filter((u) => !q || u.username.toLowerCase().indexOf(q) !== -1);
+    $('cgUserList').innerHTML = list.length
+      ? list.map((u) => '<button type="button" class="cg-user" data-open="' + u.id + '">' + avatar(u, 'cg-av') +
+          '<span class="cg-user-txt"><span class="cg-user-name">' + esc(u.username) + '</span>' +
+          '<span class="cg-user-bio">' + esc(u.bio || 'Belum ada bio') + '</span></span></button>').join('')
+      : '<div class="cg-empty">Belum ada pengguna lain</div>';
+  }
+
+  // ---------- pesan ----------
+  function msgHtml(m, byId) {
+    const mine = m.user_id === me.id;
+    const canDel = mine || me.is_admin;
+    const u = { id: m.user_id, username: m.username, has_avatar: m.has_avatar, av: m.av };
+    const parent = m.reply_to && byId[m.reply_to];
+    const src = '/api/chat?file=' + m.id;
+    let media = '';
+    if (m.has_file) {
+      if (m.kind === 'image') media = '<img class="cg-media" src="' + src + '" loading="lazy" alt="">';
+      else if (m.kind === 'video') media = '<video class="cg-media" controls preload="metadata" src="' + src + '"></video>';
+      else if (m.kind === 'audio' || m.kind === 'voice') media = '<audio class="cg-audio" controls preload="none" src="' + src + '"></audio>';
+      else media = '<a class="cg-file" href="' + src + '" download="' + esc(m.file_name) + '">' + esc(m.file_name || 'File') + '</a>';
     }
+    const quote = parent ? '<div class="cg-quote"><b>' + esc(parent.username) + '</b> ' + esc((parent.body || 'File').slice(0, 90)) + '</div>' : '';
+    const text = m.body ? '<div class="cg-txt">' + esc(m.body) + '</div>' : '';
+    const av = mine ? '' : '<button class="cg-av-btn" data-profile="' + m.user_id + '" aria-label="Profil">' + avatar(u, 'cg-av') + '</button>';
+    const name = mine ? '' : '<button class="cg-name" data-profile="' + m.user_id + '">' + esc(m.username) + '</button>';
+    const del = canDel ? '<button type="button" data-del="' + m.id + '">Hapus</button>' : '';
+    return '<div class="cg-row-msg' + (mine ? ' mine' : '') + '" data-id="' + m.id + '">' + av +
+      '<div class="cg-bubble">' + name + quote + media + text +
+      '<div class="cg-meta"><time>' + timeOf(m.created_at) + '</time><span class="cg-acts">' +
+      '<button type="button" data-reply="' + m.id + '">Balas</button>' + del + '</span></div></div></div>';
   }
-};
 
-$('cgCancelReply').onclick = clearReply;
+  async function loadThread() {
+    const url = '/api/chat' + (thread ? '?with=' + thread.id : '');
+    const r = await api(url);
+    const messages = r.messages;
+    const sig = messages.map((m) => m.id).join(',');
+    if (sig === lastSig) return;
+    lastSig = sig;
 
-$('cgSend').onclick = async () => {
-  const body = $('cgText').value.trim();
-  if (!body) return;
-  $('cgSend').disabled = true;
-  try {
-    await sendPayload({ kind: 'text', body });
-    $('cgText').value = '';
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    $('cgSend').disabled = false;
-  }
-};
-$('cgText').onkeydown = (e) => { if (e.key === 'Enter') $('cgSend').click(); };
+    const list = $('cgList');
+    if (!messages.length) {
+      list.innerHTML = '<div class="cg-empty">Belum ada pesan</div>';
+      return;
+    }
+    const first = !list.querySelector('[data-id]');
+    const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 160;
+    list.querySelectorAll('.cg-empty').forEach((e) => e.remove());
 
-$('cgReport').onclick = async () => {
-  const body = $('cgText').value.trim();
-  if (!body) { alert('Tulis dulu bug-nya di kolom pesan, lalu tekan Lapor bug.'); return; }
-  try {
-    await sendPayload({ kind: 'report', body });
-    $('cgText').value = '';
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-// ---------- file ----------
-$('cgAttach').onclick = () => $('cgFileIn').click();
-$('cgFileIn').onchange = async () => {
-  const f = $('cgFileIn').files[0];
-  $('cgFileIn').value = '';
-  if (!f) return;
-  if (f.size > MAX_BYTES) { alert('File terlalu besar, maksimal 3 MB.'); return; }
-  const kind = f.type.startsWith('image/') ? 'image' : f.type.startsWith('video/') ? 'video' : f.type.startsWith('audio/') ? 'audio' : 'file';
-  setStatus('Mengirim file...');
-  try {
-    const data = await readBase64(f);
-    await sendPayload({
-      kind,
-      body: $('cgText').value.trim() || null,
-      file_name: f.name,
-      mime: f.type || 'application/octet-stream',
-      data
+    const byId = {};
+    messages.forEach((m) => { byId[m.id] = m; });
+    const ids = new Set(messages.map((m) => m.id));
+    list.querySelectorAll('[data-id]').forEach((el) => { if (!ids.has(Number(el.dataset.id))) el.remove(); });
+    const have = new Set([...list.querySelectorAll('[data-id]')].map((el) => Number(el.dataset.id)));
+    messages.forEach((m) => {
+      if (have.has(m.id)) return;
+      const t = document.createElement('div');
+      t.innerHTML = msgHtml(m, byId);
+      list.appendChild(t.firstElementChild);
     });
-    $('cgText').value = '';
-  } catch (err) {
-    alert(err.message);
-  } finally {
-    setStatus('');
+    if (first || nearBottom) list.scrollTop = list.scrollHeight;
   }
-};
 
-// ---------- VN (tekan sekali mulai, tekan lagi kirim; maks 60 detik) ----------
-$('cgVn').onclick = async () => {
-  if (rec) { rec.stop(); return; }
-  let stream;
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  } catch (err) {
-    alert('Mikrofon tidak bisa dipakai: ' + err.message);
-    return;
+  async function sendPayload(p) {
+    const body = Object.assign({}, p, {
+      reply_to: replyTo ? replyTo.id : null,
+      to: thread ? thread.id : null
+    });
+    await api('/api/chat', { method: 'POST', body: JSON.stringify(body) });
+    clearReply();
+    await loadThread();
   }
-  const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
-  recChunks = [];
-  rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
-  rec.ondataavailable = (e) => { if (e.data.size) recChunks.push(e.data); };
-  rec.onstop = async () => {
-    clearTimeout(recTimeout);
-    stream.getTracks().forEach((t) => t.stop());
-    const type = (rec && rec.mimeType) || mime || 'audio/webm';
-    rec = null;
-    $('cgVn').classList.remove('rec');
-    $('cgVn').textContent = 'Rekam VN';
-    const blob = new Blob(recChunks, { type });
-    if (blob.size < 500) return;
-    if (blob.size > MAX_BYTES) { alert('VN terlalu panjang.'); return; }
-    setStatus('Mengirim VN...');
+
+  // ---------- auth ----------
+  function setMode(m) {
+    mode = m;
+    $('cgTabLogin').classList.toggle('on', m === 'login');
+    $('cgTabReg').classList.toggle('on', m === 'register');
+    $('cgAuthBtn').textContent = m === 'login' ? 'Masuk' : 'Daftar';
+    $('cgAuthErr').textContent = '';
+  }
+
+  async function boot() {
     try {
-      const data = await readBase64(blob);
-      const base = type.split(';')[0];
-      await sendPayload({
-        kind: 'voice',
-        file_name: 'voice.' + (base.includes('mp4') ? 'm4a' : 'webm'),
-        mime: base,
-        data
-      });
-    } catch (err) {
-      alert(err.message);
-    } finally {
-      setStatus('');
+      me = await api('/api/auth?action=me');
+    } catch (e) {
+      me = null;
+      stopPolling();
+      $('cgMe').hidden = true;
+      showView('auth');
+      setTop('Masuk', 'Buat akun atau masuk untuk chat', {});
+      return;
     }
-  };
-  rec.start();
-  $('cgVn').classList.add('rec');
-  $('cgVn').textContent = 'Kirim VN';
-  recTimeout = setTimeout(() => { if (rec && rec.state !== 'inactive') rec.stop(); }, 60000);
-};
+    try { await refreshMe(); } catch (e) {}
+    openGlobal();
+  }
 
-
-  document.getElementById('cgOpen').onclick = () => {
-    document.getElementById('cgRoot').style.display = 'flex';
+  // ---------- event ----------
+  $('cgOpen').onclick = () => {
+    $('cgRoot').classList.add('cg-open');
     boot();
   };
-  document.getElementById('cgClose').onclick = () => {
-    document.getElementById('cgRoot').style.display = 'none';
-    clearInterval(pollTimer);
+  $('cgClose').onclick = () => {
+    if (rec) rec.stop();
+    $('cgRoot').classList.remove('cg-open');
+    stopPolling();
   };
+  $('cgBack').onclick = () => (backFn || openGlobal)();
+  $('cgMe').onclick = () => { if (me) openProfile(me.id, currentBack()); };
+  document.querySelectorAll('#cgSeg button').forEach((b) => {
+    b.onclick = () => (b.dataset.seg === 'global' ? openGlobal() : openPrivate());
+  });
+
+  $('cgTabLogin').onclick = () => setMode('login');
+  $('cgTabReg').onclick = () => setMode('register');
+  $('cgAuthForm').onsubmit = async (e) => {
+    e.preventDefault();
+    $('cgAuthErr').textContent = '';
+    $('cgAuthBtn').disabled = true;
+    try {
+      await api('/api/auth?action=' + (mode === 'login' ? 'login' : 'register'), {
+        method: 'POST',
+        body: JSON.stringify({ username: $('cgU').value.trim(), password: $('cgP').value, remember: $('cgRemember').checked })
+      });
+      $('cgP').value = '';
+      await boot();
+    } catch (err) {
+      $('cgAuthErr').textContent = err.message;
+    } finally {
+      $('cgAuthBtn').disabled = false;
+    }
+  };
+
+  $('cgSearch').oninput = renderUsers;
+  $('cgUserList').onclick = (e) => {
+    const b = e.target.closest('[data-open]');
+    if (!b) return;
+    const u = allUsers.find((x) => x.id === Number(b.dataset.open));
+    if (u) openThread(u);
+  };
+
+  $('cgProfileBody').onclick = (e) => {
+    const b = e.target.closest('[data-act]');
+    if (!b) return;
+    const act = b.dataset.act;
+    if (act === 'edit') renderEdit();
+    if (act === 'dm') openThread(profileUser);
+    if (act === 'cancel') renderProfile();
+    if (act === 'logout') logout();
+    if (act === 'avremove') {
+      pendingAvatar = null;
+      $('cgPreview').innerHTML = avatar({ id: profileUser.id, username: profileUser.username, has_avatar: false }, 'cg-av-xl');
+    }
+  };
+  $('cgProfileBody').onsubmit = (e) => {
+    if (e.target.id === 'cgEditForm') { e.preventDefault(); saveProfile(); }
+  };
+  $('cgProfileBody').onchange = async (e) => {
+    if (e.target.id !== 'cgAvFile' || !e.target.files[0]) return;
+    try {
+      pendingAvatar = await resizeImage(e.target.files[0]);
+      $('cgPreview').innerHTML = '<img class="cg-av-xl" src="' + pendingAvatar + '" alt="">';
+      $('cgEditErr').textContent = '';
+    } catch (err) {
+      $('cgEditErr').textContent = err.message;
+    }
+  };
+
+  $('cgList').onclick = async (e) => {
+    const p = e.target.closest('[data-profile]');
+    if (p) { openProfile(Number(p.dataset.profile), currentBack()); return; }
+    const r = e.target.closest('[data-reply]');
+    if (r) {
+      const el = r.closest('.cg-row-msg');
+      const nameEl = el.querySelector('.cg-name');
+      replyTo = { id: Number(r.dataset.reply), who: nameEl ? nameEl.textContent : 'Kamu' };
+      showReply();
+      return;
+    }
+    const d = e.target.closest('[data-del]');
+    if (d && confirm('Hapus pesan ini?')) {
+      try {
+        await api('/api/chat?id=' + d.dataset.del, { method: 'DELETE' });
+        await loadThread();
+      } catch (err) { setStatus(err.message); }
+    }
+  };
+  $('cgCancelReply').onclick = clearReply;
+
+  $('cgSend').onclick = async () => {
+    const body = $('cgText').value.trim();
+    if (!body) return;
+    $('cgSend').disabled = true;
+    try {
+      await sendPayload({ kind: 'text', body: body });
+      $('cgText').value = '';
+    } catch (err) {
+      setStatus(err.message);
+    } finally {
+      $('cgSend').disabled = false;
+    }
+  };
+  $('cgText').onkeydown = (e) => { if (e.key === 'Enter') $('cgSend').click(); };
+
+  $('cgAttach').onclick = () => $('cgFileIn').click();
+  $('cgFileIn').onchange = async () => {
+    const f = $('cgFileIn').files[0];
+    $('cgFileIn').value = '';
+    if (!f) return;
+    if (f.size > MAX_BYTES) { setStatus('File maksimal 3 MB'); return; }
+    const kind = f.type.startsWith('image/') ? 'image' : f.type.startsWith('video/') ? 'video' : f.type.startsWith('audio/') ? 'audio' : 'file';
+    setStatus('Mengirim file...');
+    try {
+      const data = (await readDataUrl(f)).split(',')[1];
+      await sendPayload({
+        kind: kind,
+        body: $('cgText').value.trim() || null,
+        file_name: f.name,
+        mime: f.type || 'application/octet-stream',
+        data: data
+      });
+      $('cgText').value = '';
+      setStatus('');
+    } catch (err) {
+      setStatus(err.message);
+    }
+  };
+
+  function setRecUi(on) {
+    $('cgVn').classList.toggle('rec', on);
+    $('cgVn').setAttribute('aria-label', on ? 'Kirim VN' : 'Rekam VN');
+  }
+
+  $('cgVn').onclick = async () => {
+    if (rec) { rec.stop(); return; }
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      setStatus('Izinkan akses mikrofon di browser');
+      return;
+    }
+    const type = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+    recChunks = [];
+    const mr = new MediaRecorder(stream, type ? { mimeType: type } : undefined);
+    rec = mr;
+    mr.ondataavailable = (e) => { if (e.data.size) recChunks.push(e.data); };
+    mr.onstop = async () => {
+      clearTimeout(recTimer);
+      clearInterval(recTick);
+      stream.getTracks().forEach((t) => t.stop());
+      rec = null;
+      setRecUi(false);
+      const mime = (mr.mimeType || type || 'audio/webm').split(';')[0];
+      const blob = new Blob(recChunks, { type: mime });
+      if (blob.size < 800) { setStatus(''); return; }
+      if (blob.size > MAX_BYTES) { setStatus('VN terlalu panjang'); return; }
+      setStatus('Mengirim VN...');
+      try {
+        const data = (await readDataUrl(blob)).split(',')[1];
+        await sendPayload({
+          kind: 'voice',
+          file_name: 'voice.' + (mime.indexOf('mp4') !== -1 ? 'm4a' : 'webm'),
+          mime: mime,
+          data: data
+        });
+        setStatus('');
+      } catch (err) {
+        setStatus(err.message);
+      }
+    };
+    mr.start();
+    recStart = Date.now();
+    setRecUi(true);
+    setStatus('Merekam 0:00');
+    recTick = setInterval(() => setStatus('Merekam ' + fmt((Date.now() - recStart) / 1000)), 250);
+    recTimer = setTimeout(() => { if (rec) rec.stop(); }, 60000);
+  };
+
+  setMode('login');
 })();
 </script>
 </body>
