@@ -494,6 +494,10 @@ html { scroll-behavior: smooth; }
 #cgRoot .cg-danger { border-color: #c62828; box-shadow: 4px 4px 0 #c62828; }
 #cgRoot .cg-danger-btn { background: #c62828; color: #fff; font-weight: 700; }
 #cgRoot .cg-ok { color: #2e7d32; font-size: 13px; min-height: 1.2em; }
+
+.cg-pop-btns { display: flex; gap: 8px; }
+.cg-pop-btns button { flex: 1; }
+.cg-pop-card button.cg-ghost { background: #fffdf8; }
 </style>
 </head>
 <body>
@@ -1411,7 +1415,7 @@ function syncLyrics() {
   <div class="cg-pop-card" role="dialog" aria-modal="true">
     <div id="cgPopTitle" class="cg-pop-title"></div>
     <div id="cgPopBody" class="cg-pop-body"></div>
-    <button id="cgPopOk" type="button">Oke</button>
+    <div id="cgPopBtns" class="cg-pop-btns"></div>
   </div>
 </div>
 <script>
@@ -1714,20 +1718,18 @@ function syncLyrics() {
       $('cgMe').hidden = true;
       showView('auth');
       setTop('Masuk', 'Buat akun atau masuk untuk chat', {});
+      greet(false);
       return;
     }
     try { await refreshMe(); } catch (e) {}
     startNotify();
+    greet(true);
     openGlobal();
   }
 
   // ---------- event ----------
   $('cgOpen').onclick = () => {
     $('cgRoot').classList.add('cg-open');
-    if (!welcomeShown) {
-      welcomeShown = true;
-      notify('Selamat datang di Global Chat', 'Jaga sopan santun dan saling menghormati. Tekan Oke untuk lanjut.');
-    }
     boot();
   };
   $('cgClose').onclick = () => {
@@ -1753,6 +1755,7 @@ function syncLyrics() {
         body: JSON.stringify({ username: $('cgU').value.trim(), password: $('cgP').value, remember: $('cgRemember').checked })
       });
       $('cgP').value = '';
+      greetPending = mode === 'register' ? 'new' : 'back';
       await boot();
     } catch (err) {
       $('cgAuthErr').textContent = err.message;
@@ -1922,24 +1925,35 @@ function syncLyrics() {
   const popQueue = [];
   let popOpen = false;
 
+  function closePop() {
+    popOpen = false;
+    $('cgPop').hidden = true;
+    showNextPop();
+  }
   function showNextPop() {
     if (popOpen || !popQueue.length) return;
     const p = popQueue.shift();
     popOpen = true;
     $('cgPopTitle').textContent = p.title;
     $('cgPopBody').textContent = p.text;
+    const box = $('cgPopBtns');
+    box.innerHTML = '';
+    (p.actions || [{ label: 'Oke' }]).forEach((a, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.textContent = a.label;
+      if (i > 0) b.className = 'cg-ghost';
+      b.onclick = () => { closePop(); if (a.run) a.run(); };
+      box.appendChild(b);
+    });
     $('cgPop').hidden = false;
-    $('cgPopOk').focus();
+    box.firstChild.focus();
   }
   function notify(title, text) {
     popQueue.push({ title: title, text: text });
     showNextPop();
   }
-  $('cgPopOk').onclick = () => {
-    popOpen = false;
-    $('cgPop').hidden = true;
-    showNextPop();
-  };
+
 
   // ---------- cek pesan baru (berjalan selama website terbuka dan sudah login) ----------
   const KIND_LABEL = { image: 'Mengirim foto', video: 'Mengirim video', audio: 'Mengirim audio', voice: 'Mengirim VN', file: 'Mengirim file' };
@@ -1952,7 +1966,9 @@ function syncLyrics() {
       const visible = openNow && view === 'chat' && (m.to_user ? (thread && thread.id === m.user_id) : !thread);
       if (visible) continue;
       const preview = (m.body ? String(m.body) : (KIND_LABEL[m.kind] || 'Pesan baru')).slice(0, 140);
-      notify(m.to_user ? 'Pesan pribadi dari ' + m.username : 'Global: ' + m.username, preview);
+      const ttl = m.to_user ? 'Pesan pribadi dari ' + m.username : 'Global: ' + m.username;
+      notify(ttl, preview);
+      nativeNotify(ttl, preview);
     }
   }
   async function startNotify() {
@@ -2051,6 +2067,47 @@ function syncLyrics() {
         await boot();
       } catch (err) { setMsg('cgSetDelMsg', err.message, false); }
     }
+  }
+
+  // ---------- sapaan dan izin notifikasi ----------
+  let greetPending = null;
+  let notifAsked = false;
+
+  function nativeNotify(title, body) {
+    try {
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification(title, { body: body, tag: 'cg-chat' });
+      }
+    } catch (e) {}
+  }
+
+  function askNotifPermission() {
+    if (notifAsked || !('Notification' in window) || Notification.permission !== 'default') return;
+    notifAsked = true;
+    popQueue.push({
+      title: 'Aktifkan notifikasi',
+      text: 'Izinkan notifikasi supaya kamu tahu saat ada pesan baru, walaupun sedang membuka halaman lain.',
+      actions: [
+        { label: 'Aktifkan', run: () => { Notification.requestPermission().catch(() => {}); } },
+        { label: 'Nanti' }
+      ]
+    });
+    showNextPop();
+  }
+
+  function greet(loggedIn) {
+    const kind = greetPending;
+    if (!kind && welcomeShown) return;
+    greetPending = null;
+    welcomeShown = true;
+    if (loggedIn && kind === 'new') {
+      notify('Selamat datang di Global Chat, ' + me.username, 'Akunmu sudah siap. Sekarang kamu bisa ngobrol dengan semua orang di sini.');
+    } else if (loggedIn) {
+      notify('Selamat datang kembali, ' + me.username, 'Senang melihatmu lagi. Pesan baru akan muncul sebagai notifikasi.');
+    } else {
+      notify('Selamat datang di Global Chat', 'Masuk atau daftar untuk ikut ngobrol. Jaga sopan santun dan saling menghormati.');
+    }
+    askNotifPermission();
   }
 
   setMode('login');
