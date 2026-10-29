@@ -348,6 +348,49 @@ button { font-family: inherit; }
   .music-fab { bottom: 16px; right: 16px; width: 54px; height: 54px; }
   .music-panel { bottom: 82px; right: 14px; width: calc(100vw - 28px); }
 }
+
+#cgRoot { display:none; position:fixed; inset:0; z-index:9999; flex-direction:column; background:#f4efe4; color:#1b1b1b; font:15px/1.45 system-ui,-apple-system,'Segoe UI',sans-serif; }
+#cgRoot *, #cgRoot *::before, #cgRoot *::after { box-sizing:border-box; }
+#cgRoot button { font:inherit; color:#1b1b1b; background:#fffdf8; border:2px solid #1b1b1b; border-radius:10px; padding:8px 14px; cursor:pointer; box-shadow:2px 2px 0 #1b1b1b; }
+#cgRoot button:active { transform:translate(2px,2px); box-shadow:none; }
+#cgRoot button:disabled { opacity:.5; cursor:default; }
+#cgRoot .cg-primary { background:#f6b8b3; font-weight:700; }
+#cgRoot .cg-link { border:none; background:none; box-shadow:none; padding:6px 4px; text-decoration:underline; text-underline-offset:3px; }
+#cgRoot .cg-link.rec { color:#c62828; font-weight:700; }
+#cgRoot .cg-top { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 16px; padding-top:calc(12px + env(safe-area-inset-top,0px)); background:#fffdf8; border-bottom:2px solid #1b1b1b; }
+#cgRoot .cg-title { font-weight:800; font-size:17px; }
+#cgRoot .cg-sub { font-size:13px; opacity:.65; }
+#cgRoot .cg-top-actions { display:flex; gap:8px; }
+#cgRoot .cg-top-actions button { padding:6px 10px; font-size:13px; }
+#cgRoot .cg-auth { flex:1; display:none; align-items:center; justify-content:center; padding:20px; overflow:auto; }
+#cgRoot .cg-card { width:min(360px,100%); background:#fffdf8; border:2px solid #1b1b1b; border-radius:14px; padding:20px; box-shadow:4px 4px 0 #1b1b1b; display:flex; flex-direction:column; gap:12px; }
+#cgRoot .cg-tabs { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+#cgRoot .cg-tab.on { background:#f6b8b3; font-weight:700; }
+#cgRoot .cg-field { display:flex; flex-direction:column; gap:4px; font-size:13px; font-weight:600; }
+#cgRoot .cg-field input { font:inherit; font-weight:400; padding:10px 12px; border:2px solid #1b1b1b; border-radius:10px; background:#fff; color:#1b1b1b; }
+#cgRoot .cg-check { display:flex; align-items:center; gap:8px; font-size:14px; }
+#cgRoot .cg-block { width:100%; }
+#cgRoot .cg-err { min-height:1.2em; color:#c62828; font-size:13px; }
+#cgRoot .cg-hint { margin:0; font-size:12px; opacity:.6; }
+#cgRoot .cg-main { flex:1; display:none; flex-direction:column; min-height:0; }
+#cgRoot .cg-list { flex:1; overflow-y:auto; padding:14px 14px 6px; display:flex; flex-direction:column; gap:10px; -webkit-overflow-scrolling:touch; }
+#cgRoot .cg-msg { max-width:82%; background:#fffdf8; border:2px solid #1b1b1b; border-radius:14px 14px 14px 4px; padding:8px 12px 6px; align-self:flex-start; }
+#cgRoot .cg-msg.cg-mine { align-self:flex-end; background:#fbe9a6; border-radius:14px 14px 4px 14px; }
+#cgRoot .cg-who { font-size:12px; font-weight:700; opacity:.7; margin-bottom:3px; }
+#cgRoot .cg-txt { white-space:pre-wrap; word-break:break-word; }
+#cgRoot .cg-quote { border-left:3px solid #e9807b; padding:2px 8px; margin-bottom:6px; font-size:13px; opacity:.8; word-break:break-word; }
+#cgRoot .cg-msg img, #cgRoot .cg-msg video { display:block; max-width:100%; border-radius:8px; margin-bottom:4px; }
+#cgRoot .cg-msg audio { width:100%; margin-bottom:4px; }
+#cgRoot .cg-msg a { word-break:break-all; color:#1b1b1b; font-weight:600; }
+#cgRoot .cg-acts { display:flex; gap:6px; margin-top:6px; }
+#cgRoot .cg-acts button { padding:2px 8px; font-size:12px; box-shadow:none; border-width:1.5px; }
+#cgRoot .cg-composer { border-top:2px solid #1b1b1b; background:#fffdf8; padding:10px 12px; padding-bottom:calc(10px + env(safe-area-inset-bottom,0px)); display:flex; flex-direction:column; gap:6px; }
+#cgRoot .cg-row { display:flex; gap:8px; align-items:center; }
+#cgRoot .cg-input { flex:1; min-width:0; font:inherit; padding:10px 12px; border:2px solid #1b1b1b; border-radius:10px; background:#fff; color:#1b1b1b; }
+#cgRoot .cg-tools { justify-content:flex-start; gap:4px; flex-wrap:wrap; }
+#cgRoot .cg-status { font-size:12px; opacity:.6; margin-left:auto; }
+#cgRoot .cg-reply { display:none; align-items:center; justify-content:space-between; gap:8px; font-size:13px; background:#f4efe4; border:2px solid #1b1b1b; border-radius:10px; padding:6px 10px; }
+.tab-chat { grid-column: 1 / -1; }
 </style>
 </head>
 <body>
@@ -386,6 +429,10 @@ button { font-family: inherit; }
     <button class="tab" data-tab="status" type="button">
       <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12h4l2-8 4 16 2-8h4"/></svg></span>
       <span class="tlabel"><span class="tmain">Status</span><span class="tsub">System Health</span></span>
+    </button>
+    <button class="tab tab-chat" id="cgOpen" type="button">
+      <span class="ticon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg></span>
+      <span class="tlabel"><span class="tmain">Global Chat</span><span class="tsub">Ngobrol bareng</span></span>
     </button>
   </nav>
 
@@ -630,7 +677,7 @@ function bindImgFallback(root) {
 }
 
 /* ---------- TABS ---------- */
-const tabs = document.querySelectorAll('.tab'), panels = document.querySelectorAll('.panel');
+const tabs = document.querySelectorAll('.tab[data-tab]'), panels = document.querySelectorAll('.panel');
 tabs.forEach(t => t.addEventListener('click', () => showTab(t.dataset.tab)));
 function showTab(name) {
   tabs.forEach(x => x.classList.toggle('active', x.dataset.tab === name));
@@ -1177,6 +1224,331 @@ function syncLyrics() {
       setTimeout(() => { loader.classList.add('hide'); setTimeout(() => loader.remove(), 450); }, 200);
     }
   }, 140);
+})();
+</script>
+
+<div id="cgRoot">
+  <div class="cg-top">
+    <div>
+      <div class="cg-title">Global Chat</div>
+      <div class="cg-sub" id="cgWho"></div>
+    </div>
+    <div class="cg-top-actions">
+      <button id="cgLogout" type="button" hidden>Keluar</button>
+      <button id="cgClose" type="button">Tutup</button>
+    </div>
+  </div>
+
+  <div id="cgAuth" class="cg-auth">
+    <form id="cgAuthForm" class="cg-card">
+      <div class="cg-tabs">
+        <button type="button" id="cgTabLogin" class="cg-tab on">Masuk</button>
+        <button type="button" id="cgTabReg" class="cg-tab">Daftar</button>
+      </div>
+      <label class="cg-field">Username<input id="cgU" type="text" autocomplete="username" required></label>
+      <label class="cg-field">Password<input id="cgP" type="password" autocomplete="current-password" required></label>
+      <label class="cg-check"><input id="cgRemember" type="checkbox" checked> Ingat saya</label>
+      <div class="cg-err" id="cgAuthErr"></div>
+      <button id="cgAuthBtn" class="cg-primary cg-block" type="submit">Masuk</button>
+      <p class="cg-hint">Username 3-20 karakter (huruf, angka, _). Password minimal 4 karakter.</p>
+    </form>
+  </div>
+
+  <div id="cgChat" class="cg-main">
+    <div id="cgList" class="cg-list"></div>
+    <div id="cgComposer" class="cg-composer">
+      <div id="cgReplyBar" class="cg-reply">
+        <span id="cgReplyTxt"></span>
+        <button id="cgCancelReply" class="cg-link" type="button">Batal</button>
+      </div>
+      <div class="cg-row">
+        <button id="cgAttach" type="button">File</button>
+        <input id="cgFileIn" type="file" accept="image/*,video/*,audio/*,*/*" hidden>
+        <input id="cgText" class="cg-input" type="text" placeholder="Tulis pesan" maxlength="2000">
+        <button id="cgSend" class="cg-primary" type="button">Kirim</button>
+      </div>
+      <div class="cg-row cg-tools">
+        <button id="cgVn" class="cg-link" type="button">Rekam VN</button>
+        <button id="cgReport" class="cg-link" type="button">Lapor bug</button>
+        <span id="cgStatus" class="cg-status"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+
+const $ = (id) => document.getElementById(id);
+const MAX_BYTES = 3 * 1024 * 1024;
+let me = null, mode = 'login', replyTo = null, pollTimer = null;
+let rec = null, recChunks = [], recTimeout = null;
+
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+async function api(url, opts = {}) {
+  const r = await fetch(url, {
+    credentials: 'same-origin',
+    method: opts.method || 'GET',
+    headers: { 'Content-Type': 'application/json' },
+    body: opts.body
+  });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Gagal (' + r.status + ')');
+  return j;
+}
+
+function setStatus(t) { $('cgStatus').textContent = t; }
+
+function readBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1]);
+    r.onerror = () => reject(new Error('Gagal membaca file'));
+    r.readAsDataURL(blob);
+  });
+}
+
+// ---------- login / daftar ----------
+function setMode(m) {
+  mode = m;
+  $('cgTabLogin').className = m === 'login' ? 'cg-tab on' : 'cg-tab';
+  $('cgTabReg').className = m === 'register' ? 'cg-tab on' : 'cg-tab';
+  $('cgAuthBtn').textContent = m === 'login' ? 'Masuk' : 'Daftar';
+  $('cgAuthErr').textContent = '';
+}
+$('cgTabLogin').onclick = () => setMode('login');
+$('cgTabReg').onclick = () => setMode('register');
+
+$('cgAuthForm').onsubmit = async (e) => {
+  e.preventDefault();
+  $('cgAuthErr').textContent = '';
+  $('cgAuthBtn').disabled = true;
+  try {
+    await api('/api/auth?action=' + (mode === 'login' ? 'login' : 'register'), {
+      method: 'POST',
+      body: JSON.stringify({ username: $('cgU').value.trim(), password: $('cgP').value, remember: $('cgRemember').checked })
+    });
+    $('cgP').value = '';
+    await boot();
+  } catch (err) {
+    $('cgAuthErr').textContent = err.message;
+  } finally {
+    $('cgAuthBtn').disabled = false;
+  }
+};
+
+async function boot() {
+  try {
+    me = await api('/api/auth?action=me');
+    $('cgAuth').style.display = 'none';
+    $('cgChat').style.display = 'flex';
+    $('cgWho').textContent = me.username;
+    $('cgLogout').hidden = false;
+    await loadMessages();
+    clearInterval(pollTimer);
+    pollTimer = setInterval(() => loadMessages().catch(() => {}), 3000);
+  } catch {
+    me = null;
+    clearInterval(pollTimer);
+    $('cgAuth').style.display = 'flex';
+    $('cgChat').style.display = 'none';
+    $('cgLogout').hidden = true;
+    $('cgWho').textContent = '';
+    $('cgList').innerHTML = '';
+  }
+}
+
+$('cgLogout').onclick = async () => {
+  await fetch('/api/auth?action=logout', { method: 'POST', credentials: 'same-origin' });
+  await boot();
+};
+
+// ---------- pesan ----------
+function msgHtml(m, byId) {
+  const mine = me && m.username === me.username;
+  const canDelete = mine || (me && me.is_admin);
+  const src = '/api/chat?file=' + m.id;
+  let inner = '';
+  const parent = m.reply_to && byId[m.reply_to];
+  if (parent) inner += '<div class="cg-quote">' + esc(parent.username) + ': ' + esc((parent.body || '[file]').slice(0, 80)) + '</div>';
+  if (m.has_file) {
+    if (m.kind === 'image') inner += '<img src="' + src + '" loading="lazy" alt="">';
+    else if (m.kind === 'video') inner += '<video controls preload="metadata" src="' + src + '"></video>';
+    else if (m.kind === 'audio' || m.kind === 'voice') inner += '<audio controls preload="none" src="' + src + '"></audio>';
+    else inner += '<a href="' + src + '" download="' + esc(m.file_name) + '">' + esc(m.file_name || 'file') + '</a>';
+  }
+  if (m.body) inner += '<div class="cg-txt">' + (m.kind === 'report' ? '' : '') + esc(m.body) + '</div>';
+  const time = new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  inner += '<div class="cg-acts"><button data-reply="' + m.id + '">Balas</button>' +
+    (canDelete ? '<button data-del="' + m.id + '">Hapus</button>' : '') + '</div>';
+  return '<div class="cg-msg ' + (mine ? 'cg-mine' : '') + '" data-id="' + m.id + '"><div class="cg-who">' + esc(m.username) + ' · ' + time + '</div>' + inner + '</div>';
+}
+
+// Update incremental: pesan baru ditambah di bawah, pesan yang sudah hilang dibuang.
+// Jadi audio yang sedang diputar tidak ter-reset tiap polling.
+async function loadMessages() {
+  const { messages } = await api('/api/chat');
+  const list = $('cgList');
+  const nearBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 120;
+  const firstLoad = list.children.length === 0;
+  const byId = Object.fromEntries(messages.map((m) => [m.id, m]));
+  const ids = new Set(messages.map((m) => m.id));
+
+  for (const el of [...list.children]) {
+    if (!ids.has(Number(el.dataset.id))) el.remove();
+  }
+  const have = new Set([...list.children].map((el) => Number(el.dataset.id)));
+  for (const m of messages) {
+    if (have.has(m.id)) continue;
+    const tmp = document.createElement('div');
+    tmp.innerHTML = msgHtml(m, byId);
+    list.appendChild(tmp.firstElementChild);
+  }
+  if (firstLoad || nearBottom) list.scrollTop = list.scrollHeight;
+}
+
+function clearReply() {
+  replyTo = null;
+  $('cgReplyBar').style.display = 'none';
+}
+
+async function sendPayload(payload) {
+  await api('/api/chat', { method: 'POST', body: JSON.stringify({ ...payload, reply_to: replyTo ? replyTo.id : null }) });
+  clearReply();
+  await loadMessages();
+}
+
+$('cgList').onclick = async (e) => {
+  const rb = e.target.closest('[data-reply]');
+  const db = e.target.closest('[data-del]');
+  if (rb) {
+    const el = rb.closest('.cg-msg');
+    replyTo = { id: Number(rb.dataset.reply), who: el.querySelector('.cg-who').textContent.split(' · ')[0] };
+    $('cgReplyTxt').textContent = 'Membalas ' + replyTo.who;
+    $('cgReplyBar').style.display = 'block';
+    $('cgText').focus();
+  }
+  if (db) {
+    if (!confirm('Hapus pesan ini?')) return;
+    try {
+      await api('/api/chat?id=' + db.dataset.del, { method: 'DELETE' });
+      await loadMessages();
+    } catch (err) {
+      alert(err.message);
+    }
+  }
+};
+
+$('cgCancelReply').onclick = clearReply;
+
+$('cgSend').onclick = async () => {
+  const body = $('cgText').value.trim();
+  if (!body) return;
+  $('cgSend').disabled = true;
+  try {
+    await sendPayload({ kind: 'text', body });
+    $('cgText').value = '';
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    $('cgSend').disabled = false;
+  }
+};
+$('cgText').onkeydown = (e) => { if (e.key === 'Enter') $('cgSend').click(); };
+
+$('cgReport').onclick = async () => {
+  const body = $('cgText').value.trim();
+  if (!body) { alert('Tulis dulu bug-nya di kolom pesan, lalu tekan Lapor bug.'); return; }
+  try {
+    await sendPayload({ kind: 'report', body });
+    $('cgText').value = '';
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+// ---------- file ----------
+$('cgAttach').onclick = () => $('cgFileIn').click();
+$('cgFileIn').onchange = async () => {
+  const f = $('cgFileIn').files[0];
+  $('cgFileIn').value = '';
+  if (!f) return;
+  if (f.size > MAX_BYTES) { alert('File terlalu besar, maksimal 3 MB.'); return; }
+  const kind = f.type.startsWith('image/') ? 'image' : f.type.startsWith('video/') ? 'video' : f.type.startsWith('audio/') ? 'audio' : 'file';
+  setStatus('Mengirim file...');
+  try {
+    const data = await readBase64(f);
+    await sendPayload({
+      kind,
+      body: $('cgText').value.trim() || null,
+      file_name: f.name,
+      mime: f.type || 'application/octet-stream',
+      data
+    });
+    $('cgText').value = '';
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    setStatus('');
+  }
+};
+
+// ---------- VN (tekan sekali mulai, tekan lagi kirim; maks 60 detik) ----------
+$('cgVn').onclick = async () => {
+  if (rec) { rec.stop(); return; }
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    alert('Mikrofon tidak bisa dipakai: ' + err.message);
+    return;
+  }
+  const mime = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'].find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+  recChunks = [];
+  rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
+  rec.ondataavailable = (e) => { if (e.data.size) recChunks.push(e.data); };
+  rec.onstop = async () => {
+    clearTimeout(recTimeout);
+    stream.getTracks().forEach((t) => t.stop());
+    const type = (rec && rec.mimeType) || mime || 'audio/webm';
+    rec = null;
+    $('cgVn').classList.remove('rec');
+    $('cgVn').textContent = 'Rekam VN';
+    const blob = new Blob(recChunks, { type });
+    if (blob.size < 500) return;
+    if (blob.size > MAX_BYTES) { alert('VN terlalu panjang.'); return; }
+    setStatus('Mengirim VN...');
+    try {
+      const data = await readBase64(blob);
+      const base = type.split(';')[0];
+      await sendPayload({
+        kind: 'voice',
+        file_name: 'voice.' + (base.includes('mp4') ? 'm4a' : 'webm'),
+        mime: base,
+        data
+      });
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setStatus('');
+    }
+  };
+  rec.start();
+  $('cgVn').classList.add('rec');
+  $('cgVn').textContent = 'Kirim VN';
+  recTimeout = setTimeout(() => { if (rec && rec.state !== 'inactive') rec.stop(); }, 60000);
+};
+
+
+  document.getElementById('cgOpen').onclick = () => {
+    document.getElementById('cgRoot').style.display = 'flex';
+    boot();
+  };
+  document.getElementById('cgClose').onclick = () => {
+    document.getElementById('cgRoot').style.display = 'none';
+    clearInterval(pollTimer);
+  };
 })();
 </script>
 </body>
