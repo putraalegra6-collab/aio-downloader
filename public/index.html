@@ -477,6 +477,9 @@ html { scroll-behavior: smooth; }
 #cgRoot .cg-verified svg { width: 10px; height: 10px; fill: none; stroke: #fff; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
 #cgRoot .cg-pname .cg-verified { width: 18px; height: 18px; margin-left: 6px; }
 #cgRoot .cg-pname .cg-verified svg { width: 12px; height: 12px; }
+
+#cgRoot .cg-row-msg.mine { flex-direction: row-reverse; }
+#cgRoot .cg-row-msg.mine .cg-name { text-align: right; }
 </style>
 </head>
 <body>
@@ -1617,8 +1620,8 @@ function syncLyrics() {
     }
     const quote = parent ? '<div class="cg-quote"><b>' + esc(parent.username) + '</b> ' + esc((parent.body || 'File').slice(0, 90)) + '</div>' : '';
     const text = m.body ? '<div class="cg-txt">' + esc(m.body) + '</div>' : '';
-    const av = mine ? '' : '<button class="cg-av-btn" data-profile="' + m.user_id + '" aria-label="Profil">' + avatar(u, 'cg-av') + '</button>';
-    const name = mine ? '' : '<button class="cg-name" data-profile="' + m.user_id + '">' + esc(m.username) + badge(m) + '</button>';
+    const av = '<button class="cg-av-btn" data-profile="' + m.user_id + '" aria-label="Profil">' + avatar(u, 'cg-av') + '</button>';
+    const name = '<button class="cg-name" data-profile="' + m.user_id + '">' + esc(m.username) + badge(m) + '</button>';
     const del = canDel ? '<button type="button" data-del="' + m.id + '">Hapus</button>' : '';
     return '<div class="cg-row-msg' + (mine ? ' mine' : '') + '" data-id="' + m.id + '">' + av +
       '<div class="cg-bubble">' + name + quote + media + text +
