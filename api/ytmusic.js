@@ -81,17 +81,18 @@ module.exports = async (req, res) => {
 
     if (action === 'play') {
       const { urls, duration } = await getCandidates(videoId);
+      if (!urls.length) {
+        return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
+      }
       const checks = await Promise.all(urls.map((u) => isPlayableAudio(u)));
       const idx = checks.indexOf(true);
-      if (idx !== -1) {
-        return res.status(200).json({
-          status: true,
-          result: { duration, download: { audio: urls[idx] } }
-        });
-      }
+      console.log('[ytmusic]', videoId, 'kandidat:', urls.length, 'lolos cek:', checks.filter(Boolean).length);
+      // Kalau pengecekan gagal semua, tetap kirim kandidat pertama.
+      // Player yang akan mencoba lewat proxy, supaya false negatif dari pengecekan tidak memblokir lagu.
+      const pick = idx !== -1 ? idx : 0;
       return res.status(200).json({
-        status: false,
-        message: 'Semua sumber audio gagal untuk lagu ini'
+        status: true,
+        result: { duration, download: { audio: urls[pick] } }
       });
     }
 
