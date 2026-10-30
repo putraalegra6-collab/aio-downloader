@@ -38,20 +38,6 @@ const SERVICES = [
     }
   },
   {
-    id: 'izz',
-    name: 'Riki Music',
-    label: 'Music & Lyrics',
-    check: async () => {
-      const r = await axios.get('https://musicaly.maspaizz.web.id/api/search', {
-        params: { query: 'test' },
-        timeout: 15000,
-        validateStatus: () => true,
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-      return r.status === 200 && r.data && r.data.status === true;
-    }
-  },
-  {
     id: 'nanz',
     name: 'Nanz Music',
     label: 'Music & Lyrics (cadangan)',
