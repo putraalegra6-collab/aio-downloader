@@ -1,6 +1,6 @@
 /* ============================================================
    STATUS API — By Egaa
-   Cek: Jerexd AIO v2, TikWM, IZZ Music, Downr
+   Cek: Jerexd AIO v2, TikWM, Riki Music, Downr
    ============================================================ */
 
 const axios = require('axios');
@@ -39,7 +39,7 @@ const SERVICES = [
   },
   {
     id: 'izz',
-    name: 'IZZ Music',
+    name: 'Riki Music',
     label: 'Music & Lyrics',
     check: async () => {
       const r = await axios.get('https://musicaly.maspaizz.web.id/api/search', {
@@ -49,6 +49,20 @@ const SERVICES = [
         headers: { 'User-Agent': 'Mozilla/5.0' }
       });
       return r.status === 200 && r.data && r.data.status === true;
+    }
+  },
+  {
+    id: 'nanz',
+    name: 'Nanz Music',
+    label: 'Music & Lyrics (cadangan)',
+    check: async () => {
+      const r = await axios.get('https://nanzmusify-updated.netlify.app/api/search', {
+        params: { query: 'test', type: 'songs' },
+        timeout: 15000,
+        validateStatus: () => true,
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
+      return r.status === 200 && !!(r.data && r.data.result);
     }
   },
   {
