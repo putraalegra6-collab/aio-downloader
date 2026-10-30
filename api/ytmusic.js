@@ -94,6 +94,21 @@ async function getNanzCandidates(videoId) {
   }
 }
 
+// Cadangan kedua untuk play: Musicaly (Jerexd tidak dipakai)
+async function getMusicalyCandidate(videoId) {
+  try {
+    const r = await axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
+      headers: browserHeaders, timeout: 10000, validateStatus: () => true
+    });
+    const u = r.data && r.data.result && r.data.result.download && r.data.result.download.audio;
+    console.log('[ytmusic]', videoId, 'sumber: musicaly', u ? 'ada link' : 'tanpa link');
+    return { urls: u ? [u] : [], duration: (r.data && r.data.result && r.data.result.duration) || null };
+  } catch (e) {
+    console.log('[ytmusic] musicaly error:', e.message);
+    return { urls: [], duration: null };
+  }
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -111,7 +126,12 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'play') {
-      const { urls, duration } = await getNanzCandidates(videoId);
+      let { urls, duration } = await getNanzCandidates(videoId);
+      if (!urls.length) {
+        const m = await getMusicalyCandidate(videoId);
+        urls = m.urls;
+        duration = duration || m.duration;
+      }
       if (!urls.length) {
         return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
       }
