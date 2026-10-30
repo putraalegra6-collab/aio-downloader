@@ -13,7 +13,7 @@ const browserHeaders = {
   'Referer': BASE + '/'
 };
 
-// Cek apakah link benar-benar file audio (bukan halaman web / JSON)
+// Hasil: 'ok' (file audio), 'bad' (pasti bukan audio, mis. halaman web), 'unknown' (tidak bisa dicek)
 async function isPlayableAudio(url) {
   try {
     const r = await axios.get(url, {
@@ -23,14 +23,14 @@ async function isPlayableAudio(url) {
       maxRedirects: 5,
       validateStatus: () => true
     });
-    if (r.status >= 400) return false;
+    if (r.status >= 400) return 'bad';
     const type = String(r.headers['content-type'] || '');
-    if (/html|json/i.test(type)) return false;
+    if (/html|json/i.test(type)) return 'bad';
     const head = Buffer.from(r.data).slice(0, 64).toString('latin1').trimStart();
-    if (head.startsWith('<') || head.startsWith('{')) return false;
-    return true;
+    if (head.startsWith('<') || head.startsWith('{')) return 'bad';
+    return 'ok';
   } catch (e) {
-    return false;
+    return 'unknown';
   }
 }
 
@@ -101,10 +101,15 @@ module.exports = async (req, res) => {
         return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
       }
       const checks = await Promise.all(urls.map((u) => isPlayableAudio(u)));
-      const idx = checks.indexOf(true);
-      console.log('[ytmusic]', videoId, 'kandidat:', urls.length, 'lolos cek:', checks.filter(Boolean).length);
-      // Kalau pengecekan gagal semua, tetap kirim kandidat pertama.
-      const pick = idx !== -1 ? idx : 0;
+      console.log('[ytmusic]', videoId, 'kandidat:', urls.length, 'hasil cek:', checks.join(','));
+      let pick = checks.indexOf('ok');
+      if (pick === -1) pick = checks.indexOf('unknown');
+      if (pick === -1) {
+        return res.status(200).json({
+          status: false,
+          message: 'Lagu ini belum bisa diputar. Semua sumber mengirim halaman web, bukan file musik.'
+        });
+      }
       return res.status(200).json({
         status: true,
         result: { duration: fmtDur(duration), download: { audio: urls[pick] } }
