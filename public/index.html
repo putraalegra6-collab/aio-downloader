@@ -498,6 +498,9 @@ html { scroll-behavior: smooth; }
 .cg-pop-btns { display: flex; gap: 8px; }
 .cg-pop-btns button { flex: 1; }
 .cg-pop-card button.cg-ghost { background: #fffdf8; }
+
+.ld-pop { position: fixed; left: 50%; bottom: 96px; transform: translateX(-50%); z-index: 10001; background: #fffdf8; color: #1b1b1b; border: 2px solid #1b1b1b; border-radius: 14px; padding: 12px 18px; box-shadow: 3px 3px 0 #1b1b1b; font: 600 14px/1.3 system-ui, -apple-system, 'Segoe UI', sans-serif; white-space: nowrap; }
+.ld-pop[hidden] { display: none !important; }
 </style>
 </head>
 <body>
@@ -1242,6 +1245,12 @@ async function playSong(list, idx) {
   setPlayIcon(ICON_LOAD);
   mpTab('lirik');
   fetchLyrics(s);
+  const ldEl = document.getElementById('ldPop');
+  const hideLd = () => { ldEl.hidden = true; clearTimeout(window.__ldT); };
+  const showLd = () => { ldEl.hidden = false; clearTimeout(window.__ldT); window.__ldT = setTimeout(hideLd, 90000); };
+  showLd();
+  audio.addEventListener('playing', hideLd, { once: true });
+  audio.addEventListener('error', hideLd, { once: true });
   try {
     const r = await fetch('/api/ytmusic', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'play', videoId: s.videoId }) });
     const d = await r.json();
@@ -1412,6 +1421,7 @@ function syncLyrics() {
   </section>
 </div>
 
+<div id="ldPop" class="ld-pop" hidden role="status">Sabar, lagi memuat audio...</div>
 <div id="cgPop" class="cg-pop" hidden>
   <div class="cg-pop-card" role="dialog" aria-modal="true">
     <div id="cgPopTitle" class="cg-pop-title"></div>
