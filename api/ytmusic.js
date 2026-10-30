@@ -1,4 +1,5 @@
 const axios = require('axios');
+const nanz = require('../lib/nanz');
 const BASE = 'https://musicaly.maspaizz.web.id';
 const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
@@ -56,11 +57,26 @@ async function getCandidates(videoId) {
     return { urls, duration: j.result.duration || null };
   }).catch(() => ({ urls: [], duration: null }));
 
-  const [a, b] = await Promise.all([musicaly, jerexd]);
+  const nanzSrc = Promise.race([
+    nanz.extractAudio(videoId).then((x) => ({ urls: x.streamUrl ? [x.streamUrl] : [], duration: x.duration || null })),
+    new Promise((r) => setTimeout(() => r({ urls: [], duration: null }), 15000))
+  ]).catch((e) => {
+    console.log('[ytmusic] nanzmusify error:', e.message);
+    return { urls: [], duration: null };
+  });
+
+  const [a, b, c] = await Promise.all([musicaly, jerexd, nanzSrc]);
   return {
-    urls: [...new Set([...a.urls, ...b.urls])],
-    duration: a.duration || b.duration || null
+    urls: [...new Set([...a.urls, ...c.urls, ...b.urls])],
+    duration: a.duration || c.duration || b.duration || null
   };
+}
+
+function fmtDur(d) {
+  if (typeof d === 'number' && isFinite(d)) {
+    return Math.floor(d / 60) + ':' + String(Math.floor(d % 60)).padStart(2, '0');
+  }
+  return d || null;
 }
 
 module.exports = async (req, res) => {
@@ -91,7 +107,7 @@ module.exports = async (req, res) => {
       const pick = idx !== -1 ? idx : 0;
       return res.status(200).json({
         status: true,
-        result: { duration, download: { audio: urls[pick] } }
+        result: { duration: fmtDur(duration), download: { audio: urls[pick] } }
       });
     }
 
