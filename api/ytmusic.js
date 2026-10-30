@@ -79,6 +79,21 @@ function fmtDur(d) {
   return d || null;
 }
 
+// Sumber audio untuk play: NanzMusify saja (Musicaly dan Jerexd tidak dipakai saat memutar)
+async function getNanzCandidates(videoId) {
+  try {
+    const x = await Promise.race([
+      nanz.extractAudio(videoId),
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout 20 detik')), 20000))
+    ]);
+    console.log('[ytmusic]', videoId, 'sumber: nanz', x.streamUrl ? 'ada link' : 'tanpa link');
+    return { urls: x.streamUrl ? [x.streamUrl] : [], duration: x.duration || null };
+  } catch (e) {
+    console.log('[ytmusic] nanzmusify error:', e.message);
+    return { urls: [], duration: null };
+  }
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -96,7 +111,7 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'play') {
-      const { urls, duration } = await getCandidates(videoId);
+      const { urls, duration } = await getNanzCandidates(videoId);
       if (!urls.length) {
         return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
       }
