@@ -127,19 +127,34 @@ async function searchNaa(query) {
   return { status: true, creator: 'Naa Music', result: { query: query, songs: songs } };
 }
 
-// Link audio langsung dari Naa Music untuk pemutaran
+// Link audio langsung dari Naa Music: stream dulu, lalu track sebagai cadangan
 async function getNaaCandidate(videoId) {
+  const id = encodeURIComponent(videoId);
+  const pick = (u) => {
+    const m = u ? String(u).match(/[?&]dur=([\d.]+)/) : null;
+    return { url: u || null, duration: m ? Math.round(parseFloat(m[1])) : null };
+  };
   try {
-    const r = await axios.get(NAA + '/api/stream/' + encodeURIComponent(videoId), { timeout: 15000, validateStatus: () => true });
-    const url = r.data && r.data.data && r.data.data.url;
-    const m = url ? String(url).match(/[?&]dur=([\d.]+)/) : null;
-    const duration = m ? Math.round(parseFloat(m[1])) : null;
-    console.log('[ytmusic]', videoId, 'sumber: naa', url ? 'ada link' : 'tanpa link');
-    return { urls: url ? [url] : [], duration: duration };
+    const r = await axios.get(NAA + '/api/stream/' + id, { timeout: 15000, validateStatus: () => true });
+    const got = pick(r.data && r.data.data && r.data.data.url);
+    if (got.url) {
+      console.log('[ytmusic]', videoId, 'sumber: naa stream ada link');
+      return { urls: [got.url], duration: got.duration };
+    }
+    console.log('[ytmusic]', videoId, 'naa stream', r.status, String(JSON.stringify(r.data)).slice(0, 200));
   } catch (e) {
-    console.log('[ytmusic] naa error:', e.message);
-    return { urls: [], duration: null };
+    console.log('[ytmusic] naa stream error:', e.message);
   }
+  try {
+    const r = await axios.get(NAA + '/api/track/' + id, { timeout: 15000, validateStatus: () => true });
+    const d = (r.data && r.data.data) || {};
+    const got = pick(d.streamUrl);
+    console.log('[ytmusic]', videoId, 'naa track', r.status, got.url ? 'ada link' : 'tanpa link', String(JSON.stringify(r.data)).slice(0, 200));
+    if (got.url) return { urls: [got.url], duration: got.duration || (d.duration && d.duration.seconds) || null };
+  } catch (e) {
+    console.log('[ytmusic] naa track error:', e.message);
+  }
+  return { urls: [], duration: null };
 }
 
 module.exports = async (req, res) => {
