@@ -2199,32 +2199,32 @@ function syncLyrics() {
       return showNextPop();
     }
     const perm = Notification.permission;
-    if (perm === 'granted') {
-      const on = !notifOn();
-      localStorage.setItem('cgNotif', on ? '1' : '0');
-      paintBell();
-      if (on) setupPush();
-      setStatus(on ? 'Notifikasi aktif' : 'Notifikasi dimatikan');
-      return;
-    }
     if (perm === 'denied') {
-      popQueue.push({ title: 'Notifikasi diblokir', text: 'Buka pengaturan browser, izinkan notifikasi untuk situs ini, lalu coba lagi.', actions: [{ label: 'Oke' }] });
+      popQueue.push({ title: 'Notifikasi diblokir', text: 'Notifikasi untuk situs ini diblokir di browser. Buka pengaturan situs di browser, izinkan notifikasi, lalu coba lagi.', actions: [{ label: 'Oke' }] });
+      return showNextPop();
+    }
+    if (perm === 'granted' && notifOn()) {
+      popQueue.push({
+        title: 'Matikan notifikasi?',
+        text: 'Kamu tidak akan dapat notifikasi pesan baru sampai notifikasi diaktifkan lagi.',
+        actions: [
+          { label: 'Matikan', run: () => { localStorage.setItem('cgNotif', '0'); paintBell(); setStatus('Notifikasi dimatikan'); } },
+          { label: 'Batal' }
+        ]
+      });
       return showNextPop();
     }
     popQueue.push({
       title: 'Aktifkan notifikasi',
-      text: 'Izinkan notifikasi supaya kamu dapat kabar saat ada pesan baru di Global Chat, walaupun browser sedang tertutup.',
+      text: 'Izinkan notifikasi supaya kamu tahu saat ada pesan baru di Global Chat dan chat pribadi, walaupun browser sedang tertutup.',
       actions: [
         { label: 'Aktifkan', run: () => {
+          const finish = () => { localStorage.setItem('cgNotif', '1'); paintBell(); setupPush(); setStatus('Notifikasi aktif'); };
+          if (perm === 'granted') return finish();
           Notification.requestPermission().then((p) => {
-            if (p === 'granted') {
-              localStorage.setItem('cgNotif', '1');
-              paintBell();
-              setupPush();
-              popQueue.push({ title: 'Notifikasi aktif', text: 'Kamu akan dapat notifikasi saat ada pesan baru.', actions: [{ label: 'Oke' }] });
-              showNextPop();
-            }
-          }).catch(() => {});
+            if (p === 'granted') finish();
+            else setStatus('Izin notifikasi ditolak');
+          }).catch(() => setStatus('Izin notifikasi gagal'));
         } },
         { label: 'Nanti' }
       ]
@@ -2633,6 +2633,19 @@ main{padding:8px 16px 110px;max-width:768px}
 .cg-story-body .st-song span{color:#9B9BA1;font-size:14px}
 .cg-story-body .st-play{margin-top:12px;height:46px;padding:0 26px;border-radius:99px;border:0;background:#F5F5F4;color:#0B0B0C;font:600 15px 'Space Grotesk',sans-serif;cursor:pointer}
 .cg-story-bar i.on.static b{animation:none;width:50%}
+</style>
+<style id="chat-crisp">
+#cgRoot .cg-list{background:#0B0B0C}
+#cgRoot .cg-row-msg{opacity:1!important;filter:none!important}
+#cgRoot .cg-row-msg .cg-msg{opacity:1!important;filter:none!important;backdrop-filter:none!important}
+#cgRoot .cg-row-msg .cg-msg:not(.cg-mine){background:#1C1C1F!important;color:#F5F5F4!important}
+#cgRoot .cg-row-msg .cg-msg:not(.cg-mine) .cg-who{color:#F5F5F4!important;opacity:.75}
+#cgRoot .cg-row-msg .cg-msg:not(.cg-mine) .cg-meta,#cgRoot .cg-row-msg .cg-msg:not(.cg-mine) .cg-acts button{color:#9B9BA1!important}
+#cgRoot .cg-row-msg .cg-msg.cg-mine{background:#F5F5F4!important;color:#0B0B0C!important}
+#cgRoot .cg-row-msg .cg-msg.cg-mine .cg-who,#cgRoot .cg-row-msg .cg-msg.cg-mine .cg-txt{color:#0B0B0C!important;opacity:1}
+#cgRoot .cg-row-msg .cg-msg.cg-mine .cg-meta,#cgRoot .cg-row-msg .cg-msg.cg-mine .cg-acts button{color:#4A4A50!important;opacity:1}
+#cgRoot .cg-row-msg .cg-msg.cg-mine .cg-quote{color:#0B0B0C!important;background:rgba(11,11,12,.07)!important;border-left-color:#0B0B0C!important}
+#cgRoot .cg-st-tools{grid-template-columns:repeat(5,1fr)}
 </style>
 </body>
 </html>
