@@ -1,6 +1,6 @@
 const axios = require('axios');
 const nanz = require('../lib/nanz');
-const musicfyrik = require('../lib/musicfyrik'); // API baru yang stabil
+const musicfyrik = require('../lib/musicfyrik');
 const BASE = 'https://musicaly.maspaizz.web.id';
 const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
@@ -14,7 +14,7 @@ const browserHeaders = {
   'Referer': BASE + '/'
 };
 
-// Cek apakah link beneran audio atau cuma halaman HTML
+// Validasi apakah link beneran file audio
 async function isPlayableAudio(url) {
   try {
     const r = await axios.get(url, {
@@ -35,7 +35,7 @@ async function isPlayableAudio(url) {
   }
 }
 
-// 1. Musicfyrik (Prioritas Utama - Stabil)
+// 1. Musicfyrik (Paling Stabil)
 async function getMusicfyrikCandidate(videoId) {
   try {
     const res = await musicfyrik.play(videoId);
@@ -48,33 +48,7 @@ async function getMusicfyrikCandidate(videoId) {
   }
 }
 
-// 2. Naa Music
-async function getNaaCandidate(videoId) {
-  const NAA = 'https://naa-music.vercel.app';
-  const id = encodeURIComponent(videoId);
-  const pick = (u) => {
-    const m = u ? String(u).match(/[?&]dur=([\d.]+)/) : null;
-    return { url: u || null, duration: m ? Math.round(parseFloat(m[1])) : null };
-  };
-  try {
-    const r = await axios.get(NAA + '/api/stream/' + id, { timeout: 15000, validateStatus: () => true });
-    const got = pick(r.data && r.data.data && r.data.data.url);
-    if (got.url) return { urls: [got.url], duration: got.duration };
-  } catch (e) {
-    console.log('[ytmusic] naa stream error:', e.message);
-  }
-  try {
-    const r = await axios.get(NAA + '/api/track/' + id, { timeout: 15000, validateStatus: () => true });
-    const d = (r.data && r.data.data) || {};
-    const got = pick(d.streamUrl);
-    if (got.url) return { urls: [got.url], duration: got.duration || (d.duration && d.duration.seconds) || null };
-  } catch (e) {
-    console.log('[ytmusic] naa track error:', e.message);
-  }
-  return { urls: [], duration: null };
-}
-
-// 3. Jerexd AIO (API Downloader punya lo)
+// 2. Jerexd AIO (API Punya Lo)
 async function getJerexdCandidate(videoId) {
   try {
     const r = await axios.get('https://api.jerexd.my.id/api/downloader/aiov2', {
@@ -96,7 +70,7 @@ async function getJerexdCandidate(videoId) {
   }
 }
 
-// 4. Nanz
+// 3. Nanz
 async function getNanzCandidates(videoId) {
   try {
     const x = await Promise.race([
@@ -111,7 +85,7 @@ async function getNanzCandidates(videoId) {
   }
 }
 
-// 5. Musicaly
+// 4. Musicaly
 async function getMusicalyCandidate(videoId) {
   try {
     const r = await axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
@@ -142,72 +116,78 @@ module.exports = async (req, res) => {
   const { action, query, videoId, title, artist } = req.method === 'POST' ? req.body : req.query;
 
   try {
+    // ==========================================
+    // 1. ACTION HOME (Lagu Populer)
+    // ==========================================
     if (action === 'home') {
       try {
-        const r = await axios.get('https://naa-music.vercel.app/api/home', { timeout: 15000, validateStatus: () => true });
-        const sections = (r.data && r.data.data && r.data.data.sections) || [];
-        const songs = [];
-        sections.forEach((sec) => (sec.items || []).forEach((x) => {
-          if (x.type === 'song' && x.id) songs.push({ videoId: x.id, title: x.title || '', artist: x.artistName || '', thumbnail: x.thumbnail || '' });
-        }));
-        return res.status(200).json({ status: true, result: { songs: songs.slice(0, 30) } });
+        // Pakai Musicfyrik untuk cari lagu populer default
+        const sr = await musicfyrik.search('Top Hits Indonesia');
+        return res.status(200).json({ status: true, result: { songs: sr.songs.slice(0, 30) } });
       } catch (e) {
-        return res.status(200).json({ status: false, result: { songs: [] } });
+        // Fallback kalau Musicfyrik error, pakai Musicaly
+        try {
+          const r = await axios.get(`${BASE}/api/search?query=top+indonesia&type=songs`, { headers: browserHeaders, timeout: 15000 });
+          return res.status(200).json(r.data);
+        } catch (err) {
+          return res.status(200).json({ status: false, result: { songs: [] } });
+        }
       }
     }
     
+    // ==========================================
+    // 2. ACTION SEARCH (Pencarian Lagu)
+    // ==========================================
     if (action === 'search') {
       try {
-        const r = await axios.get('https://naa-music.vercel.app/api/search', { params: { q: query }, timeout: 15000, validateStatus: () => true });
-        const d = r.data && r.data.data;
-        if (d && d.results) {
-          const songs = d.results.filter((x) => x.type === 'song' && x.id).map((x) => ({
-            videoId: x.id,
-            title: x.title || '',
-            artist: x.artistName || '',
-            album: (x.album && x.album.name) || '',
-            thumbnail: x.thumbnail || '',
-            duration: x.duration || ''
-          }));
-          if(songs.length) return res.status(200).json({ status: true, creator: 'Naa Music', result: { query: query, songs } });
+        // Utamakan Musicfyrik
+        const sr = await musicfyrik.search(query);
+        if (sr && sr.songs && sr.songs.length > 0) {
+          return res.status(200).json({ status: true, result: { query: query, songs: sr.songs } });
         }
       } catch (e) {
-        console.log('[ytmusic] search naa error:', e.message);
+        console.log('[ytmusic] Search musicfyrik error:', e.message);
       }
-      const r = await axios.get(`${BASE}/api/search?query=${encodeURIComponent(query)}&type=songs`, {
-        headers: browserHeaders, timeout: 20000
-      });
-      return res.status(200).json(r.data);
+
+      // Fallback ke Musicaly kalau Musicfyrik error
+      try {
+        const r = await axios.get(`${BASE}/api/search?query=${encodeURIComponent(query)}&type=songs`, {
+          headers: browserHeaders, timeout: 20000
+        });
+        // Pastikan yang dibalikin beneran JSON
+        if (r.data && r.data.result) {
+          return res.status(200).json(r.data);
+        }
+      } catch (e) {
+        console.log('[ytmusic] Search musicaly error:', e.message);
+      }
+
+      return res.status(200).json({ status: false, message: 'Gagal mencari lagu' });
     }
 
+    // ==========================================
+    // 3. ACTION PLAY (Putar Lagu)
+    // ==========================================
     if (action === 'play') {
       let urls = [], duration = null;
 
-      // ALUR PENCARIAN AUDIO (FALLBACK BERANTAI)
-      
-      // 1. Coba Musicfyrik
+      // 1. Musicfyrik
       let res = await getMusicfyrikCandidate(videoId);
       urls = res.urls; duration = res.duration;
 
-      // 2. Kalau gagal, coba Naa
-      if (!urls.length) {
-        res = await getNaaCandidate(videoId);
-        urls = res.urls; duration = duration || res.duration;
-      }
-      
-      // 3. Kalau gagal, coba Jerexd (API punya lo)
+      // 2. Jerexd (API lo)
       if (!urls.length) {
         res = await getJerexdCandidate(videoId);
         urls = res.urls; duration = duration || res.duration;
       }
 
-      // 4. Kalau gagal, coba Nanz
+      // 3. Nanz
       if (!urls.length) {
         res = await getNanzCandidates(videoId);
         urls = res.urls; duration = duration || res.duration;
       }
       
-      // 5. Kalau gagal, coba Musicaly
+      // 4. Musicaly
       if (!urls.length) {
         res = await getMusicalyCandidate(videoId);
         urls = res.urls; duration = duration || res.duration;
@@ -217,7 +197,6 @@ module.exports = async (req, res) => {
         return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
       }
 
-      // Validasi link (pastikan bukan HTML)
       const checks = await Promise.all(urls.map((u) => isPlayableAudio(u)));
       console.log('[ytmusic]', videoId, 'kandidat:', urls.length, 'hasil cek:', checks.join(','));
       let pick = checks.indexOf('ok');
@@ -236,6 +215,9 @@ module.exports = async (req, res) => {
       });
     }
 
+    // ==========================================
+    // 4. ACTION LYRICS (Lirik Lagu)
+    // ==========================================
     if (action === 'lyrics') {
       try {
         const l = await musicfyrik.lyrics(videoId, artist);
@@ -246,10 +228,16 @@ module.exports = async (req, res) => {
         console.log('[ytmusic] musicfyrik lyrics error:', e.message);
       }
 
-      const r = await axios.get(`${BASE}/api/lyrics?id=${videoId}&title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`, {
-        headers: browserHeaders, timeout: 20000
-      });
-      return res.status(200).json(r.data);
+      try {
+        const r = await axios.get(`${BASE}/api/lyrics?id=${videoId}&title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`, {
+          headers: browserHeaders, timeout: 20000
+        });
+        if (r.data) return res.status(200).json(r.data);
+      } catch (e) {
+        console.log('[ytmusic] lyrics fallback error:', e.message);
+      }
+      
+      return res.status(200).json({ status: false, message: 'Lirik tidak ditemukan' });
     }
 
     return res.status(400).json({ status: false, message: 'Action invalid' });
