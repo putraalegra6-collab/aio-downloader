@@ -552,7 +552,7 @@ h1, h2, h3, .ttl, .title, .tmain, .cg-title, .pname { font-family: 'Space Grotes
       <input type="text" class="mp-search" id="musicSearch" placeholder="Cari judul atau artis" />
       <button class="mp-search-btn" id="musicSearchBtn" type="button">Cari</button>
     </div>
-    <div id="musicResults"></div>
+    <div class="mh-title">Lagi populer</div><div id="musicHome" class="mh-list"></div><div id="musicResults"></div>
   </div>
   <div class="mp-tab-content" id="tab-lirik"><div id="lyricsContent"></div></div>
   <div class="mp-tab-content" id="tab-favorit"><div id="favoritResults"></div></div>
@@ -2647,5 +2647,40 @@ main{padding:8px 16px 110px;max-width:768px}
 #cgRoot .cg-row-msg .cg-msg.cg-mine .cg-quote{color:#0B0B0C!important;background:rgba(11,11,12,.07)!important;border-left-color:#0B0B0C!important}
 #cgRoot .cg-st-tools{grid-template-columns:repeat(5,1fr)}
 </style>
+<style id="music-home">
+.mh-title{font:600 13px 'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);margin:6px 4px 8px}
+.mh-list{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;padding-bottom:4px}
+.mh-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--s2);border:1px solid var(--stroke);border-radius:16px;padding:8px;color:var(--paper)}
+.mh-item img,.mh-cov{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--s3);flex:none;display:block}
+.mh-item .mp-item-info{min-width:0;flex:1;display:flex;flex-direction:column}
+.mh-item .mp-item-title{font:600 14px 'Space Grotesk',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mh-item .mp-item-artist{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+<script>
+(()=>{let loaded=false;
+const box=()=>document.getElementById('musicHome');
+const loadHome=async()=>{
+  if(loaded) return; loaded=true;
+  box().innerHTML='<div class="empty">Memuat lagu...</div>';
+  try{
+    const r=await fetch('/api/ytmusic?action=home'); const j=await r.json();
+    const songs=(j.result&&j.result.songs)||[];
+    window.__home=songs.slice(0,12);
+    if(!window.__home.length){ box().innerHTML='<div class="empty">Belum ada lagu</div>'; return; }
+    box().innerHTML=window.__home.map((x,i)=>'<button class="mh-item" data-i="'+i+'" type="button">'+(x.thumbnail?'<img src="'+x.thumbnail.replace(/"/g,'')+'" alt="">':'<span class="mh-cov"></span>')+'<span class="mp-item-info"><span class="mp-item-title"></span><span class="mp-item-artist"></span></span></button>').join('');
+    box().querySelectorAll('.mh-item').forEach((el,i)=>{const x=window.__home[i];el.querySelector('.mp-item-title').textContent=x.title;el.querySelector('.mp-item-artist').textContent=x.artist||'';});
+  }catch(e){ loaded=false; box().innerHTML='<div class="empty">Gagal memuat lagu</div>'; }
+};
+const fab=document.getElementById('musicFab'), bn=document.getElementById('bnMusic');
+if(fab) fab.addEventListener('click',loadHome);
+if(bn) bn.addEventListener('click',loadHome);
+box().addEventListener('click',e=>{
+  const b=e.target.closest('.mh-item'); if(!b) return;
+  const x=(window.__home||[])[Number(b.dataset.i)]; if(!x) return;
+  document.getElementById('musicSearch').value=(x.title+' '+(x.artist||'')).trim();
+  document.getElementById('musicSearchBtn').click();
+});
+})();
+</script>
 </body>
 </html>
