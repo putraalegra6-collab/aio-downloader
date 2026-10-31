@@ -109,6 +109,39 @@ async function getMusicalyCandidate(videoId) {
   }
 }
 
+const NAA = 'https://naa-music.vercel.app';
+
+// Pencarian lewat Naa Music (hasil dipetakan ke bentuk yang dipakai aplikasi)
+async function searchNaa(query) {
+  const r = await axios.get(NAA + '/api/search', { params: { q: query }, timeout: 15000, validateStatus: () => true });
+  const d = r.data && r.data.data;
+  if (!r.data || !r.data.success || !d) return null;
+  const songs = (d.results || []).filter((x) => x.type === 'song' && x.id).map((x) => ({
+    videoId: x.id,
+    title: x.title || '',
+    artist: x.artistName || '',
+    album: (x.album && x.album.name) || '',
+    thumbnail: x.thumbnail || '',
+    duration: x.duration || ''
+  }));
+  return { status: true, creator: 'Naa Music', result: { query: query, songs: songs } };
+}
+
+// Link audio langsung dari Naa Music untuk pemutaran
+async function getNaaCandidate(videoId) {
+  try {
+    const r = await axios.get(NAA + '/api/stream/' + encodeURIComponent(videoId), { timeout: 15000, validateStatus: () => true });
+    const url = r.data && r.data.data && r.data.data.url;
+    const m = url ? String(url).match(/[?&]dur=([\d.]+)/) : null;
+    const duration = m ? Math.round(parseFloat(m[1])) : null;
+    console.log('[ytmusic]', videoId, 'sumber: naa', url ? 'ada link' : 'tanpa link');
+    return { urls: url ? [url] : [], duration: duration };
+  } catch (e) {
+    console.log('[ytmusic] naa error:', e.message);
+    return { urls: [], duration: null };
+  }
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -118,7 +151,26 @@ module.exports = async (req, res) => {
   const { action, query, videoId, title, artist } = req.method === 'POST' ? req.body : req.query;
 
   try {
+    if (action === 'home') {
+      try {
+        const r = await axios.get(NAA + '/api/home', { timeout: 15000, validateStatus: () => true });
+        const sections = (r.data && r.data.data && r.data.data.sections) || [];
+        const songs = [];
+        sections.forEach((sec) => (sec.items || []).forEach((x) => {
+          if (x.type === 'song' && x.id) songs.push({ videoId: x.id, title: x.title || '', artist: x.artistName || '', thumbnail: x.thumbnail || '' });
+        }));
+        return res.status(200).json({ status: true, result: { songs: songs.slice(0, 30) } });
+      } catch (e) {
+        return res.status(200).json({ status: false, result: { songs: [] } });
+      }
+    }
     if (action === 'search') {
+      try {
+        const nr = await searchNaa(query);
+        if (nr && nr.result.songs.length) return res.status(200).json(nr);
+      } catch (e) {
+        console.log('[ytmusic] search naa error:', e.message);
+      }
       const r = await axios.get(`${BASE}/api/search?query=${encodeURIComponent(query)}&type=songs`, {
         headers: browserHeaders, timeout: 20000
       });
@@ -126,7 +178,12 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'play') {
-      let { urls, duration } = await getNanzCandidates(videoId);
+      let { urls, duration } = await getNaaCandidate(videoId);
+      if (!urls.length) {
+        const nz = await getNanzCandidates(videoId);
+        urls = nz.urls;
+        duration = duration || nz.duration;
+      }
       if (!urls.length) {
         const m = await getMusicalyCandidate(videoId);
         urls = m.urls;
