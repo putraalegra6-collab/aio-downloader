@@ -1,6 +1,6 @@
 const axios = require('axios');
 const nanz = require('../lib/nanz');
-const musicfyrik = require('../lib/musicfyrik'); // <-- TAMBAHAN: Library Musicfyrik lu
+const musicfyrik = require('../lib/musicfyrik'); // <-- TAMBAHAN: Backup Musicfyrik lu
 const BASE = 'https://musicaly.maspaizz.web.id';
 const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
@@ -14,7 +14,6 @@ const browserHeaders = {
   'Referer': BASE + '/'
 };
 
-// Hasil: 'ok' (file audio), 'bad' (pasti bukan audio, mis. halaman web), 'unknown' (tidak bisa dicek)
 async function isPlayableAudio(url) {
   try {
     const r = await axios.get(url, {
@@ -35,24 +34,6 @@ async function isPlayableAudio(url) {
   }
 }
 
-// ==============================================================
-// TAMBAHAN BARU: Fungsi untuk narik link dari Musicfyrik
-// ==============================================================
-async function getMusicfyrikCandidate(videoId) {
-  try {
-    const res = await musicfyrik.play(videoId);
-    const url = res.downloadUrl || res.proxyStreamUrl;
-    console.log('[ytmusic]', videoId, 'sumber: musicfyrik', url ? 'ada link' : 'tanpa link');
-    return { urls: url ? [url] : [], duration: res.duration || null };
-  } catch (e) {
-    console.log('[ytmusic] musicfyrik error:', e.message);
-    return { urls: [], duration: null };
-  }
-}
-// ==============================================================
-
-
-// Kumpulkan kandidat link audio dari dua sumber (paralel) - ORIGINAL
 async function getCandidates(videoId) {
   const musicaly = axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
     headers: browserHeaders, timeout: 10000, validateStatus: () => true
@@ -97,7 +78,6 @@ function fmtDur(d) {
   return d || null;
 }
 
-// Sumber audio untuk play: NanzMusify saja (Musicaly dan Jerexd tidak dipakai saat memutar) - ORIGINAL
 async function getNanzCandidates(videoId) {
   try {
     const x = await Promise.race([
@@ -112,7 +92,6 @@ async function getNanzCandidates(videoId) {
   }
 }
 
-// Cadangan kedua untuk play: Musicaly (Jerexd tidak dipakai) - ORIGINAL
 async function getMusicalyCandidate(videoId) {
   try {
     const r = await axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
@@ -129,7 +108,6 @@ async function getMusicalyCandidate(videoId) {
 
 const NAA = 'https://naa-music.vercel.app';
 
-// Pencarian lewat Naa Music (hasil dipetakan ke bentuk yang dipakai aplikasi) - ORIGINAL
 async function searchNaa(query) {
   const r = await axios.get(NAA + '/api/search', { params: { q: query }, timeout: 15000, validateStatus: () => true });
   const d = r.data && r.data.data;
@@ -145,7 +123,6 @@ async function searchNaa(query) {
   return { status: true, creator: 'Naa Music', result: { query: query, songs: songs } };
 }
 
-// Link audio langsung dari Naa Music: stream dulu, lalu track sebagai cadangan - ORIGINAL
 async function getNaaCandidate(videoId) {
   const id = encodeURIComponent(videoId);
   const pick = (u) => {
@@ -159,7 +136,6 @@ async function getNaaCandidate(videoId) {
       console.log('[ytmusic]', videoId, 'sumber: naa stream ada link');
       return { urls: [got.url], duration: got.duration };
     }
-    console.log('[ytmusic]', videoId, 'naa stream', r.status, String(JSON.stringify(r.data)).slice(0, 200));
   } catch (e) {
     console.log('[ytmusic] naa stream error:', e.message);
   }
@@ -167,7 +143,6 @@ async function getNaaCandidate(videoId) {
     const r = await axios.get(NAA + '/api/track/' + id, { timeout: 15000, validateStatus: () => true });
     const d = (r.data && r.data.data) || {};
     const got = pick(d.streamUrl);
-    console.log('[ytmusic]', videoId, 'naa track', r.status, got.url ? 'ada link' : 'tanpa link', String(JSON.stringify(r.data)).slice(0, 200));
     if (got.url) return { urls: [got.url], duration: got.duration || (d.duration && d.duration.seconds) || null };
   } catch (e) {
     console.log('[ytmusic] naa track error:', e.message);
@@ -175,9 +150,22 @@ async function getNaaCandidate(videoId) {
   return { urls: [], duration: null };
 }
 
-// ==============================================================
-// MAIN HANDLER (100% ORIGINAL LU, cuma disisipin musicfyrik di PLAY)
-// ==============================================================
+// ==========================================
+// FUNGSI BACKUP DARI MUSICFYRIK
+// ==========================================
+async function getMusicfyrikCandidate(videoId) {
+  try {
+    const res = await musicfyrik.play(videoId);
+    const url = res.downloadUrl || res.proxyStreamUrl;
+    console.log('[ytmusic]', videoId, 'sumber: musicfyrik', url ? 'ada link' : 'tanpa link');
+    return { urls: url ? [url] : [], duration: res.duration || null };
+  } catch (e) {
+    console.log('[ytmusic] musicfyrik error:', e.message);
+    return { urls: [], duration: null };
+  }
+}
+// ==========================================
+
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -195,11 +183,22 @@ module.exports = async (req, res) => {
         sections.forEach((sec) => (sec.items || []).forEach((x) => {
           if (x.type === 'song' && x.id) songs.push({ videoId: x.id, title: x.title || '', artist: x.artistName || '', thumbnail: x.thumbnail || '' });
         }));
+        
+        // PENGAMAN: Kalau Naa ngirim HTML (error), songs bakal kosong. Kita lempar error biar masuk catch.
+        if (songs.length === 0) throw new Error('Naa Home kosong/error');
+        
         return res.status(200).json({ status: true, result: { songs: songs.slice(0, 30) } });
       } catch (e) {
-        return res.status(200).json({ status: false, result: { songs: [] } });
+        console.log('[ytmusic] Home Naa mati, alihkan ke backup Musicfyrik');
+        try {
+          const sr = await musicfyrik.search('Top Hits Indonesia');
+          return res.status(200).json({ status: true, result: { songs: sr.songs.slice(0, 30) } });
+        } catch (err) {
+          return res.status(200).json({ status: false, result: { songs: [] } });
+        }
       }
     }
+
     if (action === 'search') {
       try {
         const nr = await searchNaa(query);
@@ -207,52 +206,56 @@ module.exports = async (req, res) => {
       } catch (e) {
         console.log('[ytmusic] search naa error:', e.message);
       }
-      const r = await axios.get(`${BASE}/api/search?query=${encodeURIComponent(query)}&type=songs`, {
-        headers: browserHeaders, timeout: 20000
-      });
-      return res.status(200).json(r.data);
+      
+      try {
+        // PENGAMAN: Cek dulu sebelum kirim ke frontend
+        const r = await axios.get(`${BASE}/api/search?query=${encodeURIComponent(query)}&type=songs`, {
+          headers: browserHeaders, timeout: 20000
+        });
+        if (r.data && r.data.result) return res.status(200).json(r.data);
+      } catch (e) {
+        console.log('[ytmusic] search musicaly error:', e.message);
+      }
+
+      // PENGAMAN: Kalau Naa & Musicaly mati, pakai Musicfyrik
+      try {
+        const sr = await musicfyrik.search(query);
+        return res.status(200).json({ status: true, result: { query: query, songs: sr.songs } });
+      } catch (e) {
+        return res.status(200).json({ status: false, result: { songs: [] } });
+      }
     }
 
     if (action === 'play') {
+      // 1. Coba Naa dulu (sesuai original lu)
+      let { urls, duration } = await getNaaCandidate(videoId);
+      if (urls.length) return res.status(200).json({ status: true, result: { duration: fmtDur(duration), download: { audio: urls[0] } } });
       
-      // --- BAGIAN YANG DIGANTI ---
-      // Gw prioritasin Musicfyrik dulu di paling atas. 
-      // Kalo musicfyrik gagal, baru masuk ke logic ORIGINAL lu (Naa -> Nanz -> Musicaly).
-      
-      let urls = [];
-      let duration = null;
-
-      try {
-        const mf = await getMusicfyrikCandidate(videoId);
-        if (mf.urls.length) {
-            urls = mf.urls;
-            duration = mf.duration;
-        }
-      } catch(e) { console.log('Musicfyrik bypass error', e.message); }
-
-      if (!urls.length) {
-        // Kalau Musicfyrik kosong, jalankan logic Naa lu yang asli
-        const naa = await getNaaCandidate(videoId);
-        urls = naa.urls;
-        duration = naa.duration;
-      }
-      
+      // 2. Kalau Naa mati, coba Nanz (sesuai original lu)
       if (!urls.length) {
         const nz = await getNanzCandidates(videoId);
         urls = nz.urls;
         duration = duration || nz.duration;
       }
       
+      // 3. Kalau Nanz mati, coba Musicaly (sesuai original lu)
       if (!urls.length) {
         const m = await getMusicalyCandidate(videoId);
         urls = m.urls;
         duration = duration || m.duration;
       }
-      
+
+      // 4. TAMBAHAN: Kalau semuanya mati, tembak Musicfyrik
+      if (!urls.length) {
+        const mf = await getMusicfyrikCandidate(videoId);
+        urls = mf.urls;
+        duration = duration || mf.duration;
+      }
+
       if (!urls.length) {
         return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
       }
-
+      
       const checks = await Promise.all(urls.map((u) => isPlayableAudio(u)));
       console.log('[ytmusic]', videoId, 'kandidat:', urls.length, 'hasil cek:', checks.join(','));
       let pick = checks.indexOf('ok');
@@ -270,10 +273,22 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'lyrics') {
-      const r = await axios.get(`${BASE}/api/lyrics?id=${videoId}&title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`, {
-        headers: browserHeaders, timeout: 20000
-      });
-      return res.status(200).json(r.data);
+      try {
+        const r = await axios.get(`${BASE}/api/lyrics?id=${videoId}&title=${encodeURIComponent(title)}&artist=${encodeURIComponent(artist)}`, {
+          headers: browserHeaders, timeout: 20000
+        });
+        if (r.data) return res.status(200).json(r.data);
+      } catch (e) {
+        console.log('[ytmusic] lyrics error:', e.message);
+      }
+      
+      // Backup lirik pakai Musicfyrik
+      try {
+        const l = await musicfyrik.lyrics(videoId, artist);
+        return res.status(200).json({ status: true, result: { lyrics: l } });
+      } catch (err) {
+        return res.status(200).json({ status: false, message: 'Lirik tidak ditemukan' });
+      }
     }
 
     return res.status(400).json({ status: false, message: 'Action invalid' });
