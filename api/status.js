@@ -39,16 +39,15 @@ const SERVICES = [
   },
   {
     id: 'nanz',
-    name: 'Nanz Music',
-    label: 'Music & Lyrics (cadangan)',
+    name: 'Naa Music',
+    label: 'Music & Lyrics',
     check: async () => {
-      const r = await axios.get('https://nanzmusify-updated.netlify.app/api/search', {
-        params: { query: 'test', type: 'songs' },
+      const r = await axios.get('https://naa-music.vercel.app/health', {
         timeout: 15000,
         validateStatus: () => true,
         headers: { 'User-Agent': 'Mozilla/5.0' }
       });
-      return r.status === 200 && !!(r.data && r.data.result);
+      return r.status === 200;
     }
   },
   {
