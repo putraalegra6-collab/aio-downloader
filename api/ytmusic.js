@@ -1,5 +1,6 @@
 const axios = require('axios');
 const nanz = require('../lib/nanz');
+const musicfyrik = require('../lib/musicfyrik'); // <-- TAMBAHAN PENYELAMAT
 const BASE = 'https://musicaly.maspaizz.web.id';
 const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
@@ -13,7 +14,6 @@ const browserHeaders = {
   'Referer': BASE + '/'
 };
 
-// Hasil: 'ok' (file audio), 'bad' (pasti bukan audio, mis. halaman web), 'unknown' (tidak bisa dicek)
 async function isPlayableAudio(url) {
   try {
     const r = await axios.get(url, {
@@ -34,7 +34,6 @@ async function isPlayableAudio(url) {
   }
 }
 
-// Kumpulkan kandidat link audio dari dua sumber (paralel)
 async function getCandidates(videoId) {
   const musicaly = axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
     headers: browserHeaders, timeout: 10000, validateStatus: () => true
@@ -79,7 +78,6 @@ function fmtDur(d) {
   return d || null;
 }
 
-// Sumber audio untuk play: NanzMusify saja (Musicaly dan Jerexd tidak dipakai saat memutar)
 async function getNanzCandidates(videoId) {
   try {
     const x = await Promise.race([
@@ -94,7 +92,6 @@ async function getNanzCandidates(videoId) {
   }
 }
 
-// Cadangan kedua untuk play: Musicaly (Jerexd tidak dipakai)
 async function getMusicalyCandidate(videoId) {
   try {
     const r = await axios.post(`${BASE}/api/ytplay`, { query: videoId }, {
@@ -109,9 +106,24 @@ async function getMusicalyCandidate(videoId) {
   }
 }
 
+// ==========================================
+// TAMBAHAN: Fungsi Musicfyrik buat Play
+// ==========================================
+async function getMusicfyrikCandidate(videoId) {
+  try {
+    const res = await musicfyrik.play(videoId);
+    const url = res.downloadUrl || res.proxyStreamUrl;
+    console.log('[ytmusic]', videoId, 'sumber: musicfyrik', url ? 'ada link' : 'tanpa link');
+    return { urls: url ? [url] : [], duration: res.duration || null };
+  } catch (e) {
+    console.log('[ytmusic] musicfyrik error:', e.message);
+    return { urls: [], duration: null };
+  }
+}
+// ==========================================
+
 const NAA = 'https://naa-music.vercel.app';
 
-// Pencarian lewat Naa Music (hasil dipetakan ke bentuk yang dipakai aplikasi)
 async function searchNaa(query) {
   const r = await axios.get(NAA + '/api/search', { params: { q: query }, timeout: 15000, validateStatus: () => true });
   const d = r.data && r.data.data;
@@ -127,7 +139,6 @@ async function searchNaa(query) {
   return { status: true, creator: 'Naa Music', result: { query: query, songs: songs } };
 }
 
-// Link audio langsung dari Naa Music: stream dulu, lalu track sebagai cadangan
 async function getNaaCandidate(videoId) {
   const id = encodeURIComponent(videoId);
   const pick = (u) => {
@@ -179,6 +190,7 @@ module.exports = async (req, res) => {
         return res.status(200).json({ status: false, result: { songs: [] } });
       }
     }
+    
     if (action === 'search') {
       try {
         const nr = await searchNaa(query);
@@ -193,8 +205,10 @@ module.exports = async (req, res) => {
     }
 
     if (action === 'play') {
+      // --- 100% URUTAN ASLI LU ---
       let { urls, duration } = await getNaaCandidate(videoId);
       if (urls.length) return res.status(200).json({ status: true, result: { duration: fmtDur(duration), download: { audio: urls[0] } } });
+      
       if (!urls.length) {
         const nz = await getNanzCandidates(videoId);
         urls = nz.urls;
@@ -205,9 +219,19 @@ module.exports = async (req, res) => {
         urls = m.urls;
         duration = duration || m.duration;
       }
+
+      // --- TAMBAHAN: JURUS PENYELAMAT DARI MUSICFYRIK ---
+      if (!urls.length) {
+        const mf = await getMusicfyrikCandidate(videoId);
+        urls = mf.urls;
+        duration = duration || mf.duration;
+      }
+      // --------------------------------------------------
+
       if (!urls.length) {
         return res.status(200).json({ status: false, message: 'Tidak ada sumber audio untuk lagu ini' });
       }
+      
       const checks = await Promise.all(urls.map((u) => isPlayableAudio(u)));
       console.log('[ytmusic]', videoId, 'kandidat:', urls.length, 'hasil cek:', checks.join(','));
       let pick = checks.indexOf('ok');
