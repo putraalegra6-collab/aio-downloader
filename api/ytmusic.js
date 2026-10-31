@@ -179,6 +179,7 @@ module.exports = async (req, res) => {
 
     if (action === 'play') {
       let { urls, duration } = await getNaaCandidate(videoId);
+      if (urls.length) return res.status(200).json({ status: true, result: { duration: fmtDur(duration), download: { audio: urls[0] } } });
       if (!urls.length) {
         const nz = await getNanzCandidates(videoId);
         urls = nz.urls;
