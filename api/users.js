@@ -25,14 +25,34 @@ module.exports = async (req, res) => {
     }
 
     if (req.method === 'GET' && q.id) {
-      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av,
+      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av, last_seen,
         (verified OR LOWER(username) = ${OWNER}) AS verified FROM users WHERE id = ${Number(q.id)}`;
       if (!rows[0]) return res.status(404).json({ error: 'User tidak ditemukan' });
       return res.status(200).json(rows[0]);
     }
 
+    if (req.method === 'GET' && q.chats !== undefined) {
+      const rows = await sql`SELECT u.id, u.username, u.bio, (u.avatar IS NOT NULL) AS has_avatar, u.avatar_v AS av, u.last_seen,
+          (u.verified OR LOWER(u.username) = ${OWNER}) AS verified, MAX(m.id) AS last_id
+        FROM messages m
+        JOIN users u ON u.id = (CASE WHEN m.user_id = ${me.id} THEN m.to_user ELSE m.user_id END)
+        WHERE m.to_user IS NOT NULL AND (m.user_id = ${me.id} OR m.to_user = ${me.id})
+          AND m.id > COALESCE((SELECT c.last_id FROM chat_clear c WHERE c.user_id = ${me.id} AND c.peer_id = u.id), 0)
+        GROUP BY u.id
+        ORDER BY last_id DESC LIMIT 200`;
+      return res.status(200).json({ users: rows });
+    }
+
+    if (req.method === 'GET' && q.q !== undefined) {
+      const term = '%' + String(q.q).toLowerCase().replace(/[%_\\]/g, '') + '%';
+      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av, last_seen,
+          (verified OR LOWER(username) = ${OWNER}) AS verified
+        FROM users WHERE id <> ${me.id} AND LOWER(username) LIKE ${term} ORDER BY LOWER(username) LIMIT 50`;
+      return res.status(200).json({ users: rows });
+    }
+
     if (req.method === 'GET') {
-      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av,
+      const rows = await sql`SELECT id, username, bio, (avatar IS NOT NULL) AS has_avatar, avatar_v AS av, last_seen,
         (verified OR LOWER(username) = ${OWNER}) AS verified
         FROM users WHERE id <> ${me.id} ORDER BY LOWER(username) LIMIT 500`;
       return res.status(200).json({ users: rows });
