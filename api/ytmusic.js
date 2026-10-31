@@ -1,6 +1,6 @@
 const axios = require('axios');
 const nanz = require('../lib/nanz');
-const BASE = 'https://musicaly.maspaizz.web.id';
+const BASE = 'https://musicfyrik.web.id';
 const JEREXD_KEY = process.env.JEREXD_KEY || 's2tQZgBEIaX4t3K7';
 const UA = 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Mobile Safari/537.36';
 
